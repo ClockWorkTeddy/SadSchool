@@ -1,0 +1,49 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - SadSchool</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+</head>
+<body>
+    <div class="row">
+        <div class="col-12" style="align-items: top;">
+            <hr class="hr" />
+        </div>
+    </div>
+    <div class="container-fluid">
+        <div class="row" style="margin-top:7px">
+            <div class="col-2">
+            </div>
+            <div class="col-8">
+                <h1 class="text-center my-h1 display-1">WHY SO SAD?</h1>
+            </div>
+            <div class="col-2 d-flex align-items-center justify-content-center">
+                <div class="d-flex justify-content-center">
+                    <a class="btn btn-v btn-v-main"
+                       href=""
+                       role="button"
+                       style="display: flex; align-items: center; justify-content: center;">
+                        Let me in
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="footer text-muted">
+        
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

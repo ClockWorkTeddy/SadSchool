@@ -1,0 +1,107 @@
+:root {
+  --color1: #13141a;
+  --color2: #70717d;
+  --color3: #5dd15d;
+  --pagewidth: 800px;
+
+  --width: 200px;
+  --radius: var(--width);
+}
+
+body {
+  background-color: var(--color1);
+  min-height: 100%;
+}
+
+footer {
+  background: var(--color1);
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  /* Высота footer */
+  height: 300px;
+}
+
+.my-h1 {
+  font-size: 110px; 
+}
+
+.my-h2 {
+  font-size: 60px;
+}
+
+.hr {
+  height: 2px;
+  background: var(--color2);
+  margin-top: 0px;
+}
+
+.text-center{
+  color: var(--color2);
+}
+
+.text-center:hover {
+  color: var(--color3);
+}
+
+.btn-v {
+  border-radius: 50px;
+  font-weight: 400;
+  font-size:x-large;
+  border-width: 4px;
+  margin-left: 10px;
+  margin-top: 10px;
+  margin-right: 10px;
+  margin-bottom: 10px;
+  padding-right: 0px;
+  padding-left: 0px;
+  background-color: var(--color1);
+  border-color: var(--color2);
+  color: var(--color2);
+}
+
+.btn-v-main {
+  min-width: 200px;
+  width:var(--width);
+  aspect-ratio: 2/1;
+}
+
+.btn-v-service {
+  min-width: 100px;
+  width: 100px;
+  border-radius: 50px;
+  aspect-ratio: 1/1;
+}
+
+.btn-v:hover {
+  background-color: var(--color1);
+  border-color: var(--color3);
+  color: var(--color3);
+}
+
+.btn-v:active:hover {
+  background-color: var(--color3);
+  border-color: var(--color1);
+  color: var(--color1);
+}
+
+.btn:active {
+  background-color: var(--color3);
+  border-color: var(--color3);
+  color: var(--color3);
+
+}
+
+.forest-house {
+  background-image: url(../pics/src/Mono400.bmp);
+  scale: 75%;
+  width: 400px;
+  height:300px;
+  background-position:center;
+  background-repeat: no-repeat;
+  justify-content: center;
+}
+
+.forest-house:hover {
+  background-image: url(../pics/src/Color400.bmp);
+}
