@@ -13,15 +13,6 @@ body {
   min-height: 100%;
 }
 
-footer {
-  background: var(--color1);
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  /* Высота footer */
-  height: 300px;
-}
-
 .my-h1 {
   font-size: 110px; 
 }
@@ -89,19 +80,29 @@ footer {
   background-color: var(--color3);
   border-color: var(--color3);
   color: var(--color3);
+}
 
+footer {
+    background: var(--color1);
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    /* Высота footer */
+    height: 300px;
 }
 
 .forest-house {
-  background-image: url(../pics/src/Mono400.bmp);
-  scale: 75%;
-  width: 400px;
-  height:300px;
-  background-position:center;
-  background-repeat: no-repeat;
-  justify-content: center;
+    background-image: url(/lib/logo/Mono400.bmp);
+    scale: 75%;
+    width: 400px;
+    height: 300px;
+    min-height: 300px;
+    background-position: center;
+    background-repeat: no-repeat;
+    justify-content: center;
 }
 
-.forest-house:hover {
-  background-image: url(../pics/src/Color400.bmp);
-}
+    .forest-house:hover {
+        background-image: url(/lib/logo/Color400.bmp);
+    }
+
