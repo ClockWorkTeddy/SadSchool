@@ -6,11 +6,23 @@
     <title>@ViewData["Title"] - SadSchool</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/fontello.css" asp-append-version="true" />
+
 </head>
 <body>
     <div class="container-fluid">
         <div class="row" style="margin-top:7px">
             <div class="col-2">
+                @if(ViewContext.RouteData.Values["action"].ToString() == "About")
+                {
+                    <a class="btn btn-v btn-v-service" 
+                        href="/Home/Index" 
+                        role="button"
+                        style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
+                        <i class="icon-left-open-3" style="margin-top: -2px;
+                                                margin-left: -4px"> </i>  
+                    </a>
+                }
             </div>
             <div class="col-8">
                 <h1 class="text-center my-h1 display-1">WHY SO SAD?</h1>
@@ -27,7 +39,7 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-12" style="align-items: top; margin-top:7px">
+            <div class="col-12" style="margin-top:7px">
                 <hr class="hr" />
             </div>
         </div>
