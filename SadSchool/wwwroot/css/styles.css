@@ -76,10 +76,9 @@ body {
   color: var(--color1);
 }
 
-.btn:active {
-  background-color: var(--color3);
-  border-color: var(--color3);
-  color: var(--color3);
+.btn-v:focus {
+    outline : none;
+    box-shadow: none;
 }
 
 footer {
