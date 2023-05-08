@@ -16,4 +16,6 @@ public partial class Student
     public DateTime? DateOfBirth { get; set; }
 
     public bool? Sex { get; set; }
+
+    public virtual Class Class { get; set; } = null!;
 }

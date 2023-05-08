@@ -9,13 +9,13 @@ public partial class Class
 
     public string Name { get; set; } = null!;
 
-    public int StudentsQuantity { get; set; }
-
     public int? TeacherId { get; set; }
 
     public int? LeaderId { get; set; }
 
     public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+
+    public virtual ICollection<Student> Students { get; set; } = new List<Student>();
 
     public virtual Teacher? Teacher { get; set; }
 }

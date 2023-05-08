@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
-builder.Services.AddDbContext<SadSchoolContext>(options => options.UseSqlServer());
+
+var connStr = "Data Source=.\\sad_school.db";
+builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlite(connStr));
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

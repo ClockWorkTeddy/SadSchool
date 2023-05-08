@@ -27,15 +27,35 @@ public partial class SadSchoolContext : DbContext
 
     public virtual DbSet<Teacher> Teachers { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Data Source=V03\\SQLEXPRESS;Initial Catalog=SadSchool;Integrated Security=True;Connect Timeout=30;Encrypt=False;TrustServerCertificate=False;ApplicationIntent=ReadWrite;MultiSubnetFailover=False;Encrypt=false");
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Mark>(entity =>
+        {
+            entity.ToTable("mark");
+
+            entity.HasKey(_ => _.Id);
+
+            entity.Property(_ => _.Id)
+                  .ValueGeneratedOnAdd()
+                  .HasColumnName("id");
+
+            entity.Property(_ => _.Value)
+                  .HasColumnName("value");
+
+            entity.Property(_ => _.LessonId)
+                  .HasColumnName("lesson_id");
+
+            entity.HasOne(d => d.Lesson).WithMany(p => p.Marks)
+                .HasForeignKey(d => d.LessonId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_mark_lesson");
+        });
+
         modelBuilder.Entity<Class>(entity =>
         {
             entity.ToTable("class");
+
+            entity.HasKey(c => c.Id);
 
             entity.Property(e => e.Id)
                 .ValueGeneratedNever()
@@ -44,7 +64,6 @@ public partial class SadSchoolContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(10)
                 .HasColumnName("name");
-            entity.Property(e => e.StudentsQuantity).HasColumnName("students_quantity");
             entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
 
             entity.HasOne(d => d.Teacher).WithMany(p => p.Classes)
@@ -97,15 +116,15 @@ public partial class SadSchoolContext : DbContext
 
         modelBuilder.Entity<Student>(entity =>
         {
-            entity
-                .HasNoKey()
-                .ToTable("student");
+            entity.ToTable("student");
 
+            entity.Property(e => e.Id)
+                .ValueGeneratedNever()
+                .HasColumnName("id");
             entity.Property(e => e.ClassId).HasColumnName("class_id");
             entity.Property(e => e.DateOfBirth)
                 .HasColumnType("date")
                 .HasColumnName("date_of_birth");
-            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.LastName)
                 .HasMaxLength(30)
                 .HasColumnName("last_name");
@@ -113,6 +132,11 @@ public partial class SadSchoolContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("name");
             entity.Property(e => e.Sex).HasColumnName("sex");
+
+            entity.HasOne(d => d.Class).WithMany(p => p.Students)
+                .HasForeignKey(d => d.ClassId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_student_class");
         });
 
         modelBuilder.Entity<Subject>(entity =>

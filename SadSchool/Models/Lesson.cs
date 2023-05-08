@@ -15,6 +15,8 @@ public partial class Lesson
 
     public int TeacherId { get; set; }
 
+    public DateTime Date { get; set; }
+
     public virtual Class Class { get; set; } = null!;
 
     public virtual SchedulePosition ScheduledPosition { get; set; } = null!;
@@ -22,4 +24,6 @@ public partial class Lesson
     public virtual Subject Subject { get; set; } = null!;
 
     public virtual Teacher Teacher { get; set; } = null!;
+
+    public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 }

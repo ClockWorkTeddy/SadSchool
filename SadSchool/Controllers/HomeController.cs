@@ -7,7 +7,8 @@ namespace SadSchool.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        SadSchoolContext _context;
+        private readonly SadSchoolContext _context;
+
         public HomeController(ILogger<HomeController> logger, SadSchoolContext context)
         {
             _logger = logger;
@@ -21,7 +22,14 @@ namespace SadSchool.Controllers
 
         public IActionResult About()
         {
-            return View(_context.SchedulePositions.ToList());
+            try
+            {
+                return View(_context);
+            }
+            catch(Exception ex)
+            {
+                return View(ex.Message);
+            }
         }
 
         public IActionResult Privacy()

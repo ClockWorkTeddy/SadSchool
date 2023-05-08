@@ -1,4 +1,4 @@
-﻿@model List<SchedulePosition>
+﻿@model SadSchoolContext
 
 <!DOCTYPE html>
 <html lang="en">
@@ -16,10 +16,11 @@
         <div class="row" style="justify-content: center;">
             <div class="col-12" style="max-width: 800px; margin-top:30px">
                 <div class="text-center" style="padding: 0px; font-size:18px;">
-                    All work and no play makes Jack a dull boy. @Model.Count All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy.
                     All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy.
                     All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy.
                     All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy.
+                    All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy. All work and no play makes Jack a dull boy.
+                    There are @Model.Subjects.ToList()[1].Name lessons today.
                 </div>
             </div>
         </div>
