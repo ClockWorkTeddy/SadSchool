@@ -1,0 +1,7 @@
+﻿1. Add IdentityAuth
+	1. Add Identity
+	2. Add AuthDB
+	3. Add Admin and User
+2. Add Crud operations
+
+
