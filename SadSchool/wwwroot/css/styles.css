@@ -17,8 +17,9 @@ body {
   font-size: 110px; 
 }
 
-.my-h2 {
-  font-size: 60px;
+.my-account-name {
+  font-size: 25px;
+  font-weight:400;
 }
 
 .hr {
@@ -38,7 +39,7 @@ body {
 .btn-v {
   border-radius: 50px;
   font-weight: 400;
-  font-size:x-large;
+  font-size:25px;
   border-width: 4px;
   margin-left: 10px;
   margin-top: 10px;

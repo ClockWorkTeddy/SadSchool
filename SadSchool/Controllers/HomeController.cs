@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SadSchool.Models;
+using SadSchool.Services;
+using SadSchool.ViewModels;
 using System.Diagnostics;
 
 namespace SadSchool.Controllers
@@ -8,11 +10,15 @@ namespace SadSchool.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly SadSchoolContext _context;
+        private readonly ILoginDisplay _loginDisplay;
 
-        public HomeController(ILogger<HomeController> logger, SadSchoolContext context)
+
+        public HomeController(ILogger<HomeController> logger, SadSchoolContext context,
+                                             ILoginDisplay loginDisplay)
         {
             _logger = logger;
             _context = context;
+            _loginDisplay = loginDisplay;
         }
 
         public IActionResult Index()
@@ -24,7 +30,7 @@ namespace SadSchool.Controllers
         {
             try
             {
-                return View(_context);
+                return View();
             }
             catch(Exception ex)
             {

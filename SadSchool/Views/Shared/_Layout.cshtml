@@ -6,20 +6,20 @@
     <title>@ViewData["Title"] - SadSchool</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/styles.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/fontello.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/icons.css" asp-append-version="true" />
 
 </head>
 <body>
     <div class="container-fluid">
-        <div class="row" style="margin-top:7px">
+        <div class="row">
             <div class="col-2">
                 @if(ViewContext.RouteData.Values["action"].ToString() == "About")
                 {
                     <a class="btn btn-v btn-v-service" 
                         href="/Home/Index" 
                         role="button"
-                        style="display: flex; align-items: center; justify-content: center; margin-top: 20px;">
-                        <i class="icon-left-open-3" style="margin-top: -2px;
+                   style="display: flex; align-items: center; justify-content: center; margin-top: 20px;font-size:28px">
+                        <i class="icon-back" style="margin-top: -2px;
                                                 margin-left: -4px"> </i>  
                     </a>
                 }
@@ -27,19 +27,23 @@
             <div class="col-8">
                 <h1 class="text-center my-h1 display-1">WHY SO SAD?</h1>
             </div>
-            <div class="col-2 d-flex align-items-center justify-content-center">
-                <div class="d-flex justify-content-center">
-                    <a class="btn btn-v btn-v-main"
-                       href=""
-                       role="button"
-                       style="display: flex; align-items: center; justify-content: center;">
-                        Let me in
-                    </a>
+            <div class="col-2" style="display:flex;">
+                <div class="container" style="display:flex; align-items:center; justify-content: flex-end;padding-top:2px">
+                    <div class = "row">
+                        @if (!User.Identity.IsAuthenticated)
+                        {
+                            <partial name="~/Views/Account/_PartialLogIn.cshtml" />
+                        }
+                        else
+                        {
+                            <partial name="~/Views/Account/_PartialLogOut.cshtml" />
+                        }
+                    </div>
                 </div>
             </div>
         </div>
         <div class="row">
-            <div class="col-12" style="margin-top:7px">
+            <div class="col-12">
                 <hr class="hr" />
             </div>
         </div>
