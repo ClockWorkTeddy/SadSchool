@@ -1,9 +1,5 @@
-﻿1. Add IdentityAuth
-	1. Add Identity
-		1. AddContext.
-		2. 
-	2. Add AuthDB
-	3. Add Admin and User
-2. Add Crud operations
+﻿1. Add Stuff button
+	1. Add Stuff Controller
+	2. Add Stuff actions.
 
 

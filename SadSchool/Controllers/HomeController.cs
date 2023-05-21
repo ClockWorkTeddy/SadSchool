@@ -38,6 +38,19 @@ namespace SadSchool.Controllers
             }
         }
 
+        public IActionResult Data()
+        {
+            try
+            {
+                return View();
+            }
+            catch (Exception ex)
+            {
+                return View(ex.Message);
+            }
+        }
+
+
         public IActionResult Privacy()
         {
             return View();
