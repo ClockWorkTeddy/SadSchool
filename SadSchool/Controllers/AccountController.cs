@@ -81,7 +81,7 @@ namespace SadSchool.Controllers
                 if (result.Succeeded)
                     return RedirectToAction("Index", "Home");
                 else
-                    ModelState.AddModelError("", "Неправильный логин и (или) пароль");
+                    ModelState.AddModelError("Password", "Think twice, little friend.");
             }
 
             return View(model);

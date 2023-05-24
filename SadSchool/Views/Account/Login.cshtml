@@ -1,19 +1,36 @@
 ﻿@model SadSchool.ViewModels.LoginViewModel
+<body>
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="text-center" style="color:orange; font-size:24px; font-weight:300">Think twice, little friend</div>
+    }     
+    else
+    {
+        <div class="text-center my-h3">
+            It's time to remeber ur password
+        </div>
+    }
 
-<h2>Вход в приложение</h2>
-<form method="post" asp-controller="Account" asp-action="Login">
-    <div asp-validation-summary="ModelOnly"></div>
-    <div>
-        <label asp-for="UserName"></label><br />
-        <input asp-for="UserName" />
-        <span asp-validation-for="UserName"></span>
-    </div>
-    <div>
-        <label asp-for="Password"></label><br />
-        <input asp-for="Password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div>
-        <input type="submit" value="Enter The Void" />
-    </div>
-</form>
+    <form method="post" asp-controller="Account" asp-action="Login">
+        <div class="container" style="display:flex; flex-direction:row; align-items: center">
+            <div class="col-3">
+            </div>
+            <div class="col-3">
+                <div class="row" style="margin:7px; justify-content:flex-end">
+                    <input asp-for="UserName" class="input-my" />
+                    <span asp-validation-for="UserName"></span>
+                </div>
+                <div class="row" style="margin:7px; justify-content:flex-end">
+                    <input asp-for="Password" class="input-my" />
+                </div>
+            </div>
+            <div class="col-3 d-flex" style="align-items:center">
+                <div>
+                    <input type="submit" value="Enter The Void" class="btn btn-v btn-v-main"/>
+                </div>
+            </div>
+            <div class="col-3">
+            </div>
+        </div>
+    </form>
+</body>

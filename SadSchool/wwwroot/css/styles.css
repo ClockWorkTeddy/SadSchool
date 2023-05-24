@@ -17,6 +17,10 @@ body {
   font-size: 110px; 
 }
 
+.my-h3 {
+    font-size: 30px;
+}
+
 .my-account-name {
   font-size: 25px;
   font-weight:400;
@@ -102,7 +106,32 @@ footer {
     justify-content: center;
 }
 
-    .forest-house:hover {
-        background-image: url(/lib/logo/Color400.bmp);
-    }
+.forest-house:hover {
+    background-image: url(/lib/logo/Color400.bmp);
+}
+
+.input-my {
+    height:50px;
+    border-radius:25px;
+    border-width:3px;
+    width:210px;
+    border-color: var(--color2);
+    border-image:none;
+    border-style:solid;
+    color: var(--color2);
+    background: var(--color1);
+    font-weight:600;
+    font-size: 22px;
+    padding-bottom:3px;
+}
+
+.input-my:hover {
+    border-color : var(--color3);
+    color: var(--color3);
+}
+
+.input-my:active {
+    border-color: var(--color3);
+    color: var(--color3);
+}
 
