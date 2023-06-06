@@ -2,11 +2,11 @@
 <body>
     @if (!ViewData.ModelState.IsValid)
     {
-        <div class="text-center" style="color:orange; font-size:24px; font-weight:300">Think twice, little friend</div>
+        <div class="text-center-sad" style="color:orange; font-size:24px; font-weight:300">Think twice, little friend</div>
     }     
     else
     {
-        <div class="text-center my-h3">
+        <div class="text-center blinker-sad h3-sad">
             It's time to remeber ur password
         </div>
     }
@@ -17,16 +17,16 @@
             </div>
             <div class="col-3">
                 <div class="row" style="margin:7px; justify-content:flex-end">
-                    <input asp-for="UserName" class="input-my" />
+                    <input asp-for="UserName" class="input-sad blinker-sad" />
                     <span asp-validation-for="UserName"></span>
                 </div>
                 <div class="row" style="margin:7px; justify-content:flex-end">
-                    <input asp-for="Password" class="input-my" />
+                    <input asp-for="Password" class="input-sad blinker-sad" />
                 </div>
             </div>
             <div class="col-3 d-flex" style="align-items:center">
                 <div>
-                    <input type="submit" value="Enter The Void" class="btn btn-v btn-v-main"/>
+                    <input type="submit" value="Enter The Void" class="btn btn-sad btn-main-sad blinker-sad" />
                 </div>
             </div>
             <div class="col-3">

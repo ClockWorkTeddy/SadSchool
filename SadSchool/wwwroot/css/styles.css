@@ -4,86 +4,13 @@
   --color3: #5dd15d;
   --pagewidth: 800px;
 
-  --width: 200px;
+  --height: 100px;
   --radius: var(--width);
 }
 
 body {
   background-color: var(--color1);
   min-height: 100%;
-}
-
-.my-h1 {
-  font-size: 110px; 
-}
-
-.my-h3 {
-    font-size: 30px;
-}
-
-.my-account-name {
-  font-size: 25px;
-  font-weight:400;
-}
-
-.hr {
-  height: 2px;
-  background: var(--color2);
-  margin-top: 0px;
-}
-
-.text-center{
-  color: var(--color2);
-}
-
-.text-center:hover {
-  color: var(--color3);
-}
-
-.btn-v {
-  border-radius: 50px;
-  font-weight: 400;
-  font-size:25px;
-  border-width: 4px;
-  margin-left: 10px;
-  margin-top: 10px;
-  margin-right: 10px;
-  margin-bottom: 10px;
-  padding-right: 0px;
-  padding-left: 0px;
-  background-color: var(--color1);
-  border-color: var(--color2);
-  color: var(--color2);
-}
-
-.btn-v-main {
-  min-width: 200px;
-  width:var(--width);
-  aspect-ratio: 2/1;
-}
-
-.btn-v-service {
-  min-width: 100px;
-  width: 100px;
-  border-radius: 50px;
-  aspect-ratio: 1/1;
-}
-
-.btn-v:hover {
-  background-color: var(--color1);
-  border-color: var(--color3);
-  color: var(--color3);
-}
-
-.btn-v:active:hover {
-  background-color: var(--color3);
-  border-color: var(--color1);
-  color: var(--color1);
-}
-
-.btn-v:focus {
-    outline : none;
-    box-shadow: none;
 }
 
 footer {
@@ -93,6 +20,44 @@ footer {
     width: 100%;
     /* Высота footer */
     height: 300px;
+}
+
+.blinker-sad {
+    background-color: var(--color1);
+    border-color: var(--color2);
+    color: var(--color2);
+}
+
+.blinker-sad:hover {
+    background-color: var(--color1);
+    border-color: var(--color3);
+    color: var(--color3);
+}
+
+.btn-sad {
+    border-radius: 50px;
+    font-size: 25px;
+    border-width: 4px;
+    height: var(--height);
+}
+
+.btn-sad:active:hover {
+    background-color: var(--color3);
+    border-color: var(--color1);
+    color: var(--color1);
+}
+
+.btn-sad:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+.btn-main-sad {
+    aspect-ratio: 2/1;
+}
+
+.btn-sub-service-sad {
+    aspect-ratio: 1/1;
 }
 
 .forest-house {
@@ -110,28 +75,29 @@ footer {
     background-image: url(/lib/logo/Color400.bmp);
 }
 
-.input-my {
+.h1-sad {
+  font-size: 110px; 
+  font-weight: 100;
+}
+
+.h3-sad {
+    font-size: 25px;
+}
+
+.hr-sad {
+  height: 2px;
+  background: var(--color2);
+  margin-top: 0px;
+}
+
+.input-sad {
     height:50px;
     border-radius:25px;
     border-width:3px;
-    width:210px;
-    border-color: var(--color2);
+    width:400px;
     border-image:none;
     border-style:solid;
-    color: var(--color2);
-    background: var(--color1);
     font-weight:600;
     font-size: 22px;
     padding-bottom:3px;
 }
-
-.input-my:hover {
-    border-color : var(--color3);
-    color: var(--color3);
-}
-
-.input-my:active {
-    border-color: var(--color3);
-    color: var(--color3);
-}
-
