@@ -8,60 +8,11 @@ namespace SadSchool.Controllers
 {
     public class AccountController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
         private readonly SignInManager<IdentityUser> _signInManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public AccountController(UserManager<IdentityUser> userManager, 
-                                 SignInManager<IdentityUser> signInManager,
-                                 RoleManager<IdentityRole> roleManager)
+        public AccountController(SignInManager<IdentityUser> signInManager)
         {
-            _userManager = userManager;
             _signInManager = signInManager;
-            _roleManager = roleManager;
-        }
-        [HttpGet]
-        public IActionResult Register()
-        {
-            return View();
-        }
-
-        [HttpPost]
-        [Authorize(Roles = "admin")]
-        public async Task<IActionResult> Register(RegisterViewModel model)
-        {
-            if (ModelState.IsValid)
-            {
-                var adminRole = _roleManager.Roles.ToList().Find(_ => _.Name == "admin");
-
-                if (adminRole == null)
-                {
-                    adminRole = new IdentityRole("admin");
-                    await _roleManager.CreateAsync(adminRole);
-                }
-
-                IdentityUser user = new IdentityUser 
-                { 
-                    UserName = model.UserName,
-                };
-                // добавляем пользователя
-                var result = await _userManager.CreateAsync(user, model.Password);
-                if (result.Succeeded)
-                {
-                    await _userManager.AddToRoleAsync(user, "admin");
-                    // установка куки
-                    await _signInManager.SignInAsync(user, false);
-                    return RedirectToAction("Index", "Home");
-                }
-                else
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError(string.Empty, error.Description);
-                    }
-                }
-            }
-            return View(model);
         }
 
         [HttpGet]

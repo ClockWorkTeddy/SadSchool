@@ -37,6 +37,19 @@
                     </a>
                 </div>
             </div>
+            @if(User.IsInRole("admin"))
+            {
+            <div class="row justify-content-center" style="margin-top:30px">
+                <div class="col-12 d-flex justify-content-center">
+                    <a class="btn btn-v btn-v-main"
+                       role="button"
+                       style="display: flex; align-items: center; justify-content: center;"
+                       asp-controller="Stuff" asp-action="Stuff">
+                        Stuff
+                    </a>
+                </div>
+            </div>
+            }
         </div>
     </div>
     <script src="/js/bootstrap.bundle.min.js"></script>

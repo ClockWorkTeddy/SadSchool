@@ -10,15 +10,12 @@ namespace SadSchool.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly SadSchoolContext _context;
-        private readonly ILoginDisplay _loginDisplay;
 
 
-        public HomeController(ILogger<HomeController> logger, SadSchoolContext context,
-                                             ILoginDisplay loginDisplay)
+        public HomeController(ILogger<HomeController> logger, SadSchoolContext context)
         {
             _logger = logger;
             _context = context;
-            _loginDisplay = loginDisplay;
         }
 
         public IActionResult Index()

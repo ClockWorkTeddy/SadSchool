@@ -1,8 +1,19 @@
 ﻿using System.ComponentModel.DataAnnotations;
 namespace SadSchool.ViewModels
 {
+    public enum Roles
+    {
+        admin,
+        moder,
+        user
+    }
+
     public class RegisterViewModel
     {
+        [Required]
+        [Display(Name = "Role")]
+        public Roles Role { get; set; }
+
         [Required]
         [Display(Name = "Username")]
         public string UserName { get; set; }
@@ -17,5 +28,7 @@ namespace SadSchool.ViewModels
         [DataType(DataType.Password)]
         [Display(Name = "Password confirm")]
         public string PasswordConfirm { get; set; }
+
+        public List<string> RolesForDisplay { get; set; }
     }
 }
