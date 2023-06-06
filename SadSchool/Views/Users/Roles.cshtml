@@ -21,24 +21,38 @@
                        asp-controller="Users" asp-action="AddRole">Add Role</a>
                 </div>
             </div>
-            <div class="row justify-content-center" style="margin-top:30px">
-                <div class="col-4 justify-content-center">
+            <div class="row" style="margin-top:30px">
+                <div class="col-4">
                     <table class="table">
-                        @foreach (var role in Model)
-                        {
+                        <thead>
                             <tr>
-                                <td>@role.Name</td>
-                                @if (role.Name != "admin" && role.Name != "moder" && role.Name != "user")
-                                {
-                                    <td>
-                                        <form asp-action="DeleteRole" asp-route-id="@role.Id" asp-controller="Users" method="post">
-                                            <button type="submit" class="btn btn-sm btn-sad btn-main-sad blinker-sad">
-                                                Delete
-                                            </button>
-                                        </form>
-                                    </td>
-                                }
+                                <th scope="col" class="h3-sad blinker-sad">#</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Last</th>
                             </tr>
+                        </thead>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var role = Model[i];
+
+                            @if (role.Name != "admin" && role.Name != "moder" && role.Name != "user")
+                            {
+                                <tr>
+                                    <td><div class="h3-sad blinker-sad">@Model.IndexOf(role)</div></td>
+                                    <td>
+                                        <div class="h3-sad blinker-sad">@role.Name</div>
+                                    </td>
+                                    <td>
+                                        <div class="justify-content-end">
+                                            <form asp-action="DeleteRole" asp-route-id="@role.Id" asp-controller="Users" method="post">
+                                                <button type="submit" class="btn btn-service-sad blinker-sad">
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
                         }
                     </table>
                 </div>

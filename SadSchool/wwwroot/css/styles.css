@@ -56,6 +56,13 @@ footer {
     aspect-ratio: 2/1;
 }
 
+.btn-service-sad {
+    aspect-ratio: 2/1;
+    height : 50 px;
+    border-radius: 5px;
+    border-width: 1px;
+}
+
 .btn-sub-service-sad {
     aspect-ratio: 1/1;
 }
