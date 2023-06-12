@@ -1,14 +1,25 @@
 ﻿@model SadSchool.ViewModels.NewRoleViewModel
 
-<h2>Add new Role</h2>
+<div class="text-center blinker-sad h3-sad">
+    Add new Role
+</div>
 <form method="post" asp-controller="Users" asp-action="AddRole">
-    <div asp-validation-summary="ModelOnly"></div>
-    <div>
-        <label asp-for="RoleName"></label><br />
-        <input asp-for="RoleName" />
-        <span asp-validation-for="RoleName"></span>
-    </div>
-    <div>
-        <input type="submit" value="Create" />
+    <div class="container" style="padding-top:30px">
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div class="container d-flex" style="flex-direction:column; align-items:center; text-align:center; margin: 10px;">
+                    <label asp-for="RoleName" style="align-self:center" class="blinker-sad">Role Name</label>
+                    <input asp-for="RoleName" class="input-sad blinker-sad"/>
+                    <span asp-validation-for="RoleName"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div>
+                    <input type="submit" value="Create" class="btn btn-sad btn-service-sad blinker-sad"/>
+                </div>
+            </div>
+        </div>
     </div>
 </form>
