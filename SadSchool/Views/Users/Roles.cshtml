@@ -35,27 +35,26 @@
                         {
                             var role = Model[i];
 
-                                <tr>
-                                    <td class="td-sad">
-                                        <div class="blinker-sad">@Model.IndexOf(role)</div>
-                                    </td>
-                                    <td class="td-sad">
-                                        <div class="blinker-sad">@role.Name</div>
-                                    </td>
-                                    <td class="td-btn-sad">
-                                        <div class="justify-content-end">
-                                        @if (role.Name != "admin" && role.Name != "moder" && role.Name != "user")
-                                        {
-
-                                            <form asp-action="DeleteRole" asp-route-id="@role.Id" asp-controller="Users" method="post">
+                            <tr>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@Model.IndexOf(role)</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@role.Name</div>
+                                </td>
+                                <td class="td-sad">
+                                    @if (role.Name != "admin" && role.Name != "moder" && role.Name != "user")
+                                    {
+                                        <form asp-action="DeleteRole" asp-route-id="@role.Id" asp-controller="Users" method="post">
+                                            <div class="d-flex justify-content-center">
                                                 <button type="submit" class="btn btn-sad btn-service-sad blinker-sad">
                                                     Delete
                                                 </button>
-                                            </form>
-                                        }
-                                        </div>
-                                    </td>
-                                </tr>
+                                            </div>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
                         }
                     </table>
                 </div>

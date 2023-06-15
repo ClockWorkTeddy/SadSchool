@@ -12,7 +12,7 @@ namespace SadSchool.ViewModels
     {
         [Required]
         [Display(Name = "Role")]
-        public Roles Role { get; set; }
+        public string RoleName { get; set; }
 
         [Required]
         [Display(Name = "Username")]
@@ -29,6 +29,6 @@ namespace SadSchool.ViewModels
         [Display(Name = "Password confirm")]
         public string PasswordConfirm { get; set; }
 
-        public List<string> RolesForDisplay { get; set; }
+        public List<string>? RolesForDisplay { get; set; }
     }
 }

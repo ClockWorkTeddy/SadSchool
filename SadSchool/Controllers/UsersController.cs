@@ -25,7 +25,8 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Register()
         {
-            return View(new RegisterViewModel() { RolesForDisplay = GetRolesForDisplay() });
+            return View("~/Views/Account/Register.cshtml", 
+                        new RegisterViewModel() { RolesForDisplay = GetRolesForDisplay() });
         }
 
         private List<string> GetRolesForDisplay()
@@ -36,10 +37,12 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        [Authorize(Roles = "admin")]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            var roleName = model.Role.ToString();
+            if (!(User.Identity.IsAuthenticated && User.IsInRole("admin")))
+                return View("Index");
+
+            var roleName = model.RoleName;
 
             if (ModelState.IsValid)
             {
@@ -124,9 +127,45 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Users()
         {
-            var users = _context.Users.ToList();
+            var usersViewModel = GetUsersListForView();
 
-            return View("~/Views/Stuff/Users.cshtml", users);
+            return View("~/Views/Stuff/Users.cshtml", usersViewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteUser(string id)
+        {
+            var user = _context.Users.First(_ => _.Id == id);
+
+            if (user != null)
+            {
+                var result = await _userManager.DeleteAsync(user);
+
+                if (result.Succeeded)
+                    return RedirectToAction("Users", "Users");
+                else
+                    foreach (var error in result.Errors)
+                        ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            return RedirectToAction("Users", "Users");
+        }
+
+        private List<UsersViewModel> GetUsersListForView()
+        {
+            List<UsersViewModel> result = new List<UsersViewModel>();
+
+            foreach (var user in _context.Users)
+            {
+                result.Add(new UsersViewModel()
+                {
+                    Id = user.Id,
+                    UserName = user.UserName,
+                    Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault()!.ToString()
+                });
+            }
+
+            return result;
         }
     }
 }

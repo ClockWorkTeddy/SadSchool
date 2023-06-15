@@ -1,4 +1,4 @@
-﻿@model List<Microsoft.AspNetCore.Identity.IdentityUser>
+﻿@model List<SadSchool.ViewModels.UsersViewModel>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -13,14 +13,14 @@
 <body>
     <div class="container-fluid">
         <div class="container" style="max-width: 800px;">
-            <div class="row justify-content-center" style="margin-top:30px">
-                <div class="col-6">
+            <div class="row" style="margin-top:30px">
+                <div class="col-6 d-flex justify-content-end">
                     <a class="btn btn-sad btn-main-sad blinker-sad"
                        role="button"
                        style="display: flex; align-items: center; justify-content: center;"
                        asp-controller="Users" asp-action="Register">Add User</a>
                 </div>
-                <div class="col-6">
+                <div class="col-6 d-flex justify-content-start">
                     <a class="btn btn-sad btn-main-sad blinker-sad"
                        role="button"
                        style="display: flex; align-items: center; justify-content: center;"
@@ -28,11 +28,45 @@
                 </div>
             </div>
             <div class="row justify-content-center" style="margin-top:30px">
-                <div class="col-4 d-flex justify-content-center">
-                    @foreach (var user in Model)
-                    {
-                        <div>@user.UserName</div>
-                    }
+                <div class="col-10 border border-dark scroll-sad" style="max-height: 300px; padding-top: 13px" ">
+                    <table class="table table-bordered border-dark">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width:100px">#</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">UserName</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Role</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                            </tr>
+                        </thead>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var user = Model[i];
+
+                            <tr>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@Model.IndexOf(user)</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@user.UserName</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@user.Role</div>
+                                </td>
+                                <td class="td-sad">
+                                    @if (user.Role != "admin")
+                                    {
+                                        <form asp-action="DeleteUser" asp-route-id="@user.Id" asp-controller="Users" method="post">
+                                            <div class="d-flex justify-content-center">
+                                                <button type="submit" class="btn btn-sad btn-service-sad blinker-sad">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </form>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </table>
                 </div>
             </div>
         </div>

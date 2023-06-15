@@ -1,34 +1,43 @@
 ﻿@model SadSchool.ViewModels.RegisterViewModel
 
-<h2>Create new User</h2>
-<form method="post" asp-controller="Account" asp-action="Register">
-    <div asp-validation-summary="ModelOnly"></div>
-    <div>
-        <label asp-for="Role"></label><br />
-        <select asp-for="Role">
-            @foreach (var role in Model.RolesForDisplay)
-            {
-                <option value="@role">@role</option>
-            }
-        </select>
-        <span asp-validation-for="Role"></span>
-    </div>
-    <div>
-        <label asp-for="UserName"></label><br />
-        <input asp-for="UserName" />
-        <span asp-validation-for="UserName"></span>
-    </div>
-    <div>
-        <label asp-for="Password"></label><br />
-        <input asp-for="Password" />
-        <span asp-validation-for="Password"></span>
-    </div>
-    <div>
-        <label asp-for="PasswordConfirm"></label><br />
-        <input asp-for="PasswordConfirm" />
-        <span asp-validation-for="PasswordConfirm"></span>
-    </div>
-    <div>
-        <input type="submit" value="Create" />
+<div class="text-center blinker-sad h3-sad">
+    Add new User
+</div>
+<form method="post" asp-controller="Users" asp-action="Register">
+    <div class="container" style="padding-top:30px">
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div class="container d-flex" style="flex-direction:column; align-items:center; text-align:center; padding-block:10px">
+                    
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="RoleName"></label>
+                    <select asp-for="RoleName" class="input-sad blinker-sad">
+                        @foreach (var role in Model.RolesForDisplay)
+                        {
+                            <option value="@role">@role</option>
+                        }
+                    </select>
+                    <span asp-validation-for="RoleName"></span>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="UserName"></label>
+                    <input asp-for="UserName" class="input-sad blinker-sad" />
+                    <span asp-validation-for="UserName"></span>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Password"></label>
+                    <input asp-for="Password" class="input-sad blinker-sad" />
+                    <span asp-validation-for="Password"></span>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="PasswordConfirm"></label>
+                    <input asp-for="PasswordConfirm" class="input-sad blinker-sad" />
+                    <span asp-validation-for="PasswordConfirm"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div>
+                    <input type="submit" value="Create" class="btn btn-sad btn-service-sad blinker-sad" />
+                </div>
+            </div>
+        </div>
     </div>
 </form>

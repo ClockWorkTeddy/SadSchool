@@ -15,7 +15,13 @@ var connStrAuth = "Data Source=.\\auth.db";
 builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlite(connStrSad));
 builder.Services.AddDbContext<AuthDbContext>(_ => _.UseSqlite(connStrAuth));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>().AddEntityFrameworkStores<AuthDbContext>();
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
+    opts.Password.RequiredLength = 1;  
+    opts.Password.RequireNonAlphanumeric = false;
+    opts.Password.RequireLowercase = false; 
+    opts.Password.RequireUppercase = false; 
+    opts.Password.RequireDigit = false; 
+}).AddEntityFrameworkStores<AuthDbContext>();
 
 builder.Services.AddSingleton<ILoginDisplay, LoginDisplayService>();
 
