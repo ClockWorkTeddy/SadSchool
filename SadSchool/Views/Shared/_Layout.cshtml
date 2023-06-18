@@ -16,7 +16,7 @@
                 @if(ViewContext.RouteData.Values["action"].ToString() != "Index")
                 {
                     <a class="btn btn-sad btn-sub-service-sad blinker-sad" 
-                        href="/Home/Index" 
+                        onclick="goBack()" 
                         role="button"
                         style="display: flex; align-items: center; justify-content: center; 
                                margin-top: 20px;font-size:28px">
@@ -67,4 +67,9 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
+<script>
+    function goBack() {
+        window.history.back();
+    }
+</script>
 </html>
