@@ -161,7 +161,7 @@ namespace SadSchool.Controllers
                 {
                     Id = user.Id,
                     UserName = user.UserName,
-                    Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault()!.ToString()
+                    Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault()?.ToString()
                 });
             }
 

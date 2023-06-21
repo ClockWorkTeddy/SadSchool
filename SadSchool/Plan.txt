@@ -1,10 +1,5 @@
-﻿1. Add Stuff button
-	1. Add Stuff Controller
-	2. Add Stuff actions.
-		1. Add Users COntroller.
-		2. Add Users actions.
-			1. Add Roles processing.
-			2. Add service button class.
-		3. Add Users View.
+﻿
+
+		
 
 
