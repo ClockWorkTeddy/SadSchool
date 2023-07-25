@@ -11,7 +11,7 @@ public partial class Teacher
 
     public string? LastName { get; set; }
 
-    public DateTime? DateOfBirth { get; set; }
+    public string? DateOfBirth { get; set; }
 
     public int? Grade { get; set; }
 

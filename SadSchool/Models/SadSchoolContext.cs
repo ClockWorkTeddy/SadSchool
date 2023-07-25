@@ -144,8 +144,7 @@ public partial class SadSchoolContext : DbContext
             entity.ToTable("subject");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
+                  .HasColumnName("id");
             entity.Property(e => e.Name)
                 .HasMaxLength(30)
                 .HasColumnName("name");
@@ -153,21 +152,20 @@ public partial class SadSchoolContext : DbContext
 
         modelBuilder.Entity<Teacher>(entity =>
         {
-            entity.ToTable("teacher");
+            entity.ToTable("Teacher");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
+                  .HasColumnName("Id");
             entity.Property(e => e.DateOfBirth)
                 .HasColumnType("date")
-                .HasColumnName("date_of_birth");
+                .HasColumnName("DateOfBirth");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(20)
-                .HasColumnName("first_name");
-            entity.Property(e => e.Grade).HasColumnName("grade");
+                .HasColumnName("FirstName");
+            entity.Property(e => e.Grade).HasColumnName("Grade");
             entity.Property(e => e.LastName)
                 .HasMaxLength(30)
-                .HasColumnName("last_name");
+                .HasColumnName("LastName");
         });
 
         OnModelCreatingPartial(modelBuilder);

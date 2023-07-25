@@ -1,0 +1,70 @@
+﻿@model List<SadSchool.ViewModels.ClassViewModel>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="container" style="max-width: 800px;">
+            <div class="row" style="margin-top:30px">
+                <div class="col-6 d-flex justify-content-end">
+                    <a class="btn btn-sad btn-main-sad blinker-sad"
+                       role="button"
+                       style="display: flex; align-items: center; justify-content: center;"
+                       asp-controller="Class" asp-action="AddClass">Add Class</a>
+                </div>
+            </div>
+            <div class="row justify-content-center" style="margin-top:30px">
+                <div class="col-10 border border-dark scroll-sad" style="max-height: 300px; padding-top: 13px">
+                    <table class="table table-bordered border-dark">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width:100px">#</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">UserName</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Role</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                            </tr>
+                        </thead>
+                        @for (int i = 0; i < Model.Count; i++)
+                        {
+                            var _class = Model[i];
+
+                            <tr>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@_class.Id</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@_class.Name</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@_class.TeacherId</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@_class.LeaderId</div>
+                                </td>
+                                <td class="td-sad">
+                                    <form asp-action="DeleteUser" asp-route-id="@_class.Id" asp-controller="Users" method="post">
+                                        <div class="d-flex justify-content-center">
+                                            <button type="submit" class="btn btn-sad btn-service-sad blinker-sad">
+                                                Delete
+                                            </button>
+                                        </div>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

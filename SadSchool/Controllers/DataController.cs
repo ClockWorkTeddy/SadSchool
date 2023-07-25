@@ -4,7 +4,7 @@ namespace SadSchool.Controllers
 {
     public class DataController : Controller
     {
-        public IActionResult Index()
+        public IActionResult DataIndex()
         {
             return View(@"~/Views/Data/DataIndex.cshtml");
         }
