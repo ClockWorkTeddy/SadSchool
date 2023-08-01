@@ -1,4 +1,4 @@
-﻿@model List<SadSchool.ViewModels.ClassViewModel>
+﻿@model List<SadSchool.ViewModels.TeacherViewModel>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,7 +18,7 @@
                     <a class="btn btn-sad btn-main-sad blinker-sad"
                        role="button"
                        style="display: flex; align-items: center; justify-content: center;"
-                       asp-controller="Class" asp-action="AddClass">Add Class</a>
+                       asp-controller="Teacher" asp-action="AddTeacher">Add Teacher</a>
                 </div>
             </div>
             <div class="row justify-content-center" style="margin-top:30px">
@@ -28,30 +28,34 @@
                             <tr>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width:100px">#</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Name</th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark">Teacher Name</th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark">Leader Name</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Last Name</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Date of Birth</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Grade</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
                             </tr>
                         </thead>
                         @for (int i = 0; i < Model.Count; i++)
                         {
-                            var classModel = Model[i];
+                            var teacher = Model[i];
 
                             <tr>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@classModel.Id</div>
+                                    <div class="blinker-sad">@teacher.Id</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@classModel.Name</div>
+                                    <div class="blinker-sad">@teacher.Name</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@classModel.Teacher?.FirstName @classModel.Teacher?.LastName</div>
+                                    <div class="blinker-sad">@teacher.LastName</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@classModel.Leader?.Name @classModel.Leader?.LastName</div>
+                                    <div class="blinker-sad">@teacher.DateOfBirth</div>
                                 </td>
                                 <td class="td-sad">
-                                    <form asp-action="DeleteClass" asp-route-id="@classModel.Id" asp-controller="Class" method="post">
+                                    <div class="blinker-sad">@teacher.Grade</div>
+                                </td>
+                                <td class="td-sad">
+                                    <form asp-action="DeleteTeacher" asp-route-id="@teacher.Id" asp-controller="Teacher" method="post">
                                         <div class="d-flex justify-content-center">
                                             <button type="submit" class="btn btn-sad btn-service-sad blinker-sad">
                                                 Delete

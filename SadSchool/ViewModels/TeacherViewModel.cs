@@ -2,7 +2,7 @@
 {
     public class TeacherViewModel
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; } = null!;
         public string? LastName { get; set; }
         public string? DateOfBirth { get; set; }

@@ -58,7 +58,6 @@ public partial class SadSchoolContext : DbContext
             entity.HasKey(c => c.Id);
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
                 .HasColumnName("id");
             entity.Property(e => e.LeaderId).HasColumnName("leader_id");
             entity.Property(e => e.Name)

@@ -1,0 +1,26 @@
+﻿@model SadSchool.ViewModels.SubjectViewModel;
+
+<div class="text-center blinker-sad h3-sad">
+    Add new Teacher
+</div>
+<form method="post" asp-controller="Subject" asp-action="AddSubject">
+    <div class="container" style="padding-top:30px">
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div class="container d-flex" style="flex-direction:column; align-items:center;
+                                                     text-align:center; padding-block:10px">
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Name"></label>
+                    <input asp-for="Name" class="input-sad blinker-sad" />
+                    <span asp-validation-for="Name"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div>
+                    <input type="submit" value="Create" class="btn btn-sad btn-service-sad blinker-sad" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

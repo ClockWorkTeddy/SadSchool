@@ -1,10 +1,11 @@
-﻿namespace SadSchool.ViewModels
+﻿using SadSchool.Models;
+namespace SadSchool.ViewModels
 {
     public class ClassViewModel
     {
-        public int Id { get; set; }
+        public long Id { get; set; }
         public string Name { get; set; }
-        public int? TeacherId { get; set; }
-        public int? LeaderId { get; set; }
+        public Teacher? Teacher { get; set; }
+        public Student? Leader { get; set; } 
     }
 }
