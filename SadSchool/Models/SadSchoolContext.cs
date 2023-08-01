@@ -105,12 +105,11 @@ public partial class SadSchoolContext : DbContext
 
         modelBuilder.Entity<SchedulePosition>(entity =>
         {
-            entity.ToTable("schedule_position");
+            entity.ToTable("SchedulePosition");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
                 .HasColumnName("id");
-            entity.Property(e => e.StartTime).HasColumnName("start_time");
+            entity.Property(e => e.StartTime).HasColumnName("StartTime");
         });
 
         modelBuilder.Entity<Student>(entity =>
