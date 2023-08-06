@@ -1,4 +1,4 @@
-﻿@model List<SadSchool.ViewModels.TeacherViewModel>
+﻿@model List<SadSchool.ViewModels.StudentViewModel>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -18,44 +18,48 @@
                     <a class="btn btn-sad btn-main-sad blinker-sad"
                        role="button"
                        style="display: flex; align-items: center; justify-content: center;"
-                       asp-controller="Teacher" asp-action="AddTeacher">Add Teacher</a>
+                       asp-controller="Student" asp-action="AddStudent">Add Student</a>
                 </div>
             </div>
             <div class="row justify-content-center" style="margin-top:30px">
-                <div class="col-10 border border-dark scroll-sad" style="max-height: 300px; padding-top: 13px">
+                <div class="col-10 border border-dark scroll-sad" style="max-height: 420px; padding-top: 13px">
                     <table class="table table-bordered border-dark">
                         <thead>
                             <tr>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width:100px">#</th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark">Name</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">First Name</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Last Name</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Class</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Date of Birth</th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark">Grade</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Sex</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
                             </tr>
                         </thead>
                         @for (int i = 0; i < Model.Count; i++)
                         {
-                            var teacher = Model[i];
+                            var student = Model[i];
 
                             <tr>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@teacher.Id</div>
+                                    <div class="blinker-sad">@student.Id</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@teacher.Name</div>
+                                    <div class="blinker-sad">@student.FirstName</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@teacher.LastName</div>
+                                    <div class="blinker-sad">@student.LastName</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@teacher.DateOfBirth</div>
+                                    <div class="blinker-sad">@student.ClassName</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@teacher.Grade</div>
+                                    <div class="blinker-sad">@student.DateOfBirth</div>
                                 </td>
                                 <td class="td-sad">
-                                    <form asp-action="DeleteTeacher" asp-route-id="@teacher.Id" asp-controller="Teacher" method="post">
+                                    <div class="blinker-sad">@student.Sex</div>
+                                </td>
+                                <td class="td-sad">
+                                    <form asp-action="DeleteStudent" asp-route-id="@student.Id" asp-controller="Student" method="post">
                                         <div class="d-flex justify-content-center">
                                             <button type="submit" class="btn btn-sad btn-service-sad blinker-sad">
                                                 Delete

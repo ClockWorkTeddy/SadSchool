@@ -13,7 +13,7 @@ public partial class Student
 
     public int ClassId { get; set; }
 
-    public DateTime? DateOfBirth { get; set; }
+    public string? DateOfBirth { get; set; }
 
     public bool? Sex { get; set; }
 

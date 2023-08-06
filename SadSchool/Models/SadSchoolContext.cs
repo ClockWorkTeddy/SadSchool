@@ -117,19 +117,17 @@ public partial class SadSchoolContext : DbContext
             entity.ToTable("student");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.ClassId).HasColumnName("class_id");
+                .HasColumnName("Id");
+            entity.Property(e => e.ClassId).HasColumnName("ClassId");
             entity.Property(e => e.DateOfBirth)
-                .HasColumnType("date")
-                .HasColumnName("date_of_birth");
+                .HasColumnName("DateOfBirth");
             entity.Property(e => e.LastName)
                 .HasMaxLength(30)
-                .HasColumnName("last_name");
+                .HasColumnName("LastName");
             entity.Property(e => e.Name)
                 .HasMaxLength(20)
-                .HasColumnName("name");
-            entity.Property(e => e.Sex).HasColumnName("sex");
+                .HasColumnName("Name");
+            entity.Property(e => e.Sex).HasColumnName("Sex");
 
             entity.HasOne(d => d.Class).WithMany(p => p.Students)
                 .HasForeignKey(d => d.ClassId)
@@ -155,7 +153,6 @@ public partial class SadSchoolContext : DbContext
             entity.Property(e => e.Id)
                   .HasColumnName("Id");
             entity.Property(e => e.DateOfBirth)
-                .HasColumnType("date")
                 .HasColumnName("DateOfBirth");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(20)

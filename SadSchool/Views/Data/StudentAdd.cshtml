@@ -1,17 +1,17 @@
-﻿@model SadSchool.ViewModels.TeacherViewModel;
+﻿@model SadSchool.ViewModels.StudentAddViewModel;
 
 <div class="text-center blinker-sad h3-sad">
     Add new Teacher
 </div>
-<form method="post" asp-controller="Teacher" asp-action="AddTeacher">
+<form method="post" asp-controller="Student" asp-action="AddStudent">
     <div class="container" style="padding-top:30px">
         <div class="row">
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
                 <div class="container d-flex" style="flex-direction:column; align-items:center;
                                                      text-align:center; padding-block:10px">
-                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Name"></label>
-                    <input asp-for="Name" class="input-sad blinker-sad" />
-                    <span asp-validation-for="Name"></span>
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="FirstName"></label>
+                    <input asp-for="FirstName" class="input-sad blinker-sad" />
+                    <span asp-validation-for="FirstName"></span>
 
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="LastName"></label>
                     <input asp-for="LastName" class="input-sad blinker-sad" />
@@ -21,9 +21,20 @@
                     <input asp-for="DateOfBirth" class="input-sad blinker-sad" />
                     <span asp-validation-for="DateOfBirth"></span>
 
-                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Grade"></label>
-                    <input asp-for="Grade" class="input-sad blinker-sad" />
-                    <span asp-validation-for="Grade"></span>
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="ClassId"></label>
+                    <select asp-for="ClassId" class="input-sad blinker-sad">
+                        @foreach (var myClass in Model.ClassesForView)
+                        {
+                            <option value="@myClass.Id">@myClass.Name</option>
+                        }
+                    </select>
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Sex"></label>
+                    <select asp-for="Sex" class="input-sad blinker-sad">
+                        @foreach (var sex in new string[] { "Male", "Female"})
+                        {
+                            <option value="@sex">@sex</option>
+                        }
+                    </select>
                 </div>
             </div>
         </div>
