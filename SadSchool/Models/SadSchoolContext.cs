@@ -27,6 +27,8 @@ public partial class SadSchoolContext : DbContext
 
     public virtual DbSet<Teacher> Teachers { get; set; }
 
+    public virtual DbSet<Mark> Marks { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Mark>(entity =>
@@ -49,6 +51,14 @@ public partial class SadSchoolContext : DbContext
                 .HasForeignKey(d => d.LessonId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_mark_lesson");
+
+            entity.Property(_ => _.StudentId)
+                  .HasColumnName("student_id");
+
+            entity.HasOne(d => d.Student).WithMany(p => p.Marks)
+                .HasForeignKey(d => d.StudentId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_mark_student");
         });
 
         modelBuilder.Entity<Class>(entity =>
@@ -75,12 +85,12 @@ public partial class SadSchoolContext : DbContext
             entity.ToTable("lesson");
 
             entity.Property(e => e.Id)
-                .ValueGeneratedNever()
-                .HasColumnName("id");
-            entity.Property(e => e.ClassId).HasColumnName("class_id");
-            entity.Property(e => e.ScheduledPositionId).HasColumnName("scheduled_position_id");
-            entity.Property(e => e.SubjectId).HasColumnName("subject_id");
-            entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
+                .HasColumnName("Id");
+
+            entity.Property(e => e.ClassId).HasColumnName("ClassId");
+            entity.Property(e => e.ScheduledPositionId).HasColumnName("ScheduledPositionId");
+            entity.Property(e => e.SubjectId).HasColumnName("SubjectId");
+            entity.Property(e => e.TeacherId).HasColumnName("TeacherId");
 
             entity.HasOne(d => d.Class).WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.ClassId)

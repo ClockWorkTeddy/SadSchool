@@ -18,4 +18,6 @@ public partial class Student
     public bool? Sex { get; set; }
 
     public virtual Class Class { get; set; } = null!;
+
+    public virtual ICollection<Mark> Marks { get; set; } = null!;
 }

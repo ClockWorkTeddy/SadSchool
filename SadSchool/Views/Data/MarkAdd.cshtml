@@ -1,0 +1,42 @@
+﻿@model SadSchool.ViewModels.MarkAddViewModel;
+
+<div class="text-center blinker-sad h3-sad">
+    Add new Teacher
+</div>
+<form method="post" asp-controller="Mark" asp-action="AddMark">
+    <div class="container" style="padding-top:30px">
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div class="container d-flex" style="flex-direction:column; align-items:center;
+                                                     text-align:center; padding-block:10px">
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Value"></label>
+                    <input asp-for="Value" class="input-sad blinker-sad" />
+                    <span asp-validation-for="Value"></span>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="StudentId">Class</label>
+                    <select asp-for="StudentId" class="input-sad blinker-sad">
+                        @foreach (var student in Model.StudentsForView)
+                        {
+                            <option value="@student.Id">@student.Name @student.LastName</option>
+                        }
+                    </select>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="LessonId">Subject</label>
+                    <select asp-for="LessonId" class="input-sad blinker-sad">
+                        @foreach (var lesson in Model.LessonsForView)
+                        {
+                            <option value="@lesson.Id">@lesson.Subject.Name @lesson.Date-@lesson.ScheduledPosition.StartTime</option>
+                        }
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div>
+                    <input type="submit" value="Create" class="btn btn-sad btn-service-sad blinker-sad" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

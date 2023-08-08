@@ -15,7 +15,7 @@ public partial class Lesson
 
     public int TeacherId { get; set; }
 
-    public DateTime Date { get; set; }
+    public string Date { get; set; }
 
     public virtual Class Class { get; set; } = null!;
 
