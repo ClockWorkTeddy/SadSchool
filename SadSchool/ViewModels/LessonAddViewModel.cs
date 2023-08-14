@@ -7,7 +7,7 @@ namespace SadSchool.ViewModels
         public List<Class?> ClassesForView { get; set; } = new List<Class?>();
         public List<Subject?> SubjectsForView { get; set; } = new List<Subject?>();
         public List<Teacher?> TeachersForView { get; set; } = new List<Teacher?>();
-        public List<SchedulePosition?> SchedulesForView { get; set; } = new List<SchedulePosition?>();
+        public List<StartTime?> SchedulesForView { get; set; } = new List<StartTime?>();
         public int ClassId { get; set; }
         public int SubjectId { get; set; }
         public int TeacherId { get; set; }

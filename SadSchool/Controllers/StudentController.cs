@@ -24,7 +24,7 @@ namespace SadSchool.Controllers
                 students.Add(new StudentViewModel
                 {
                     Id = student.Id,
-                    FirstName = student.Name,
+                    FirstName = student.FirstName,
                     LastName = student.LastName,
                     DateOfBirth = student.DateOfBirth,
                     Sex = student.Sex.Value ? "Female" : "Male",
@@ -51,7 +51,7 @@ namespace SadSchool.Controllers
             {
                 var student = new Student
                 {
-                    Name = viewModel.FirstName,
+                    FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
                     ClassId = viewModel.ClassId,
                     Class = _context.Classes.Find(viewModel.ClassId),

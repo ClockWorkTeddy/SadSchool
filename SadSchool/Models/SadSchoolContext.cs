@@ -19,7 +19,7 @@ public partial class SadSchoolContext : DbContext
 
     public virtual DbSet<Lesson> Lessons { get; set; }
 
-    public virtual DbSet<SchedulePosition> SchedulePositions { get; set; }
+    public virtual DbSet<StartTime> SchedulePositions { get; set; }
 
     public virtual DbSet<Student> Students { get; set; }
 
@@ -49,7 +49,7 @@ public partial class SadSchoolContext : DbContext
 
             entity.HasOne(d => d.Lesson).WithMany(p => p.Marks)
                 .HasForeignKey(d => d.LessonId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_mark_lesson");
 
             entity.Property(_ => _.StudentId)
@@ -57,7 +57,7 @@ public partial class SadSchoolContext : DbContext
 
             entity.HasOne(d => d.Student).WithMany(p => p.Marks)
                 .HasForeignKey(d => d.StudentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_mark_student");
         });
 
@@ -67,16 +67,15 @@ public partial class SadSchoolContext : DbContext
 
             entity.HasKey(c => c.Id);
 
-            entity.Property(e => e.Id)
-                .HasColumnName("id");
+            entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.LeaderId).HasColumnName("leader_id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(10)
-                .HasColumnName("name");
+            entity.Property(e => e.Name).HasMaxLength(10).HasColumnName("name");
             entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
 
-            entity.HasOne(d => d.Teacher).WithMany(p => p.Classes)
+            entity.HasOne(d => d.Teacher)
+                .WithMany(p => p.Classes)
                 .HasForeignKey(d => d.TeacherId)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_class_teacher");
         });
 
@@ -85,63 +84,59 @@ public partial class SadSchoolContext : DbContext
             entity.ToTable("lesson");
 
             entity.Property(e => e.Id)
-                .HasColumnName("Id");
+                .HasColumnName("id");
 
-            entity.Property(e => e.ClassId).HasColumnName("ClassId");
-            entity.Property(e => e.ScheduledPositionId).HasColumnName("ScheduledPositionId");
-            entity.Property(e => e.SubjectId).HasColumnName("SubjectId");
-            entity.Property(e => e.TeacherId).HasColumnName("TeacherId");
+            entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.ClassId).HasColumnName("class_id");
+            entity.Property(e => e.StartTimeId).HasColumnName("start_time_id");
+            entity.Property(e => e.SubjectId).HasColumnName("subject_id");
+            entity.Property(e => e.TeacherId).HasColumnName("teacher_id");
 
-            entity.HasOne(d => d.Class).WithMany(p => p.Lessons)
+            entity.HasOne(d => d.Class)
+                .WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.ClassId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_lesson_class");
 
             entity.HasOne(d => d.ScheduledPosition).WithMany(p => p.Lessons)
-                .HasForeignKey(d => d.ScheduledPositionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasForeignKey(d => d.StartTimeId)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_lesson_schedule_position");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.SubjectId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_lesson_subject");
 
             entity.HasOne(d => d.Teacher).WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.TeacherId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_lesson_teacher");
         });
 
-        modelBuilder.Entity<SchedulePosition>(entity =>
+        modelBuilder.Entity<StartTime>(entity =>
         {
-            entity.ToTable("SchedulePosition");
+            entity.ToTable("start_time");
 
-            entity.Property(e => e.Id)
-                .HasColumnName("id");
-            entity.Property(e => e.StartTime).HasColumnName("StartTime");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Value).HasColumnName("value");
         });
 
         modelBuilder.Entity<Student>(entity =>
         {
             entity.ToTable("student");
 
-            entity.Property(e => e.Id)
-                .HasColumnName("Id");
-            entity.Property(e => e.ClassId).HasColumnName("ClassId");
-            entity.Property(e => e.DateOfBirth)
-                .HasColumnName("DateOfBirth");
-            entity.Property(e => e.LastName)
-                .HasMaxLength(30)
-                .HasColumnName("LastName");
-            entity.Property(e => e.Name)
-                .HasMaxLength(20)
-                .HasColumnName("Name");
-            entity.Property(e => e.Sex).HasColumnName("Sex");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ClassId).HasColumnName("class_id");
+            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
+            entity.Property(e => e.LastName).HasMaxLength(30).HasColumnName("last_name");
+            entity.Property(e => e.FirstName).HasMaxLength(20).HasColumnName("first_name");
+            entity.Property(e => e.Sex).HasColumnName("sex");
 
-            entity.HasOne(d => d.Class).WithMany(p => p.Students)
+            entity.HasOne(d => d.Class)
+                .WithMany(p => p.Students)
                 .HasForeignKey(d => d.ClassId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
+                .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_student_class");
         });
 
@@ -149,28 +144,19 @@ public partial class SadSchoolContext : DbContext
         {
             entity.ToTable("subject");
 
-            entity.Property(e => e.Id)
-                  .HasColumnName("id");
-            entity.Property(e => e.Name)
-                .HasMaxLength(30)
-                .HasColumnName("name");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name).HasMaxLength(30).HasColumnName("name");
         });
 
         modelBuilder.Entity<Teacher>(entity =>
         {
-            entity.ToTable("Teacher");
+            entity.ToTable("teacher");
 
-            entity.Property(e => e.Id)
-                  .HasColumnName("Id");
-            entity.Property(e => e.DateOfBirth)
-                .HasColumnName("DateOfBirth");
-            entity.Property(e => e.FirstName)
-                .HasMaxLength(20)
-                .HasColumnName("FirstName");
-            entity.Property(e => e.Grade).HasColumnName("Grade");
-            entity.Property(e => e.LastName)
-                .HasMaxLength(30)
-                .HasColumnName("LastName");
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.DateOfBirth).HasColumnName("date_of_birth");
+            entity.Property(e => e.FirstName).HasMaxLength(20).HasColumnName("first_name");
+            entity.Property(e => e.Grade).HasColumnName("grade");
+            entity.Property(e => e.LastName).HasMaxLength(30).HasColumnName("last_name");
         });
 
         OnModelCreatingPartial(modelBuilder);

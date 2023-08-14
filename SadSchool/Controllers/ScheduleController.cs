@@ -23,7 +23,7 @@ namespace SadSchool.Controllers
                 schedules.Add(new ScheduleViewModel
                 {
                     Id = schedule.Id,
-                    StartTime = schedule.StartTime,
+                    StartTime = schedule.Value,
                 });
             }
 
@@ -41,9 +41,9 @@ namespace SadSchool.Controllers
         {
             if (ModelState.IsValid)
             {
-                var schedule = new SchedulePosition
+                var schedule = new StartTime
                 {
-                    StartTime = model.StartTime,
+                    Value = model.StartTime,
                 };
 
                 _context.SchedulePositions.Add(schedule);

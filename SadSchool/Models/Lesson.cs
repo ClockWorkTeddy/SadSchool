@@ -7,7 +7,7 @@ public partial class Lesson
 {
     public int Id { get; set; }
 
-    public int ScheduledPositionId { get; set; }
+    public int StartTimeId { get; set; }
 
     public int SubjectId { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Lesson
 
     public virtual Class Class { get; set; } = null!;
 
-    public virtual SchedulePosition ScheduledPosition { get; set; } = null!;
+    public virtual StartTime ScheduledPosition { get; set; } = null!;
 
     public virtual Subject Subject { get; set; } = null!;
 

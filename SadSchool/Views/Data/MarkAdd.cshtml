@@ -17,17 +17,19 @@
                     <select asp-for="StudentId" class="input-sad blinker-sad">
                         @foreach (var student in Model.StudentsForView)
                         {
-                            <option value="@student.Id">@student.Name @student.LastName</option>
+                            <option value="@student.Id">@student.FirstName @student.LastName</option>
                         }
                     </select>
+                    <span asp-validation-for="LessonId" style="color:orange"></span>
 
-                    <label class="blinker-sad" style="margin-top: 5px" asp-for="LessonId">Subject</label>
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="LessonId">Lesson</label>
                     <select asp-for="LessonId" class="input-sad blinker-sad">
                         @foreach (var lesson in Model.LessonsForView)
                         {
-                            <option value="@lesson.Id">@lesson.Subject.Name @lesson.Date-@lesson.ScheduledPosition.StartTime</option>
+                            <option value="@lesson?.Id">@lesson.Subject.Name @lesson.Date-@lesson.ScheduledPosition.Value</option>
                         }
                     </select>
+                    <span asp-validation-for="LessonId" style="color:orange"></span>
                 </div>
             </div>
         </div>

@@ -1,4 +1,5 @@
 ﻿using SadSchool.Models;
+using System.ComponentModel.DataAnnotations;
 
 namespace SadSchool.ViewModels
 {
@@ -6,8 +7,10 @@ namespace SadSchool.ViewModels
     {
         public List<Student?> StudentsForView { get; set; } = new List<Student?>();
         public List<Lesson?> LessonsForView { get; set; } = new List<Lesson?>();
-        public int StudentId { get; set; }
-        public int LessonId { get; set; }
+        [Required(ErrorMessage = "You have to choose a student!")]
+        public int? StudentId { get; set; }
+        [Required(ErrorMessage = "You have to choose a lesson!")]
+        public int? LessonId { get; set; }
         public string Value { get; set; }
     }
 }

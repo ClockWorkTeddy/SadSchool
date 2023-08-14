@@ -27,7 +27,7 @@ namespace SadSchool.Controllers
                 lessons.Add(new LessonViewModel
                 {
                     Id = lesson.Id,
-                    Starts = lesson?.ScheduledPosition.StartTime,
+                    Starts = lesson?.ScheduledPosition.Value,
                     Subject = lesson?.Subject?.Name,
                     Class = lesson?.Class?.Name,
                     Teacher = $"{lesson.Teacher.FirstName} {lesson.Teacher.LastName}",
@@ -64,7 +64,7 @@ namespace SadSchool.Controllers
                     Subject = _context.Subjects.Find(viewModel.SubjectId),
                     TeacherId = viewModel.TeacherId,
                     Teacher = _context.Teachers.Find(viewModel.TeacherId),
-                    ScheduledPositionId = viewModel.ScheduleId,
+                    StartTimeId = viewModel.ScheduleId,
                     ScheduledPosition = _context.SchedulePositions.Find(viewModel.ScheduleId),
                     Date = viewModel.Date
                 };

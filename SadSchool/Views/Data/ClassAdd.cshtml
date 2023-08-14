@@ -11,7 +11,7 @@
                                                      text-align:center; padding-block:10px">
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="Name"></label>
                     <input asp-for="Name" class="input-sad blinker-sad" />
-                    <span asp-validation-for="Name"></span>
+                    <span asp-validation-for="Name" style="color:orange"></span>
 
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="TeacherId"></label>
                     <select asp-for="TeacherId" class="input-sad blinker-sad">
@@ -20,6 +20,7 @@
                             <option value="@teacher.Id">@teacher.FirstName @teacher.LastName</option>
                         }
                     </select>
+                    <span asp-validation-for="TeacherId" style="color:orange"></span>
                 </div>
             </div>
         </div>

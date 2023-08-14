@@ -30,8 +30,8 @@ namespace SadSchool.Controllers
                 {
                     Id = mark.Id,
                     Value = mark.Value,
-                    Student = $"{mark.Student.Name} {mark.Student.LastName}",
-                    Lesson = $"{mark.Lesson.Subject.Name} {mark.Lesson.Date} {mark.Lesson.ScheduledPosition.StartTime}"
+                    Student = $"{mark.Student.FirstName} {mark.Student.LastName}",
+                    Lesson = $"{mark.Lesson.Subject.Name} {mark.Lesson.Date} {mark.Lesson.ScheduledPosition.Value}"
                 });
             }
 
@@ -64,9 +64,13 @@ namespace SadSchool.Controllers
 
                 _context.Marks.AddAsync(mark);
                 await _context.SaveChangesAsync();
+                return RedirectToAction("Marks");
+            }
+            else
+            {
+                return View(@"~/Views/Data/MarkAdd.cshtml", viewModel);
             }
 
-            return RedirectToAction("Marks");
         }
 
         [HttpPost]

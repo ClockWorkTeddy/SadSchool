@@ -41,7 +41,7 @@
                     <select asp-for="ScheduleId" class="input-sad blinker-sad">
                         @foreach (var scedule in Model.SchedulesForView)
                         {
-                            <option value="@scedule.Id">@scedule.StartTime</option>
+                            <option value="@scedule.Id">@scedule.Value</option>
                         }
                     </select>
                 </div>

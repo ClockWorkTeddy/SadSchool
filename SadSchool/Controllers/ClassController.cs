@@ -60,9 +60,13 @@ namespace SadSchool.Controllers
 
                 _context.Classes.Add(Class);
                 await _context.SaveChangesAsync();
+                return RedirectToAction("Classes");
+            }
+            else
+            {
+                return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
             }
 
-            return RedirectToAction("Classes");
         }
 
         [HttpPost]

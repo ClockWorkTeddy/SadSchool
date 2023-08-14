@@ -22,7 +22,7 @@
                 </div>
             </div>
             <div class="row justify-content-center" style="margin-top:30px">
-                <div class="col-10 border border-dark scroll-sad" style="max-height: 420px; padding-top: 13px">
+                <div class="col-12 border border-dark scroll-sad" style="max-height: 420px; padding-top: 13px">
                     <table class="table table-bordered border-dark">
                         <thead>
                             <tr>
@@ -48,7 +48,7 @@
                                     <div class="blinker-sad">@classModel.Teacher?.FirstName @classModel.Teacher?.LastName</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@classModel.Leader?.Name @classModel.Leader?.LastName</div>
+                                    <div class="blinker-sad">@classModel.Leader?.FirstName @classModel.Leader?.LastName</div>
                                 </td>
                                 <td class="td-sad">
                                     <form asp-action="DeleteClass" asp-route-id="@classModel.Id" asp-controller="Class" method="post">
