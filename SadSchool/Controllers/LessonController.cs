@@ -30,7 +30,7 @@ namespace SadSchool.Controllers
                     Starts = lesson?.ScheduledPosition.Value,
                     Subject = lesson?.Subject?.Name,
                     Class = lesson?.Class?.Name,
-                    Teacher = $"{lesson.Teacher.FirstName} {lesson.Teacher.LastName}",
+                    Teacher = $"{lesson.Teacher?.FirstName} {lesson.Teacher?.LastName}",
                     Date = lesson.Date
                 });
             }

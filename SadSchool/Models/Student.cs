@@ -11,13 +11,13 @@ public partial class Student
 
     public string? LastName { get; set; }
 
-    public int ClassId { get; set; }
+    public int? ClassId { get; set; }
 
     public string? DateOfBirth { get; set; }
 
     public bool? Sex { get; set; }
 
-    public virtual Class Class { get; set; } = null!;
+    public virtual Class? Class { get; set; } = null!;
 
     public virtual ICollection<Mark> Marks { get; set; } = null!;
 }

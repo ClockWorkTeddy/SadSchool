@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SadSchool.Models;
 
@@ -10,9 +11,11 @@ using SadSchool.Models;
 namespace SadSchool.Migrations
 {
     [DbContext(typeof(SadSchoolContext))]
-    partial class SadSchoolContextModelSnapshot : ModelSnapshot
+    [Migration("20230814091322_nullable_calss_student")]
+    partial class nullable_calss_student
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.9");
@@ -52,7 +55,7 @@ namespace SadSchool.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    b.Property<int?>("ClassId")
+                    b.Property<int>("ClassId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("class_id");
 
@@ -61,15 +64,15 @@ namespace SadSchool.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("date");
 
-                    b.Property<int?>("StartTimeId")
+                    b.Property<int>("StartTimeId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("start_time_id");
 
-                    b.Property<int?>("SubjectId")
+                    b.Property<int>("SubjectId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("subject_id");
 
-                    b.Property<int?>("TeacherId")
+                    b.Property<int>("TeacherId")
                         .HasColumnType("INTEGER")
                         .HasColumnName("teacher_id");
 
@@ -235,24 +238,28 @@ namespace SadSchool.Migrations
                         .WithMany("Lessons")
                         .HasForeignKey("ClassId")
                         .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired()
                         .HasConstraintName("FK_lesson_class");
 
                     b.HasOne("SadSchool.Models.StartTime", "ScheduledPosition")
                         .WithMany("Lessons")
                         .HasForeignKey("StartTimeId")
                         .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired()
                         .HasConstraintName("FK_lesson_schedule_position");
 
                     b.HasOne("SadSchool.Models.Subject", "Subject")
                         .WithMany("Lessons")
                         .HasForeignKey("SubjectId")
                         .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired()
                         .HasConstraintName("FK_lesson_subject");
 
                     b.HasOne("SadSchool.Models.Teacher", "Teacher")
                         .WithMany("Lessons")
                         .HasForeignKey("TeacherId")
                         .OnDelete(DeleteBehavior.SetNull)
+                        .IsRequired()
                         .HasConstraintName("FK_lesson_teacher");
 
                     b.Navigation("Class");

@@ -2,6 +2,7 @@
   --color1: #13141a;
   --color2: #70717d;
   --color3: #5dd15d;
+  --color4: #ff0000;
   --pagewidth: 800px;
 
   --height: 100px;
@@ -36,6 +37,19 @@ footer {
     color: var(--color3);
 }
 
+.blinker-danger-sad {
+    background-color: var(--color1);
+    border-color: var(--color4);
+    color: var(--color4);
+}
+
+.blinker-danger-sad:hover {
+    background-color: var(--color1);
+    border-color: var(--color2);
+    color: var(--color2);
+}
+
+
 .border-sad {
     border-color: var(--color2);
     border-width: 4px;
@@ -49,12 +63,6 @@ footer {
     display: flex;
     align-items: center;
     justify-content:center;
-}
-
-.btn-sad:active:hover {
-    background-color: var(--color3);
-    border-color: var(--color1);
-    color: var(--color1);
 }
 
 .btn-sad:focus {

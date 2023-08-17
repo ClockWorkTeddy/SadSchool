@@ -1,3 +1,6 @@
 ﻿1. On the Data page have to be several buttons. 
-	1. The first group of buttons is for mange data in DB.
+	+ 1. The first group of buttons is for mange data in DB.
 	2. The second group is for presenting.
+2. + Clear all the constrains in the DB.
+3. + Chage the color scheme for the bad actions.
+4. Create the "Edit" button for all the data in the DB.

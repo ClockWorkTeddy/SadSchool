@@ -30,8 +30,8 @@ namespace SadSchool.Controllers
                 {
                     Id = mark.Id,
                     Value = mark.Value,
-                    Student = $"{mark.Student.FirstName} {mark.Student.LastName}",
-                    Lesson = $"{mark.Lesson.Subject.Name} {mark.Lesson.Date} {mark.Lesson.ScheduledPosition.Value}"
+                    Student = $"{mark.Student?.FirstName} {mark.Student?.LastName}",
+                    Lesson = $"{mark.Lesson?.Subject.Name} {mark.Lesson?.Date} {mark.Lesson?.ScheduledPosition?.Value}"
                 });
             }
 

@@ -7,23 +7,23 @@ public partial class Lesson
 {
     public int Id { get; set; }
 
-    public int StartTimeId { get; set; }
+    public int? StartTimeId { get; set; }
 
-    public int SubjectId { get; set; }
+    public int? SubjectId { get; set; }
 
-    public int ClassId { get; set; }
+    public int? ClassId { get; set; }
 
-    public int TeacherId { get; set; }
+    public int? TeacherId { get; set; }
 
     public string Date { get; set; }
 
-    public virtual Class Class { get; set; } = null!;
+    public virtual Class? Class { get; set; } = null!;
 
-    public virtual StartTime ScheduledPosition { get; set; } = null!;
+    public virtual StartTime? ScheduledPosition { get; set; } = null!;
 
-    public virtual Subject Subject { get; set; } = null!;
+    public virtual Subject? Subject { get; set; } = null!;
 
-    public virtual Teacher Teacher { get; set; } = null!;
+    public virtual Teacher? Teacher { get; set; } = null!;
 
     public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 }
