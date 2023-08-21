@@ -27,7 +27,7 @@ namespace SadSchool.Controllers
                 });
             }
 
-            return View(@"~/Views/Data/Schedule.cshtml", schedules);
+            return View(@"~/Views/Data/Schedules.cshtml", schedules);
         }
 
         [HttpGet]

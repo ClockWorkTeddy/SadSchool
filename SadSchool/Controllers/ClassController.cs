@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
 using SadSchool.ViewModels;
@@ -36,18 +37,13 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult AddClass()
         {
-            var teachers = _context.Teachers.ToList();
-
-            ClassAddViewModel viewModel = new ClassAddViewModel()
-            {
-                TeachersForView = teachers
-            };
+            ClassAddViewModel viewModel = new ClassAddViewModel() { Teachers = GetTeachersList(null) };
 
             return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddClass(ClassAddViewModel viewModel)
+        public async Task<IActionResult> AddClass(ClassAddViewModel viewModel)                                         
         {
             if (ModelState.IsValid)
             {
@@ -60,6 +56,58 @@ namespace SadSchool.Controllers
 
                 _context.Classes.Add(Class);
                 await _context.SaveChangesAsync();
+
+                return RedirectToAction("Classes");
+            }
+            else
+            {
+                return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
+            }
+        }
+
+        [HttpGet]
+        public IActionResult EditClass(int id)
+        {
+            var editedClass = _context.Classes.Find(id);
+
+            ClassAddViewModel viewModel = new ClassAddViewModel()
+            {
+                Id = editedClass?.Id,
+                TeacherId = _context.Teachers.Find(editedClass?.TeacherId)?.Id,
+                Name = editedClass?.Name,
+                Teachers = GetTeachersList(editedClass?.TeacherId)
+            };
+
+            return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
+        }
+
+        private List<SelectListItem> GetTeachersList(int? teacherId)
+        {
+            var teachers = _context.Teachers.ToList();
+
+            return teachers.Select(teacher => new SelectListItem
+            {
+                Value = teacher.Id.ToString(),
+                Text = $"{teacher.FirstName} {teacher.LastName}",
+                Selected = teacher.Id == teacherId
+            }).ToList();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditClass(ClassAddViewModel viewModel)
+        {
+            if (ModelState.IsValid)
+            {
+                var Class = new Class
+                {
+                    Id = viewModel.Id.Value,
+                    Name = viewModel.Name,
+                    TeacherId = viewModel.TeacherId,
+                    Teacher = _context.Teachers.Find(viewModel.TeacherId)
+                };
+
+                _context.Classes.Update(Class);
+                await _context.SaveChangesAsync();
                 return RedirectToAction("Classes");
             }
             else
@@ -68,6 +116,7 @@ namespace SadSchool.Controllers
             }
 
         }
+
 
         [HttpPost]
         public async Task<IActionResult> DeleteClass(int id)
