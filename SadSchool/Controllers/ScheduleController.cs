@@ -18,7 +18,7 @@ namespace SadSchool.Controllers
         {
             List<ScheduleViewModel> schedules = new List<ScheduleViewModel>();
 
-            foreach (var schedule in _context.SchedulePositions)
+            foreach (var schedule in _context.StartTimes)
             {
                 schedules.Add(new ScheduleViewModel
                 {
@@ -46,7 +46,7 @@ namespace SadSchool.Controllers
                     Value = model.StartTime,
                 };
 
-                _context.SchedulePositions.Add(schedule);
+                _context.StartTimes.Add(schedule);
                 _context.SaveChanges();
             }
 
@@ -56,11 +56,11 @@ namespace SadSchool.Controllers
         [HttpPost]
         public IActionResult DeleteSchedule(int id)
         {
-            var schedule = _context.SchedulePositions.Find(id);
+            var schedule = _context.StartTimes.Find(id);
 
             if (schedule != null)
             {
-                _context.SchedulePositions.Remove(schedule);
+                _context.StartTimes.Remove(schedule);
                 _context.SaveChanges();
             }
 

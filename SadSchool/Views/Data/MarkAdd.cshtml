@@ -26,7 +26,7 @@
                     <select asp-for="LessonId" class="input-sad blinker-sad">
                         @foreach (var lesson in Model.LessonsForView)
                         {
-                            <option value="@lesson?.Id">@lesson.Subject.Name @lesson.Date-@lesson.ScheduledPosition.Value</option>
+                            <option value="@lesson?.Id">@lesson.Subject.Name @lesson.Date-@lesson.StartTime.Value</option>
                         }
                     </select>
                     <span asp-validation-for="LessonId" style="color:orange"></span>

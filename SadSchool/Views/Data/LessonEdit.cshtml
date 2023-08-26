@@ -3,7 +3,7 @@
 <div class="text-center blinker-sad h3-sad">
     Add new Teacher
 </div>
-<form method="post" asp-controller="Lesson" asp-action="AddLesson">
+<form method="post" asp-controller="Lesson" asp-action="EditLesson">
     <div class="container" style="padding-top:30px">
         <div class="row">
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
@@ -26,7 +26,7 @@
                     </select>
 
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="StartTimeId">Starts</label>
-                    <select asp-for="StartTimeId" asp-items="@Model.StartTimes"  class="input-sad blinker-sad">
+                    <select asp-for="StartTimeId" asp-items="@Model.StartTimes" class="input-sad blinker-sad">
                     </select>
                 </div>
             </div>
@@ -34,7 +34,7 @@
         <div class="row">
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
                 <div>
-                    <input type="submit" value="Create" class="btn btn-sad btn-service-sad blinker-sad" />
+                    <input type="submit" value="Save" class="btn btn-sad btn-service-sad blinker-sad" />
                 </div>
             </div>
         </div>

@@ -33,6 +33,7 @@
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Teacher</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Date</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
                             </tr>
                         </thead>
                         @for (int i = 0; i < Model.Count; i++)
@@ -44,19 +45,27 @@
                                     <div class="blinker-sad">@lesson.Id</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@lesson.Starts</div>
+                                    <div class="blinker-sad">@lesson.StartTimeValue</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@lesson.Subject</div>
+                                    <div class="blinker-sad">@lesson.SubjectName</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@lesson.Class</div>
+                                    <div class="blinker-sad">@lesson.ClassName</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@lesson.Teacher</div>
+                                    <div class="blinker-sad">@lesson.TeacherName</div>
                                 </td>
                                 <td class="td-sad">
                                     <div class="blinker-sad">@lesson.Date</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="d-flex justify-content-center">
+                                        <a class="btn btn-sad btn-service-sad blinker-sad"
+                                           role="button"
+                                           style="display: flex; align-items: center; justify-content: center;"
+                                           asp-controller="Lesson" asp-action="EditLesson" asp-route-id="@lesson.Id">Edit</a>
+                                    </div>
                                 </td>
                                 <td class="td-sad">
                                     <form asp-action="DeleteLesson" asp-route-id="@lesson.Id" asp-controller="Lesson" method="post">

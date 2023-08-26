@@ -15,11 +15,11 @@ public partial class Lesson
 
     public int? TeacherId { get; set; }
 
-    public string Date { get; set; }
+    public string? Date { get; set; }
 
     public virtual Class? Class { get; set; } = null!;
 
-    public virtual StartTime? ScheduledPosition { get; set; } = null!;
+    public virtual StartTime? StartTime { get; set; } = null!;
 
     public virtual Subject? Subject { get; set; } = null!;
 

@@ -1,11 +1,16 @@
-﻿using SadSchool.Models;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+using SadSchool.Models;
 namespace SadSchool.ViewModels
 {
     public class ClassViewModel
     {
-        public long Id { get; set; }
-        public string Name { get; set; }
-        public Teacher? Teacher { get; set; }
-        public Student? Leader { get; set; } 
+        public int? Id { get; set; }
+        public string? Name { get; set; }
+        public int? TeacherId { get; set; }
+        public int? LeaderId { get; set; }
+        public string? TeacherName { get; set; }
+        public string? LeaderName { get; set; }
+        public List<SelectListItem> Teachers { get; set; } = new List<SelectListItem>();
+        public List<SelectListItem> Leaders { get; set; } = new List<SelectListItem>();
     }
 }

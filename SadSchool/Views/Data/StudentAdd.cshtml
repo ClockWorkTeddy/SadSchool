@@ -22,11 +22,7 @@
                     <span asp-validation-for="DateOfBirth"></span>
 
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="ClassId"></label>
-                    <select asp-for="ClassId" class="input-sad blinker-sad">
-                        @foreach (var myClass in Model.ClassesForView)
-                        {
-                            <option value="@myClass.Id">@myClass.Name</option>
-                        }
+                    <select asp-for="ClassId" asp-items="@Model.Classes" class="input-sad blinker-sad">
                     </select>
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="Sex"></label>
                     <select asp-for="Sex" class="input-sad blinker-sad">

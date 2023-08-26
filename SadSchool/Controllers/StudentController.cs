@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
 using SadSchool.ViewModels;
@@ -37,11 +38,21 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult AddStudent()
         {
-            StudentAddViewModel viewModel = new StudentAddViewModel()
-            {
-                ClassesForView = _context.Classes.ToList()
-            };
+            StudentAddViewModel viewModel = new StudentAddViewModel() { Classes = GetClassesList(null) };
+
             return View(@"~/Views/Data/StudentAdd.cshtml", viewModel);
+        }
+
+        private List<SelectListItem> GetClassesList(int? classId)
+        {
+            var classes = _context.Classes.ToList();
+
+            return classes.Select(Class => new SelectListItem
+            {
+                Value = Class.Id.ToString(),
+                Text = $"{Class.Name}",
+                Selected = Class.Id == classId
+            }).ToList();
         }
 
         [HttpPost]
@@ -64,6 +75,26 @@ namespace SadSchool.Controllers
             }
 
             return RedirectToAction("Students");
+        }
+
+        [HttpGet]
+        public IActionResult EditStudent(int id)
+        {
+            var editedStudent = _context.Students.Find(id);
+
+            StudentAddViewModel viewModel = new()
+            {
+                 Id = editedStudent?.Id,
+                 ClassId = _context.Classes.Find(editedStudent?.ClassId)?.Id,
+                 FirstName = editedStudent?.FirstName,
+                 LastName = editedStudent?.LastName,
+                 Sex = editedStudent?.Sex == null 
+                    ? "null" 
+                    : editedStudent.Sex.Value ? "Male" : "Female",
+                 DateOfBirth = editedStudent?.DateOfBirth
+            };
+
+            return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
         }
 
         [HttpPost]

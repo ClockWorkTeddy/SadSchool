@@ -20,30 +20,43 @@ namespace SadSchool.Controllers
         {
             List<ClassViewModel> classes = new List<ClassViewModel>();
 
-            foreach (var c in _context.Classes.Include(cl => cl.Teacher))
-            {
+            foreach (var theClass in _context.Classes.Include(c => c.Teacher).ToList())
                 classes.Add(new ClassViewModel
                 {
-                    Id = c.Id,
-                    Name = c.Name,
-                    Teacher = c.Teacher,
-                    Leader = _context.Students.Find(c.LeaderId)
-                }); ;
-            }
+                    Id = theClass.Id,
+                    Name = theClass.Name,
+                    TeacherId = theClass.TeacherId,
+                    TeacherName = GetTeacherName(theClass.TeacherId),
+                    LeaderName = GetLeaderName(theClass.LeaderId)
+                });
 
             return View(@"~/Views/Data/Classes.cshtml", classes);
+        }
+
+        private string GetLeaderName(int? leaderId)
+        {
+            var leader = _context.Students.Find(leaderId);
+
+            return $"{leader?.FirstName} {leader?.LastName}";
+        }
+
+        private string GetTeacherName(int? teacherId)
+        {
+            var teacher = _context.Teachers.Find(teacherId);
+
+            return $"{teacher?.FirstName} {teacher?.LastName}";
         }
 
         [HttpGet]
         public IActionResult AddClass()
         {
-            ClassAddViewModel viewModel = new ClassAddViewModel() { Teachers = GetTeachersList(null) };
+            ClassViewModel viewModel = new ClassViewModel() { Teachers = GetTeachersList(null) };
 
             return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddClass(ClassAddViewModel viewModel)                                         
+        public async Task<IActionResult> AddClass(ClassViewModel viewModel)                                         
         {
             if (ModelState.IsValid)
             {
@@ -51,7 +64,6 @@ namespace SadSchool.Controllers
                 {
                     Name = viewModel.Name,
                     TeacherId = viewModel.TeacherId,
-                    Teacher = _context.Teachers.Find(viewModel.TeacherId)
                 };
 
                 _context.Classes.Add(Class);
@@ -70,10 +82,8 @@ namespace SadSchool.Controllers
         {
             var editedClass = _context.Classes.Find(id);
 
-            ClassAddViewModel viewModel = new ClassAddViewModel()
+            ClassViewModel viewModel = new()
             {
-                Id = editedClass?.Id,
-                TeacherId = _context.Teachers.Find(editedClass?.TeacherId)?.Id,
                 Name = editedClass?.Name,
                 Teachers = GetTeachersList(editedClass?.TeacherId)
             };
@@ -94,16 +104,15 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditClass(ClassAddViewModel viewModel)
+        public async Task<IActionResult> EditClass(ClassViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (ModelState.IsValid && viewModel != null)
             {
                 var Class = new Class
                 {
                     Id = viewModel.Id.Value,
                     Name = viewModel.Name,
                     TeacherId = viewModel.TeacherId,
-                    Teacher = _context.Teachers.Find(viewModel.TeacherId)
                 };
 
                 _context.Classes.Update(Class);
@@ -112,11 +121,9 @@ namespace SadSchool.Controllers
             }
             else
             {
-                return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
+                return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
             }
-
         }
-
 
         [HttpPost]
         public async Task<IActionResult> DeleteClass(int id)

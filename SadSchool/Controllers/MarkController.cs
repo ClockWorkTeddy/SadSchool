@@ -24,14 +24,14 @@ namespace SadSchool.Controllers
                 .Include(m => m.Student)
                 .Include(m => m.Lesson)
                 .Include(m => m.Lesson.Subject)
-                .Include(m => m.Lesson.ScheduledPosition))
+                .Include(m => m.Lesson.StartTime))
             { 
                 marks.Add(new MarkViewModel
                 {
                     Id = mark.Id,
                     Value = mark.Value,
                     Student = $"{mark.Student?.FirstName} {mark.Student?.LastName}",
-                    Lesson = $"{mark.Lesson?.Subject.Name} {mark.Lesson?.Date} {mark.Lesson?.ScheduledPosition?.Value}"
+                    Lesson = $"{mark.Lesson?.Subject.Name} {mark.Lesson?.Date} {mark.Lesson?.StartTime?.Value}"
                 });
             }
 
@@ -44,7 +44,7 @@ namespace SadSchool.Controllers
             MarkAddViewModel viewModel = new MarkAddViewModel()
             {
                 StudentsForView = _context.Students.ToList(),
-                LessonsForView = _context.Lessons.Include(l => l.Subject).Include(l => l.ScheduledPosition).ToList()
+                LessonsForView = _context.Lessons.Include(l => l.Subject).Include(l => l.StartTime).ToList()
             };
 
             return View(@"~/Views/Data/MarkAdd.cshtml", viewModel);

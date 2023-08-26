@@ -19,7 +19,7 @@ public partial class SadSchoolContext : DbContext
 
     public virtual DbSet<Lesson> Lessons { get; set; }
 
-    public virtual DbSet<StartTime> SchedulePositions { get; set; }
+    public virtual DbSet<StartTime> StartTimes { get; set; }
 
     public virtual DbSet<Student> Students { get; set; }
 
@@ -98,7 +98,7 @@ public partial class SadSchoolContext : DbContext
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_lesson_class");
 
-            entity.HasOne(d => d.ScheduledPosition).WithMany(p => p.Lessons)
+            entity.HasOne(d => d.StartTime).WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.StartTimeId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_lesson_schedule_position");
