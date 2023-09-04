@@ -53,6 +53,40 @@ namespace SadSchool.Controllers
             return RedirectToAction("Subjects");
         }
 
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            var editedSubject = _context.Subjects.Find(id);
+
+            var model = new SubjectViewModel
+            {
+                Name = editedSubject?.Name
+            };
+
+            return View(@"~/Views/Data/SubjectEdit.cshtml", model);
+        }
+
+        [HttpPost]
+        public IActionResult Edit(SubjectViewModel model)
+        {
+            if (ModelState.IsValid && model != null)
+            {
+                var subject = new Subject
+                {
+                    Id = model.Id,
+                    Name = model.Name
+                };
+
+                _context.Subjects.Update(subject);
+                _context.SaveChanges();
+                return RedirectToAction("Subjects");
+            }
+            else
+            {
+                return View(@"~/Views/Data/SubjectEdit.cshtml", model);
+            }
+        }
+
         [HttpPost]
         public IActionResult DeleteSubject(int id)
         {

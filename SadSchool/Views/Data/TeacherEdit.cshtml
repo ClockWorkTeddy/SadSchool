@@ -1,36 +1,36 @@
 ﻿@model SadSchool.ViewModels.TeacherViewModel;
 
 <div class="text-center blinker-sad h3-sad">
-    Add new Teacher
+    Edit Teacher
 </div>
-<form method="post" asp-controller="Teacher" asp-action="AddTeacher">
+<form method="post" asp-controller="Teacher" asp-action="Edit">
     <div class="container" style="padding-top:30px">
         <div class="row">
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
-                <div class="container d-flex" style="flex-direction:column; align-items:center; 
+                <div class="container d-flex" style="flex-direction:column; align-items:center;
                                                      text-align:center; padding-block:10px">
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="FirstName"></label>
                     <input asp-for="FirstName" class="input-sad blinker-sad" />
-                    <span asp-validation-for="FirstName"></span>
-
+                    <span asp-validation-for="FirstName" style="color:orange"></span>
+                    
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="LastName"></label>
                     <input asp-for="LastName" class="input-sad blinker-sad" />
-                    <span asp-validation-for="LastName"></span>
+                    <span asp-validation-for="LastName" style="color:orange"></span>
 
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="DateOfBirth"></label>
                     <input asp-for="DateOfBirth" class="input-sad blinker-sad" />
-                    <span asp-validation-for="DateOfBirth"></span>
+                    <span asp-validation-for="DateOfBirth" style="color:orange"></span>
 
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="Grade"></label>
                     <input asp-for="Grade" class="input-sad blinker-sad" />
-                    <span asp-validation-for="Grade"></span>
+                    <span asp-validation-for="Grade" style="color:orange"></span>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
                 <div>
-                    <input type="submit" value="Create" class="btn btn-sad btn-service-sad blinker-sad" />
+                    <input type="submit" value="Save" class="btn btn-sad btn-service-sad blinker-sad" />
                 </div>
             </div>
         </div>

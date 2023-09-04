@@ -11,7 +11,7 @@
                                                      text-align:center; padding-block:10px">
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="Date"></label>
                     <input asp-for="Date" class="input-sad blinker-sad" />
-                    <span asp-validation-for="Date">@Model.Date</span>
+                    <span asp-validation-for="Date"></span>
 
                     <label class="blinker-sad" style="margin-top: 5px" asp-for="ClassId">Class</label>
                     <select asp-for="ClassId" asp-items="@Model.Classes" class="input-sad blinker-sad">

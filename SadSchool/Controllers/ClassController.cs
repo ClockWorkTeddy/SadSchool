@@ -91,18 +91,6 @@ namespace SadSchool.Controllers
             return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
         }
 
-        private List<SelectListItem> GetTeachersList(int? teacherId)
-        {
-            var teachers = _context.Teachers.ToList();
-
-            return teachers.Select(teacher => new SelectListItem
-            {
-                Value = teacher.Id.ToString(),
-                Text = $"{teacher.FirstName} {teacher.LastName}",
-                Selected = teacher.Id == teacherId
-            }).ToList();
-        }
-
         [HttpPost]
         public async Task<IActionResult> EditClass(ClassViewModel viewModel)
         {
@@ -137,6 +125,17 @@ namespace SadSchool.Controllers
             }
 
             return RedirectToAction("Classes");
+        }
+        private List<SelectListItem> GetTeachersList(int? teacherId)
+        {
+            var teachers = _context.Teachers.ToList();
+
+            return teachers.Select(teacher => new SelectListItem
+            {
+                Value = teacher.Id.ToString(),
+                Text = $"{teacher.FirstName} {teacher.LastName}",
+                Selected = teacher.Id == teacherId
+            }).ToList();
         }
     }
 }

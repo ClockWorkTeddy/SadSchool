@@ -29,6 +29,7 @@
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width:100px">#</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Name</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
                             </tr>
                         </thead>
                         @for (int i = 0; i < Model.Count; i++)
@@ -42,6 +43,15 @@
                                 <td class="td-sad">
                                     <div class="blinker-sad">@subject.Name</div>
                                 </td>
+                                <td class="td-sad">
+                                    <div class="d-flex justify-content-center">
+                                        <a class="btn btn-sad btn-service-sad blinker-sad"
+                                           role="button"
+                                           style="display: flex; align-items: center; justify-content: center;"
+                                           asp-controller="Subject" asp-action="Edit" asp-route-id="@subject.Id">Edit</a>
+                                    </div>
+                                </td>
+
                                 <td class="td-sad">
                                     <form asp-action="DeleteSubject" asp-route-id="@subject.Id" asp-controller="Subject" method="post">
                                         <div class="d-flex justify-content-center">

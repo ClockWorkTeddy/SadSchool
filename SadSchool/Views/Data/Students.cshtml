@@ -33,6 +33,7 @@
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Date of Birth</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Sex</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
                             </tr>
                         </thead>
                         @for (int i = 0; i < Model.Count; i++)
@@ -56,7 +57,15 @@
                                     <div class="blinker-sad">@student.DateOfBirth</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@student.Sex</div>
+                                    <div class="blinker-sad">@(student.Sex.Value ? "Female" : "Male")</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="d-flex justify-content-center">
+                                        <a class="btn btn-sad btn-service-sad blinker-sad"
+                                           role="button"
+                                           style="display: flex; align-items: center; justify-content: center;"
+                                           asp-controller="Student" asp-action="EditStudent" asp-route-id="@student.Id">Edit</a>
+                                    </div>
                                 </td>
                                 <td class="td-sad">
                                     <form asp-action="DeleteStudent" asp-route-id="@student.Id" asp-controller="Student" method="post">

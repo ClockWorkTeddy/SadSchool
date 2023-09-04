@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SadSchool.Models;
@@ -41,17 +42,17 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult AddMark()
         {
-            MarkAddViewModel viewModel = new MarkAddViewModel()
+            MarkViewModel viewModel = new MarkViewModel()
             {
-                StudentsForView = _context.Students.ToList(),
-                LessonsForView = _context.Lessons.Include(l => l.Subject).Include(l => l.StartTime).ToList()
+                Students = GetStudentsList(null),
+                Lessons = GetLessonsList(null),
             };
 
             return View(@"~/Views/Data/MarkAdd.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMark(MarkAddViewModel viewModel)
+        public async Task<IActionResult> AddMark(MarkViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -62,15 +63,53 @@ namespace SadSchool.Controllers
                     LessonId = viewModel.LessonId
                 };
 
-                _context.Marks.AddAsync(mark);
+                _context.Marks.Add(mark);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction("Marks");
             }
             else
             {
                 return View(@"~/Views/Data/MarkAdd.cshtml", viewModel);
             }
+        }
 
+        [HttpGet]
+        public IActionResult EditMark(int id)
+        {
+            var editedMark = _context.Marks.Find(id);
+
+            MarkViewModel viewModel = new()
+            {
+                Value = editedMark?.Value,
+                Lessons = GetLessonsList(editedMark?.LessonId),
+                Students = GetStudentsList(editedMark?.StudentId)
+            };
+
+            return View(@"~/Views/Data/MarkEdit.cshtml", viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditMark(MarkViewModel viewModel)
+        {
+            if (ModelState.IsValid && viewModel != null)
+            {
+                var mark = new Mark
+                {
+                    Id = viewModel.Id,
+                    Value = viewModel.Value,
+                    LessonId = viewModel.LessonId,
+                    StudentId = viewModel.StudentId,
+                };
+
+                _context.Marks.Update(mark);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Marks");
+            }
+            else
+            {
+                return View(@"~/Views/Data/MarkEdit.cshtml", viewModel);
+            }
         }
 
         [HttpPost]
@@ -86,5 +125,33 @@ namespace SadSchool.Controllers
 
             return RedirectToAction("Marks");
         }
+
+        private List<SelectListItem> GetLessonsList(int? lessonId)
+        {
+            var lessons = _context.Lessons
+                .Include(l => l.StartTime)
+                .Include(l => l.Subject)
+                .Include(l => l.Class).ToList();
+
+            return lessons.Select(lesson => new SelectListItem
+            {
+                Value = lesson.Id.ToString(),
+                Text = $"{lesson.StartTime.Value} {lesson.Subject.Name} {lesson.Class.Name} {lesson.Date}",
+                Selected = lesson.Id == lessonId
+            }).ToList();
+        }
+
+        private List<SelectListItem> GetStudentsList(int? studentId)
+        {
+            var students = _context.Students.ToList();
+
+            return students.Select(student => new SelectListItem
+            {
+                Value = student.Id.ToString(),
+                Text = $"{student.FirstName} {student.LastName}",
+                Selected = student.Id == studentId
+            }).ToList();
+        }
+
     }
 }

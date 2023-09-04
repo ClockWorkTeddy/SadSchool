@@ -1,24 +1,24 @@
-﻿@model SadSchool.ViewModels.ScheduleViewModel;
+﻿@model SadSchool.ViewModels.StartTimeViewModel;
 
 <div class="text-center blinker-sad h3-sad">
-    Add new Teacher
+    Add new Class
 </div>
-<form method="post" asp-controller="Schedule" asp-action="AddSchedule">
+<form method="post" asp-controller="StartTime" asp-action="EditStartTime">
     <div class="container" style="padding-top:30px">
         <div class="row">
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
                 <div class="container d-flex" style="flex-direction:column; align-items:center;
                                                      text-align:center; padding-block:10px">
-                    <label class="blinker-sad" style="margin-top: 5px" asp-for="StartTime"></label>
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="StartTime">Start Time</label>
                     <input asp-for="StartTime" class="input-sad blinker-sad" />
-                    <span asp-validation-for="StartTime"></span>
+                    <span asp-validation-for="StartTime" style="color:orange"></span>
                 </div>
             </div>
         </div>
         <div class="row">
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
                 <div>
-                    <input type="submit" value="Create" class="btn btn-sad btn-service-sad blinker-sad" />
+                    <input type="submit" value="Save" class="btn btn-sad btn-service-sad blinker-sad" />
                 </div>
             </div>
         </div>

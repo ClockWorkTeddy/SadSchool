@@ -31,6 +31,7 @@
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Student</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Lesson</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
                             </tr>
                         </thead>
                         @foreach(var mark in Model)
@@ -47,6 +48,14 @@
                                 </td>
                                 <td class="td-sad">
                                     <div class="blinker-sad">@mark.Lesson</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="d-flex justify-content-center">
+                                        <a class="btn btn-sad btn-service-sad blinker-sad"
+                                           role="button"
+                                           style="display: flex; align-items: center; justify-content: center;"
+                                           asp-controller="Mark" asp-action="EditMark" asp-route-id="@mark.Id">Edit</a>
+                                    </div>
                                 </td>
                                 <td class="td-sad">
                                     <form asp-action="DeleteMark" asp-route-id="@mark.Id" asp-controller="Mark" method="post">

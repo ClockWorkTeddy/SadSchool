@@ -28,7 +28,7 @@ namespace SadSchool.Controllers
                     FirstName = student.FirstName,
                     LastName = student.LastName,
                     DateOfBirth = student.DateOfBirth,
-                    Sex = student.Sex.Value ? "Female" : "Male",
+                    Sex = student.Sex,
                     ClassName = student.Class?.Name
                 });
             }
@@ -38,7 +38,11 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult AddStudent()
         {
-            StudentAddViewModel viewModel = new StudentAddViewModel() { Classes = GetClassesList(null) };
+            StudentViewModel viewModel = new StudentViewModel() 
+            { 
+                Classes = GetClassesList(null),
+                Sexes = GetSexes(null)
+            };
 
             return View(@"~/Views/Data/StudentAdd.cshtml", viewModel);
         }
@@ -56,7 +60,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddStudent(StudentAddViewModel viewModel)
+        public async Task<IActionResult> AddStudent(StudentViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -67,7 +71,7 @@ namespace SadSchool.Controllers
                     ClassId = viewModel.ClassId,
                     Class = _context.Classes.Find(viewModel.ClassId),
                     DateOfBirth = viewModel.DateOfBirth,
-                    Sex = viewModel.Sex == "Male" ? false : true
+                    Sex = viewModel.Sex
                 };
 
                 _context.Students.Add(student);
@@ -82,19 +86,63 @@ namespace SadSchool.Controllers
         {
             var editedStudent = _context.Students.Find(id);
 
-            StudentAddViewModel viewModel = new()
+            StudentViewModel viewModel = new()
             {
-                 Id = editedStudent?.Id,
-                 ClassId = _context.Classes.Find(editedStudent?.ClassId)?.Id,
                  FirstName = editedStudent?.FirstName,
                  LastName = editedStudent?.LastName,
-                 Sex = editedStudent?.Sex == null 
-                    ? "null" 
-                    : editedStudent.Sex.Value ? "Male" : "Female",
-                 DateOfBirth = editedStudent?.DateOfBirth
+                 DateOfBirth = editedStudent?.DateOfBirth,
+                 Sexes = GetSexes(editedStudent?.Sex),
+                 Classes = GetClassesList(editedStudent?.ClassId)
             };
 
             return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditStudent(StudentViewModel viewModel)
+        {
+            if (ModelState.IsValid && viewModel != null)
+            {
+                var student = new Student
+                {
+                    Id = viewModel.Id.Value,
+                    FirstName = viewModel.FirstName,
+                    LastName = viewModel.LastName,
+                    DateOfBirth = viewModel.DateOfBirth,
+                    Sex = viewModel.Sex,
+                    ClassId = viewModel.ClassId
+                };
+
+                _context.Students.Update(student);
+                await _context.SaveChangesAsync();
+                return RedirectToAction("Students");
+            }
+            else
+            {
+                return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+            }
+        }
+
+        private List<SelectListItem> GetSexes(bool? sex)
+        {
+            List<SelectListItem> sexes = new List<SelectListItem>
+            {
+                new SelectListItem()
+                {
+                    Value = "False",
+                    Text = "Male",
+                    Selected = !sex.Value
+                },
+
+                new SelectListItem()
+                {
+                    Value = "True",
+                    Text = "Female",
+                    Selected = sex.Value
+                }
+            };
+
+            return sexes;
         }
 
         [HttpPost]
