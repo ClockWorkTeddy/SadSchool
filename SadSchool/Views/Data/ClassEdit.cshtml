@@ -1,7 +1,7 @@
 ﻿@model SadSchool.ViewModels.ClassViewModel;
 
 <div class="text-center blinker-sad h3-sad">
-    Add new Class
+    Edit the class
 </div>
 <form method="post" asp-controller="Class" asp-action="EditClass">
     <div class="container" style="padding-top:30px">
@@ -9,7 +9,7 @@
             <div class="col-12 d-flex" style="justify-content:center; align-items:center">
                 <div class="container d-flex" style="flex-direction:column; align-items:center;
                                                      text-align:center; padding-block:10px">
-                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Name">@Model.Name</label>
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Name"></label>
                     <input asp-for="Name" class="input-sad blinker-sad" />
                     <span asp-validation-for="Name" style="color:orange"></span>
 

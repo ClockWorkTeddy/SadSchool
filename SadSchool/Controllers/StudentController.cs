@@ -131,14 +131,14 @@ namespace SadSchool.Controllers
                 {
                     Value = "False",
                     Text = "Male",
-                    Selected = !sex.Value
+                    Selected = sex.HasValue ? !sex.Value : false
                 },
 
                 new SelectListItem()
                 {
                     Value = "True",
                     Text = "Female",
-                    Selected = sex.Value
+                    Selected = sex.HasValue ? sex.Value : false
                 }
             };
 
