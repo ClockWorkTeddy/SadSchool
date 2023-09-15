@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@inject SadSchool.Services.INavigationService NavigationService
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -15,9 +16,9 @@
             <div class="col-2">
                 @if(ViewContext.RouteData.Values["action"].ToString() != "Index")
                 {
-                    <a class="btn btn-sad btn-sub-service-sad blinker-sad" 
-                        onclick="goBack()" 
-                        role="button"
+                    <a class="btn btn-sad btn-sub-service-sad blinker-sad"
+                       asp-controller="@NavigationService.Controller" asp-action="@NavigationService.Action"
+                       role="button"
                         style="display: flex; align-items: center; justify-content: center; 
                                margin-top: 20px;font-size:28px">
                         <i class="icon-back" style="margin-top: -2px;

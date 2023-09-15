@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SadSchool.ViewModels;
 using SadSchool.Models;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
     public class SubjectController : Controller
     {
         private readonly SadSchoolContext _context;
+        private readonly INavigationService _navigationService;
 
-        public SubjectController(SadSchoolContext context)
+        public SubjectController(SadSchoolContext context, INavigationService navigationService)
         {
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
@@ -27,17 +30,21 @@ namespace SadSchool.Controllers
                 });
             }
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/Subjects.cshtml", subjects);
         }
 
         [HttpGet]
-        public IActionResult AddSubject()
+        public IActionResult Add()
         {
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/SubjectAdd.cshtml");
         }
 
         [HttpPost]
-        public IActionResult AddSubject(SubjectViewModel model)
+        public IActionResult Add(SubjectViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -62,6 +69,8 @@ namespace SadSchool.Controllers
             {
                 Name = editedSubject?.Name
             };
+
+            _navigationService.RefreshBackParams(RouteData);
 
             return View(@"~/Views/Data/SubjectEdit.cshtml", model);
         }
@@ -88,7 +97,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteSubject(int id)
+        public IActionResult Delete(int id)
         {
             var subject = _context.Subjects.Find(id);
 

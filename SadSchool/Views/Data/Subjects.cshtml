@@ -18,7 +18,7 @@
                     <a class="btn btn-sad btn-main-sad blinker-sad"
                        role="button"
                        style="display: flex; align-items: center; justify-content: center;"
-                       asp-controller="Subject" asp-action="AddSubject">Add Subject</a>
+                       asp-controller="Subject" asp-action="Add">Add Subject</a>
                 </div>
             </div>
             <div class="row justify-content-center" style="margin-top:30px">
@@ -53,7 +53,7 @@
                                 </td>
 
                                 <td class="td-sad">
-                                    <form asp-action="DeleteSubject" asp-route-id="@subject.Id" asp-controller="Subject" method="post">
+                                    <form asp-action="Delete" asp-route-id="@subject.Id" asp-controller="Subject" method="post">
                                         <div class="d-flex justify-content-center">
                                             <button type="submit" class="btn btn-sad btn-service-sad blinker-danger-sad">
                                                 Delete

@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SadSchool.Models;
 using SadSchool.ViewModels;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
     public class TeacherController : Controller
     {
         private readonly SadSchoolContext _context;
+        private readonly INavigationService _navigationService;
 
-        public TeacherController(SadSchoolContext context)
+        public TeacherController(SadSchoolContext context, INavigationService navigationService)
         {
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
@@ -30,17 +33,21 @@ namespace SadSchool.Controllers
                 });
             }
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/Teachers.cshtml", teachers);
         }
 
         [HttpGet]
-        public IActionResult AddTeacher()
+        public IActionResult Add()
         {
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/TeacherAdd.cshtml");
         }
 
         [HttpPost]
-        public IActionResult AddTeacher(TeacherViewModel model)
+        public IActionResult Add(TeacherViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -73,6 +80,8 @@ namespace SadSchool.Controllers
                     DateOfBirth = editedTeacher.DateOfBirth?.ToString(),
                     Grade = editedTeacher.Grade
                 };
+
+                _navigationService.RefreshBackParams(RouteData);
 
                 return View(@"~/Views/Data/TeacherEdit.cshtml", model);
             }

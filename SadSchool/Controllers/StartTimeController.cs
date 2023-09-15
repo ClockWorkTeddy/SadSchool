@@ -1,16 +1,19 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using SadSchool.Models;
 using SadSchool.ViewModels;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
     public class StartTimeController : Controller
     {
         private readonly SadSchoolContext _context;
+        private readonly INavigationService _navigationService;
 
-        public StartTimeController(SadSchoolContext context)
+        public StartTimeController(SadSchoolContext context, INavigationService navigationService)
         {
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
@@ -27,17 +30,21 @@ namespace SadSchool.Controllers
                 });
             }
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/StartTimes.cshtml", schedules);
         }
 
         [HttpGet]
-        public IActionResult AddStartTime()
+        public IActionResult Add()
         {
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/StartTimeAdd.cshtml");
         }
 
         [HttpPost]
-        public IActionResult AddStartTime(StartTimeViewModel model)
+        public IActionResult Add(StartTimeViewModel model)
         {
             if (ModelState.IsValid)
             {
@@ -54,7 +61,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditStartTime(int id)
+        public IActionResult Edit(int id)
         {
             var editedStartTime = _context.StartTimes.Find(id);
 
@@ -63,11 +70,13 @@ namespace SadSchool.Controllers
                 StartTime = editedStartTime?.Value
             };
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/StartTimeEdit.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditStartTime(StartTimeViewModel viewModel)
+        public async Task<IActionResult> Edit(StartTimeViewModel viewModel)
         {
             if (ModelState.IsValid && viewModel != null)
             {

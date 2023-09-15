@@ -3,16 +3,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
 using SadSchool.ViewModels;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
     public class StudentController : Controller
     {
         private readonly SadSchoolContext _context;
+        private readonly INavigationService _navigationService;
 
-        public StudentController(SadSchoolContext context)
+        public StudentController(SadSchoolContext context, INavigationService navigationService)
         {
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
@@ -32,17 +35,22 @@ namespace SadSchool.Controllers
                     ClassName = student.Class?.Name
                 });
             }
+
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/Students.cshtml", students);
         }
 
         [HttpGet]
-        public IActionResult AddStudent()
+        public IActionResult Add()
         {
             StudentViewModel viewModel = new StudentViewModel() 
             { 
                 Classes = GetClassesList(null),
                 Sexes = GetSexes(null)
             };
+
+            _navigationService.RefreshBackParams(RouteData);
 
             return View(@"~/Views/Data/StudentAdd.cshtml", viewModel);
         }
@@ -60,7 +68,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddStudent(StudentViewModel viewModel)
+        public async Task<IActionResult> Add(StudentViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -82,7 +90,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditStudent(int id)
+        public IActionResult Edit(int id)
         {
             var editedStudent = _context.Students.Find(id);
 
@@ -95,11 +103,13 @@ namespace SadSchool.Controllers
                  Classes = GetClassesList(editedStudent?.ClassId)
             };
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditStudent(StudentViewModel viewModel)
+        public async Task<IActionResult> Edit(StudentViewModel viewModel)
         {
             if (ModelState.IsValid && viewModel != null)
             {

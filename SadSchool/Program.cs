@@ -23,7 +23,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
     opts.Password.RequireDigit = false; 
 }).AddEntityFrameworkStores<AuthDbContext>();
 
-builder.Services.AddSingleton<ILoginDisplay, LoginDisplayService>();
+builder.Services.AddSingleton<INavigationService, NavigationService>();
 
 var app = builder.Build();
 

@@ -4,16 +4,19 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
 using SadSchool.ViewModels;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
     public class LessonController : Controller
     {
         private readonly SadSchoolContext _context;
+        private readonly INavigationService _navigationService;
 
-        public LessonController(SadSchoolContext context)
+        public LessonController(SadSchoolContext context, INavigationService navigationService)
         {
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
@@ -36,11 +39,14 @@ namespace SadSchool.Controllers
                     Date = lesson?.Date
                 });
             }
+
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/Lessons.cshtml", lessons);
         }
 
         [HttpGet]
-        public IActionResult AddLesson()
+        public IActionResult Add()
         {
             LessonViewModel viewModel = new()
             {
@@ -49,6 +55,8 @@ namespace SadSchool.Controllers
                 Teachers = GetTeachersList(null),
                 StartTimes = GetStartTimesList(null)
             };
+
+            _navigationService.RefreshBackParams(RouteData);
 
             return View(@"~/Views/Data/LessonAdd.cshtml", viewModel);
         }
@@ -101,9 +109,8 @@ namespace SadSchool.Controllers
             }).ToList();
         }
 
-
         [HttpPost]
-        public async Task<IActionResult> AddLesson(LessonViewModel viewModel)
+        public async Task<IActionResult> Add(LessonViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -124,7 +131,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditLesson(int id)
+        public IActionResult Edit(int id)
         {
             var editedLesson = _context.Lessons.Find(id);
 
@@ -137,11 +144,13 @@ namespace SadSchool.Controllers
                 Classes = GetClassesList(editedLesson.ClassId)
             };
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditLesson(LessonViewModel viewModel)
+        public async Task<IActionResult> Edit(LessonViewModel viewModel)
         {
             if (ModelState.IsValid && viewModel != null)
             {
@@ -157,6 +166,7 @@ namespace SadSchool.Controllers
 
                 _context.Lessons.Update(Lesson);
                 await _context.SaveChangesAsync();
+
                 return RedirectToAction("Lessons");
             }
             else
@@ -164,8 +174,6 @@ namespace SadSchool.Controllers
                 return View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
             }
         }
-
-
 
         [HttpPost]
         public async Task<IActionResult> DeleteLesson(int id)

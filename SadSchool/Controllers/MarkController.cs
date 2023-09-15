@@ -1,19 +1,21 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using SadSchool.Models;
 using SadSchool.ViewModels;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
     public class MarkController : Controller
     {
         private readonly SadSchoolContext _context;
+        private readonly INavigationService _navigationService;
 
-        public MarkController(SadSchoolContext context)
+        public MarkController(SadSchoolContext context, INavigationService navigationService)
         {
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
@@ -36,11 +38,13 @@ namespace SadSchool.Controllers
                 });
             }
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/Marks.cshtml", marks);
         }
 
         [HttpGet]
-        public IActionResult AddMark()
+        public IActionResult Add()
         {
             MarkViewModel viewModel = new MarkViewModel()
             {
@@ -48,11 +52,13 @@ namespace SadSchool.Controllers
                 Lessons = GetLessonsList(null),
             };
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/MarkAdd.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddMark(MarkViewModel viewModel)
+        public async Task<IActionResult> Add(MarkViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
@@ -75,7 +81,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditMark(int id)
+        public IActionResult Edit(int id)
         {
             var editedMark = _context.Marks.Find(id);
 
@@ -86,11 +92,13 @@ namespace SadSchool.Controllers
                 Students = GetStudentsList(editedMark?.StudentId)
             };
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/MarkEdit.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditMark(MarkViewModel viewModel)
+        public async Task<IActionResult> Edit(MarkViewModel viewModel)
         {
             if (ModelState.IsValid && viewModel != null)
             {

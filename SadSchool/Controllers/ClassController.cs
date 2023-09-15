@@ -3,16 +3,18 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
 using SadSchool.ViewModels;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
     public class ClassController : Controller
     {
         private readonly SadSchoolContext _context;
-
-        public ClassController(SadSchoolContext context)
+        private readonly INavigationService _navigationService;
+        public ClassController(SadSchoolContext context, INavigationService navigationService)
         {
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
@@ -29,6 +31,8 @@ namespace SadSchool.Controllers
                     TeacherName = GetTeacherName(theClass.TeacherId),
                     LeaderName = GetLeaderName(theClass.LeaderId)
                 });
+
+            _navigationService.RefreshBackParams(RouteData);
 
             return View(@"~/Views/Data/Classes.cshtml", classes);
         }
@@ -48,15 +52,17 @@ namespace SadSchool.Controllers
         }
 
         [HttpGet]
-        public IActionResult AddClass()
+        public IActionResult Add()
         {
             ClassViewModel viewModel = new ClassViewModel() { Teachers = GetTeachersList(null) };
+
+            _navigationService.RefreshBackParams(RouteData);
 
             return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> AddClass(ClassViewModel viewModel)                                         
+        public async Task<IActionResult> Add(ClassViewModel viewModel)                                         
         {
             if (ModelState.IsValid)
             {
@@ -78,7 +84,7 @@ namespace SadSchool.Controllers
         }
 
         [HttpGet]
-        public IActionResult EditClass(int id)
+        public IActionResult Edit(int id)
         {
             var editedClass = _context.Classes.Find(id);
 
@@ -88,11 +94,13 @@ namespace SadSchool.Controllers
                 Teachers = GetTeachersList(editedClass?.TeacherId)
             };
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditClass(ClassViewModel viewModel)
+        public async Task<IActionResult> Edit(ClassViewModel viewModel)
         {
             if (ModelState.IsValid && viewModel != null)
             {

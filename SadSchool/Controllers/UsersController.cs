@@ -1,9 +1,9 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using SadSchool.Models;
 using SadSchool.ViewModels;
 using System.Data;
+using SadSchool.Services;
 
 namespace SadSchool.Controllers
 {
@@ -12,19 +12,24 @@ namespace SadSchool.Controllers
         private readonly UserManager<IdentityUser> _userManager;
         private readonly RoleManager<IdentityRole> _roleManager;
         private readonly AuthDbContext _context;
+        private readonly INavigationService _navigationService;
 
         public UsersController(UserManager<IdentityUser> userManager, 
                                RoleManager<IdentityRole> roleManager,
-                               AuthDbContext context)
+                               AuthDbContext context,
+                               INavigationService navigationService)
         {
             _userManager = userManager;
             _roleManager = roleManager;
             _context = context;
+            _navigationService = navigationService;
         }
 
         [HttpGet]
         public IActionResult Register()
         {
+            _navigationService.RefreshBackParams(RouteData);
+
             return View("~/Views/Account/Register.cshtml", 
                         new RegisterViewModel() { RolesForDisplay = GetRolesForDisplay() });
         }
@@ -77,12 +82,16 @@ namespace SadSchool.Controllers
         {
             var roles = _context.Roles.ToList();
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View("~/Views/Users/Roles.cshtml", roles);
         }
 
         [HttpGet]
         public async Task<IActionResult> AddRole()
         {
+            _navigationService.RefreshBackParams(RouteData);
+
             return View("~/Views/Users/AddRole.cshtml");
         }
 
@@ -128,6 +137,8 @@ namespace SadSchool.Controllers
         public async Task<IActionResult> Users()
         {
             var usersViewModel = GetUsersListForView();
+
+            _navigationService.RefreshBackParams(RouteData);
 
             return View("~/Views/Stuff/Users.cshtml", usersViewModel);
         }

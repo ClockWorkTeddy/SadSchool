@@ -10,12 +10,16 @@ namespace SadSchool.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly SadSchoolContext _context;
+        private readonly INavigationService _navigationService;
 
-
-        public HomeController(ILogger<HomeController> logger, SadSchoolContext context)
+        public HomeController(
+            ILogger<HomeController> logger, 
+            SadSchoolContext context, 
+            INavigationService navigationService )
         {
             _logger = logger;
             _context = context;
+            _navigationService = navigationService;
         }
 
         public IActionResult Index()
@@ -27,6 +31,7 @@ namespace SadSchool.Controllers
         {
             try
             {
+                _navigationService.RefreshBackParams(RouteData);
                 return View();
             }
             catch(Exception ex)
