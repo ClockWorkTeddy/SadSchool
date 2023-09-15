@@ -38,9 +38,14 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            _navigationService.RefreshBackParams(RouteData);
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            {
+                _navigationService.RefreshBackParams(RouteData);
 
-            return View(@"~/Views/Data/StartTimeAdd.cshtml");
+                return View(@"~/Views/Data/StartTimeAdd.cshtml");
+            }
+
+            return RedirectToAction("StartTimes");
         }
 
         [HttpPost]
@@ -63,16 +68,22 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var editedStartTime = _context.StartTimes.Find(id);
-
-            StartTimeViewModel viewModel = new()
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                StartTime = editedStartTime?.Value
-            };
 
-            _navigationService.RefreshBackParams(RouteData);
+                var editedStartTime = _context.StartTimes.Find(id);
 
-            return View(@"~/Views/Data/StartTimeEdit.cshtml", viewModel);
+                StartTimeViewModel viewModel = new()
+                {
+                    StartTime = editedStartTime?.Value
+                };
+
+                _navigationService.RefreshBackParams(RouteData);
+
+                return View(@"~/Views/Data/StartTimeEdit.cshtml", viewModel);
+            }
+
+            return RedirectToAction("StartTimes");
         }
 
         [HttpPost]
@@ -97,14 +108,17 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteStartTime(int id)
+        public IActionResult Delete(int id)
         {
-            var schedule = _context.StartTimes.Find(id);
-
-            if (schedule != null)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                _context.StartTimes.Remove(schedule);
-                _context.SaveChanges();
+                var schedule = _context.StartTimes.Find(id);
+
+                if (schedule != null)
+                {
+                    _context.StartTimes.Remove(schedule);
+                    _context.SaveChanges();
+                }
             }
 
             return RedirectToAction("StartTimes");

@@ -38,9 +38,14 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            _navigationService.RefreshBackParams(RouteData);
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            {
+                _navigationService.RefreshBackParams(RouteData);
 
-            return View(@"~/Views/Data/SubjectAdd.cshtml");
+                return View(@"~/Views/Data/SubjectAdd.cshtml");
+            }
+                
+            return RedirectToAction("Subjects");
         }
 
         [HttpPost]
@@ -63,16 +68,21 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var editedSubject = _context.Subjects.Find(id);
-
-            var model = new SubjectViewModel
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                Name = editedSubject?.Name
-            };
+                var editedSubject = _context.Subjects.Find(id);
 
-            _navigationService.RefreshBackParams(RouteData);
+                var model = new SubjectViewModel
+                {
+                    Name = editedSubject?.Name
+                };
 
-            return View(@"~/Views/Data/SubjectEdit.cshtml", model);
+                _navigationService.RefreshBackParams(RouteData);
+
+                return View(@"~/Views/Data/SubjectEdit.cshtml", model);
+            }
+                
+            return RedirectToAction("Subjects");
         }
 
         [HttpPost]
@@ -99,12 +109,15 @@ namespace SadSchool.Controllers
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            var subject = _context.Subjects.Find(id);
-
-            if (subject != null)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                _context.Subjects.Remove(subject);
-                _context.SaveChanges();
+                var subject = _context.Subjects.Find(id);
+
+                if (subject != null)
+                {
+                    _context.Subjects.Remove(subject);
+                    _context.SaveChanges();
+                }
             }
 
             return RedirectToAction("Subjects");

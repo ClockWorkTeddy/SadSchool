@@ -44,15 +44,21 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            StudentViewModel viewModel = new StudentViewModel() 
-            { 
-                Classes = GetClassesList(null),
-                Sexes = GetSexes(null)
-            };
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            {
 
-            _navigationService.RefreshBackParams(RouteData);
+                StudentViewModel viewModel = new StudentViewModel()
+                {
+                    Classes = GetClassesList(null),
+                    Sexes = GetSexes(null)
+                };
 
-            return View(@"~/Views/Data/StudentAdd.cshtml", viewModel);
+                _navigationService.RefreshBackParams(RouteData);
+
+                return View(@"~/Views/Data/StudentAdd.cshtml", viewModel);
+            }
+
+            return RedirectToAction("Students");
         }
 
         private List<SelectListItem> GetClassesList(int? classId)
@@ -92,20 +98,26 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var editedStudent = _context.Students.Find(id);
-
-            StudentViewModel viewModel = new()
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                 FirstName = editedStudent?.FirstName,
-                 LastName = editedStudent?.LastName,
-                 DateOfBirth = editedStudent?.DateOfBirth,
-                 Sexes = GetSexes(editedStudent?.Sex),
-                 Classes = GetClassesList(editedStudent?.ClassId)
-            };
 
-            _navigationService.RefreshBackParams(RouteData);
+                var editedStudent = _context.Students.Find(id);
 
-            return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+                StudentViewModel viewModel = new()
+                {
+                    FirstName = editedStudent?.FirstName,
+                    LastName = editedStudent?.LastName,
+                    DateOfBirth = editedStudent?.DateOfBirth,
+                    Sexes = GetSexes(editedStudent?.Sex),
+                    Classes = GetClassesList(editedStudent?.ClassId)
+                };
+
+                _navigationService.RefreshBackParams(RouteData);
+
+                return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+            }
+                
+            return RedirectToAction("Students");
         }
 
         [HttpPost]
@@ -156,14 +168,17 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteStudent(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var student = await _context.Students.FindAsync(id);
-
-            if (student != null)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                _context.Students.Remove(student);
-                await _context.SaveChangesAsync();
+                var student = await _context.Students.FindAsync(id);
+
+                if (student != null)
+                {
+                    _context.Students.Remove(student);
+                    await _context.SaveChangesAsync();
+                }
             }
 
             return RedirectToAction("Students");

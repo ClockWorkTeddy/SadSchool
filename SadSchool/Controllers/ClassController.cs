@@ -54,11 +54,16 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            ClassViewModel viewModel = new ClassViewModel() { Teachers = GetTeachersList(null) };
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            {
+                ClassViewModel viewModel = new ClassViewModel() { Teachers = GetTeachersList(null) };
 
-            _navigationService.RefreshBackParams(RouteData);
+                _navigationService.RefreshBackParams(RouteData);
 
-            return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
+                return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
+            }
+                
+            return RedirectToAction("Classes");
         }
 
         [HttpPost]
@@ -86,17 +91,23 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var editedClass = _context.Classes.Find(id);
-
-            ClassViewModel viewModel = new()
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                Name = editedClass?.Name,
-                Teachers = GetTeachersList(editedClass?.TeacherId)
-            };
 
-            _navigationService.RefreshBackParams(RouteData);
+                var editedClass = _context.Classes.Find(id);
 
-            return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
+                ClassViewModel viewModel = new()
+                {
+                    Name = editedClass?.Name,
+                    Teachers = GetTeachersList(editedClass?.TeacherId)
+                };
+
+                _navigationService.RefreshBackParams(RouteData);
+
+                return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
+            }
+
+            return RedirectToAction("Classes");
         }
 
         [HttpPost]
@@ -122,17 +133,23 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteClass(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var Class = await _context.Classes.FindAsync(id);
-
-            if (Class != null)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                _context.Classes.Remove(Class);
-                await _context.SaveChangesAsync();
+
+                var Class = await _context.Classes.FindAsync(id);
+
+                if (Class != null)
+                {
+                    _context.Classes.Remove(Class);
+                    await _context.SaveChangesAsync();
+                }
+
+                return RedirectToAction("Classes");
             }
 
-            return RedirectToAction("Classes");
+           return RedirectToAction("Classes");
         }
         private List<SelectListItem> GetTeachersList(int? teacherId)
         {

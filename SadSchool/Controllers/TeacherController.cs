@@ -41,9 +41,14 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            _navigationService.RefreshBackParams(RouteData);
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            {
+                _navigationService.RefreshBackParams(RouteData);
 
-            return View(@"~/Views/Data/TeacherAdd.cshtml");
+                return View(@"~/Views/Data/TeacherAdd.cshtml");
+            }
+                
+            return RedirectToAction("Teachers");
         }
 
         [HttpPost]
@@ -69,21 +74,24 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var editedTeacher = _context.Teachers.FirstOrDefault(_ => _.Id == id);
-
-            if (editedTeacher != null)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                var model = new TeacherViewModel
+                var editedTeacher = _context.Teachers.FirstOrDefault(_ => _.Id == id);
+
+                if (editedTeacher != null)
                 {
-                    FirstName = editedTeacher.FirstName,
-                    LastName = editedTeacher.LastName,
-                    DateOfBirth = editedTeacher.DateOfBirth?.ToString(),
-                    Grade = editedTeacher.Grade
-                };
+                    var model = new TeacherViewModel
+                    {
+                        FirstName = editedTeacher.FirstName,
+                        LastName = editedTeacher.LastName,
+                        DateOfBirth = editedTeacher.DateOfBirth?.ToString(),
+                        Grade = editedTeacher.Grade
+                    };
 
-                _navigationService.RefreshBackParams(RouteData);
+                    _navigationService.RefreshBackParams(RouteData);
 
-                return View(@"~/Views/Data/TeacherEdit.cshtml", model);
+                    return View(@"~/Views/Data/TeacherEdit.cshtml", model);
+                }
             }
 
             return RedirectToAction("Teachers");
@@ -115,14 +123,17 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public IActionResult DeleteTeacher(int id)
+        public IActionResult Delete(int id)
         {
-            var teacher = _context.Teachers.FirstOrDefault(_ => _.Id == id);
-
-            if (teacher != null)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                _context.Teachers.Remove(teacher);
-                _context.SaveChanges();
+                var teacher = _context.Teachers.FirstOrDefault(_ => _.Id == id);
+
+                if (teacher != null)
+                {
+                    _context.Teachers.Remove(teacher);
+                    _context.SaveChanges();
+                }
             }
 
             return RedirectToAction("Teachers");

@@ -46,15 +46,21 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            MarkViewModel viewModel = new MarkViewModel()
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                Students = GetStudentsList(null),
-                Lessons = GetLessonsList(null),
-            };
 
-            _navigationService.RefreshBackParams(RouteData);
+                MarkViewModel viewModel = new MarkViewModel()
+                {
+                    Students = GetStudentsList(null),
+                    Lessons = GetLessonsList(null),
+                };
 
-            return View(@"~/Views/Data/MarkAdd.cshtml", viewModel);
+                _navigationService.RefreshBackParams(RouteData);
+
+                return View(@"~/Views/Data/MarkAdd.cshtml", viewModel);
+            }
+
+            return RedirectToAction("Marks");
         }
 
         [HttpPost]
@@ -83,18 +89,24 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            var editedMark = _context.Marks.Find(id);
-
-            MarkViewModel viewModel = new()
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                Value = editedMark?.Value,
-                Lessons = GetLessonsList(editedMark?.LessonId),
-                Students = GetStudentsList(editedMark?.StudentId)
-            };
 
-            _navigationService.RefreshBackParams(RouteData);
+                var editedMark = _context.Marks.Find(id);
 
-            return View(@"~/Views/Data/MarkEdit.cshtml", viewModel);
+                MarkViewModel viewModel = new()
+                {
+                    Value = editedMark?.Value,
+                    Lessons = GetLessonsList(editedMark?.LessonId),
+                    Students = GetStudentsList(editedMark?.StudentId)
+                };
+
+                _navigationService.RefreshBackParams(RouteData);
+
+                return View(@"~/Views/Data/MarkEdit.cshtml", viewModel);
+            }
+
+            return RedirectToAction("Marks");
         }
 
         [HttpPost]
@@ -121,14 +133,17 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> DeleteMark(int id)
+        public async Task<IActionResult> Delete(int id)
         {
-            var mark = await _context.Marks.FindAsync(id);
-
-            if (mark != null)
+            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                _context.Marks.Remove(mark);
-                await _context.SaveChangesAsync();
+                var mark = await _context.Marks.FindAsync(id);
+
+                if (mark != null)
+                {
+                    _context.Marks.Remove(mark);
+                    await _context.SaveChangesAsync();
+                }
             }
 
             return RedirectToAction("Marks");
