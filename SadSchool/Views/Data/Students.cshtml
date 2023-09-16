@@ -13,14 +13,17 @@
 <body>
     <div class="container-fluid">
         <div class="container" style="max-width: 800px;">
-            <div class="row" style="margin-top:30px">
-                <div class="col-12 d-flex justify-content-center">
-                    <a class="btn btn-sad btn-main-sad blinker-sad"
-                       role="button"
-                       style="display: flex; align-items: center; justify-content: center;"
-                       asp-controller="Student" asp-action="Add">Add Student</a>
+            @if (!User.IsInRole("user"))
+            {
+                <div class="row" style="margin-top:30px">
+                    <div class="col-12 d-flex justify-content-center">
+                        <a class="btn btn-sad btn-main-sad blinker-sad"
+                           role="button"
+                           style="display: flex; align-items: center; justify-content: center;"
+                           asp-controller="Student" asp-action="Add">Add Student</a>
+                    </div>
                 </div>
-            </div>
+            }
             <div class="row justify-content-center" style="margin-top:30px">
                 <div class="col-12 border border-dark scroll-sad" style="max-height: 420px; padding-top: 13px">
                     <table class="table table-bordered border-dark">
@@ -32,8 +35,11 @@
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Class</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Date of Birth</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Sex</th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                                @if (!User.IsInRole("user"))
+                                {
+                                    <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                                    <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
+                                }
                             </tr>
                         </thead>
                         @for (int i = 0; i < Model.Count; i++)
@@ -59,23 +65,26 @@
                                 <td class="td-sad">
                                     <div class="blinker-sad">@(student.Sex.Value ? "Female" : "Male")</div>
                                 </td>
-                                <td class="td-sad">
-                                    <div class="d-flex justify-content-center">
-                                        <a class="btn btn-sad btn-service-sad blinker-sad"
-                                           role="button"
-                                           style="display: flex; align-items: center; justify-content: center;"
-                                           asp-controller="Student" asp-action="Edit" asp-route-id="@student.Id">Edit</a>
-                                    </div>
-                                </td>
-                                <td class="td-sad">
-                                    <form asp-action="Delete" asp-route-id="@student.Id" asp-controller="Student" method="post">
+                                @if (!User.IsInRole("user"))
+                                {
+                                    <td class="td-sad">
                                         <div class="d-flex justify-content-center">
-                                            <button type="submit" class="btn btn-sad btn-service-sad blinker-danger-sad">
-                                                Delete
-                                            </button>
+                                            <a class="btn btn-sad btn-service-sad blinker-sad"
+                                            role="button"
+                                            style="display: flex; align-items: center; justify-content: center;"
+                                            asp-controller="Student" asp-action="Edit" asp-route-id="@student.Id">Edit</a>
                                         </div>
-                                    </form>
-                                </td>
+                                    </td>
+                                    <td class="td-sad">
+                                        <form asp-action="Delete" asp-route-id="@student.Id" asp-controller="Student" method="post">
+                                            <div class="d-flex justify-content-center">
+                                                <button type="submit" class="btn btn-sad btn-service-sad blinker-danger-sad">
+                                                    Delete
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </td>
+                                }
                             </tr>
                         }
                     </table>
