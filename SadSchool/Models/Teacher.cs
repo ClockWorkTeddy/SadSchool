@@ -17,5 +17,5 @@ public partial class Teacher
 
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 
-    public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+    public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 }

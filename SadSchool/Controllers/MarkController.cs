@@ -25,16 +25,15 @@ namespace SadSchool.Controllers
 
             foreach (var mark in _context.Marks
                 .Include(m => m.Student)
-                .Include(m => m.Lesson)
-                .Include(m => m.Lesson.Subject)
-                .Include(m => m.Lesson.StartTime))
+                .Include(m => m.Lesson))
             { 
                 marks.Add(new MarkViewModel
                 {
                     Id = mark.Id,
                     Value = mark.Value,
                     Student = $"{mark.Student?.FirstName} {mark.Student?.LastName}",
-                    Lesson = $"{mark.Lesson?.Subject.Name} {mark.Lesson?.Date} {mark.Lesson?.StartTime?.Value}"
+                    Lesson = $"{mark.Lesson?.ScheduledLesson?.Subject?.Name} " +
+                             $"{mark.Lesson?.Date} {mark.Lesson?.ScheduledLesson?.StartTime?.Value}"
                 });
             }
 
@@ -48,7 +47,6 @@ namespace SadSchool.Controllers
         {
             if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-
                 MarkViewModel viewModel = new MarkViewModel()
                 {
                     Students = GetStudentsList(null),
@@ -151,7 +149,7 @@ namespace SadSchool.Controllers
 
         private List<SelectListItem> GetLessonsList(int? lessonId)
         {
-            var lessons = _context.Lessons
+            var lessons = _context.ScheduledLessons
                 .Include(l => l.StartTime)
                 .Include(l => l.Subject)
                 .Include(l => l.Class).ToList();
@@ -159,7 +157,7 @@ namespace SadSchool.Controllers
             return lessons.Select(lesson => new SelectListItem
             {
                 Value = lesson.Id.ToString(),
-                Text = $"{lesson.StartTime.Value} {lesson.Subject.Name} {lesson.Class.Name} {lesson.Date}",
+                Text = $"{lesson.StartTime.Value} {lesson.Subject.Name} {lesson.Class.Name} {lesson.Day}",
                 Selected = lesson.Id == lessonId
             }).ToList();
         }

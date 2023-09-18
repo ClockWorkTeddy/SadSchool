@@ -13,7 +13,7 @@ public partial class Class
 
     public int? LeaderId { get; set; }
 
-    public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+    public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 
     public virtual ICollection<Student> Students { get; set; } = new List<Student>();
 

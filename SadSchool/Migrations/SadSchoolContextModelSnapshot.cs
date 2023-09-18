@@ -52,36 +52,16 @@ namespace SadSchool.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("id");
 
-                    b.Property<int?>("ClassId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("class_id");
-
                     b.Property<string>("Date")
-                        .IsRequired()
-                        .HasColumnType("TEXT")
-                        .HasColumnName("date");
+                        .HasColumnType("TEXT");
 
-                    b.Property<int?>("StartTimeId")
+                    b.Property<int?>("ScheduledLessonId")
                         .HasColumnType("INTEGER")
-                        .HasColumnName("start_time_id");
-
-                    b.Property<int?>("SubjectId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("subject_id");
-
-                    b.Property<int?>("TeacherId")
-                        .HasColumnType("INTEGER")
-                        .HasColumnName("teacher_id");
+                        .HasColumnName("scheduled_lesson_id");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ClassId");
-
-                    b.HasIndex("StartTimeId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.HasIndex("TeacherId");
+                    b.HasIndex("ScheduledLessonId");
 
                     b.ToTable("lesson", (string)null);
                 });
@@ -115,6 +95,46 @@ namespace SadSchool.Migrations
                     b.ToTable("mark", (string)null);
                 });
 
+            modelBuilder.Entity("SadSchool.Models.ScheduledLesson", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("id");
+
+                    b.Property<int?>("ClassId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("class_id");
+
+                    b.Property<string>("Day")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("day");
+
+                    b.Property<int?>("StartTimeId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("start_time_id");
+
+                    b.Property<int?>("SubjectId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("subject_id");
+
+                    b.Property<int?>("TeacherId")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("teacher_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ClassId");
+
+                    b.HasIndex("StartTimeId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("TeacherId");
+
+                    b.ToTable("scheduled_lessons", (string)null);
+                });
+
             modelBuilder.Entity("SadSchool.Models.StartTime", b =>
                 {
                     b.Property<int>("Id")
@@ -123,7 +143,6 @@ namespace SadSchool.Migrations
                         .HasColumnName("id");
 
                     b.Property<string>("Value")
-                        .IsRequired()
                         .HasColumnType("TEXT")
                         .HasColumnName("value");
 
@@ -148,7 +167,6 @@ namespace SadSchool.Migrations
                         .HasColumnName("date_of_birth");
 
                     b.Property<string>("FirstName")
-                        .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("TEXT")
                         .HasColumnName("first_name");
@@ -231,37 +249,13 @@ namespace SadSchool.Migrations
 
             modelBuilder.Entity("SadSchool.Models.Lesson", b =>
                 {
-                    b.HasOne("SadSchool.Models.Class", "Class")
+                    b.HasOne("SadSchool.Models.ScheduledLesson", "ScheduledLesson")
                         .WithMany("Lessons")
-                        .HasForeignKey("ClassId")
+                        .HasForeignKey("ScheduledLessonId")
                         .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("FK_lesson_class");
+                        .HasConstraintName("FK_mark_scheduled_lessons");
 
-                    b.HasOne("SadSchool.Models.StartTime", "ScheduledPosition")
-                        .WithMany("Lessons")
-                        .HasForeignKey("StartTimeId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("FK_lesson_schedule_position");
-
-                    b.HasOne("SadSchool.Models.Subject", "Subject")
-                        .WithMany("Lessons")
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("FK_lesson_subject");
-
-                    b.HasOne("SadSchool.Models.Teacher", "Teacher")
-                        .WithMany("Lessons")
-                        .HasForeignKey("TeacherId")
-                        .OnDelete(DeleteBehavior.SetNull)
-                        .HasConstraintName("FK_lesson_teacher");
-
-                    b.Navigation("Class");
-
-                    b.Navigation("ScheduledPosition");
-
-                    b.Navigation("Subject");
-
-                    b.Navigation("Teacher");
+                    b.Navigation("ScheduledLesson");
                 });
 
             modelBuilder.Entity("SadSchool.Models.Mark", b =>
@@ -281,6 +275,41 @@ namespace SadSchool.Migrations
                     b.Navigation("Lesson");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("SadSchool.Models.ScheduledLesson", b =>
+                {
+                    b.HasOne("SadSchool.Models.Class", "Class")
+                        .WithMany("Lessons")
+                        .HasForeignKey("ClassId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_lesson_class");
+
+                    b.HasOne("SadSchool.Models.StartTime", "StartTime")
+                        .WithMany("Lessons")
+                        .HasForeignKey("StartTimeId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_lesson_schedule");
+
+                    b.HasOne("SadSchool.Models.Subject", "Subject")
+                        .WithMany("Lessons")
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_lesson_subject");
+
+                    b.HasOne("SadSchool.Models.Teacher", "Teacher")
+                        .WithMany("Lessons")
+                        .HasForeignKey("TeacherId")
+                        .OnDelete(DeleteBehavior.SetNull)
+                        .HasConstraintName("FK_lesson_teacher");
+
+                    b.Navigation("Class");
+
+                    b.Navigation("StartTime");
+
+                    b.Navigation("Subject");
+
+                    b.Navigation("Teacher");
                 });
 
             modelBuilder.Entity("SadSchool.Models.Student", b =>
@@ -304,6 +333,11 @@ namespace SadSchool.Migrations
             modelBuilder.Entity("SadSchool.Models.Lesson", b =>
                 {
                     b.Navigation("Marks");
+                });
+
+            modelBuilder.Entity("SadSchool.Models.ScheduledLesson", b =>
+                {
+                    b.Navigation("Lessons");
                 });
 
             modelBuilder.Entity("SadSchool.Models.StartTime", b =>

@@ -19,6 +19,8 @@ public partial class SadSchoolContext : DbContext
 
     public virtual DbSet<Lesson> Lessons { get; set; }
 
+    public virtual DbSet<ScheduledLesson> ScheduledLessons { get; set; }
+
     public virtual DbSet<StartTime> StartTimes { get; set; }
 
     public virtual DbSet<Student> Students { get; set; }
@@ -79,14 +81,14 @@ public partial class SadSchoolContext : DbContext
                 .HasConstraintName("FK_class_teacher");
         });
 
-        modelBuilder.Entity<Lesson>(entity =>
+        modelBuilder.Entity<ScheduledLesson>(entity =>
         {
-            entity.ToTable("lesson");
+            entity.ToTable("scheduled_lessons");
 
             entity.Property(e => e.Id)
                 .HasColumnName("id");
 
-            entity.Property(e => e.Date).HasColumnName("date");
+            entity.Property(e => e.Day).HasColumnName("day");
             entity.Property(e => e.ClassId).HasColumnName("class_id");
             entity.Property(e => e.StartTimeId).HasColumnName("start_time_id");
             entity.Property(e => e.SubjectId).HasColumnName("subject_id");
@@ -101,7 +103,7 @@ public partial class SadSchoolContext : DbContext
             entity.HasOne(d => d.StartTime).WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.StartTimeId)
                 .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_lesson_schedule_position");
+                .HasConstraintName("FK_lesson_schedule");
 
             entity.HasOne(d => d.Subject).WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.SubjectId)
@@ -112,6 +114,20 @@ public partial class SadSchoolContext : DbContext
                 .HasForeignKey(d => d.TeacherId)
                 .OnDelete(DeleteBehavior.SetNull)
                 .HasConstraintName("FK_lesson_teacher");
+        });
+
+        modelBuilder.Entity<Lesson>(entity =>
+        {
+            entity.ToTable("lesson");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.ScheduledLessonId).HasColumnName("scheduled_lesson_id");
+
+            entity.HasOne(d => d.ScheduledLesson)
+                .WithMany(p => p.Lessons)
+                .HasForeignKey(d => d.ScheduledLessonId)
+                .OnDelete(DeleteBehavior.SetNull)
+                .HasConstraintName("FK_mark_scheduled_lessons");
         });
 
         modelBuilder.Entity<StartTime>(entity =>

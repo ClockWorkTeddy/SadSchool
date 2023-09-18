@@ -9,5 +9,5 @@ public partial class Subject
 
     public string Name { get; set; } = null!;
 
-    public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+    public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 }

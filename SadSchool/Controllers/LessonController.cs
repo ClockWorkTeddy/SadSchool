@@ -25,7 +25,7 @@ namespace SadSchool.Controllers
         {
             var lessons = new List<LessonViewModel>();
 
-            foreach (var lesson in _context.Lessons.Include(l => l.Teacher)
+            foreach (var lesson in _context.ScheduledLessons.Include(l => l.Teacher)
                                                    .Include(l => l.Subject)
                                                    .Include(l => l.Class)
                                                    .Include(l => l.StartTime).ToList())
@@ -37,7 +37,7 @@ namespace SadSchool.Controllers
                     SubjectName = lesson?.Subject?.Name,
                     ClassName = lesson?.Class?.Name,
                     TeacherName = $"{lesson?.Teacher?.FirstName} {lesson?.Teacher?.LastName}",
-                    Date = lesson?.Date
+                    Date = lesson?.Day
                 });
             }
 
@@ -120,16 +120,16 @@ namespace SadSchool.Controllers
         {
             if (ModelState.IsValid)
             {
-                var lesson = new Lesson
+                var lesson = new ScheduledLesson
                 {
                     ClassId = viewModel.ClassId,
                     SubjectId = viewModel.SubjectId,
                     TeacherId = viewModel.TeacherId,
                     StartTimeId = viewModel.StartTimeId,
-                    Date = viewModel.Date
+                    Day = viewModel.Date
                 };
 
-                _context.Lessons.Add(lesson);
+                _context.ScheduledLessons.Add(lesson);
                 await _context.SaveChangesAsync();
             }
 
@@ -141,11 +141,11 @@ namespace SadSchool.Controllers
         {
             if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                var editedLesson = _context.Lessons.Find(id);
+                var editedLesson = _context.ScheduledLessons.Find(id);
 
                 LessonViewModel viewModel = new()
                 {
-                    Date = editedLesson?.Date,
+                    Date = editedLesson?.Day,
                     StartTimes = GetStartTimesList(editedLesson.StartTimeId),
                     Subjects = GetSubjectsList(editedLesson.SubjectId),
                     Teachers = GetTeachersList(editedLesson.TeacherId),
@@ -165,17 +165,17 @@ namespace SadSchool.Controllers
         {
             if (ModelState.IsValid && viewModel != null)
             {
-                var Lesson = new Lesson
+                var Lesson = new ScheduledLesson
                 {
                     Id = viewModel.Id,
-                    Date = viewModel.Date,
+                    Day = viewModel.Date,
                     ClassId = viewModel.ClassId,
                     SubjectId = viewModel.SubjectId,
                     TeacherId = viewModel.TeacherId,
                     StartTimeId = viewModel.StartTimeId
                 };
 
-                _context.Lessons.Update(Lesson);
+                _context.ScheduledLessons.Update(Lesson);
                 await _context.SaveChangesAsync();
 
                 return RedirectToAction("Lessons");
@@ -191,11 +191,11 @@ namespace SadSchool.Controllers
         {
             if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                var lesson = await _context.Lessons.FindAsync(id);
+                var lesson = await _context.ScheduledLessons.FindAsync(id);
 
                 if (lesson != null)
                 {
-                    _context.Lessons.Remove(lesson);
+                    _context.ScheduledLessons.Remove(lesson);
                     await _context.SaveChangesAsync();
                 }
             }

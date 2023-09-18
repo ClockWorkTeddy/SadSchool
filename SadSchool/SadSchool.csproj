@@ -38,9 +38,6 @@
     <None Update="auth.db">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <None Update="sad_school.db">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </None>
     <None Update="sad_school.db-shm">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
