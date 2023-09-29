@@ -30,7 +30,10 @@
                 Map["Lesson:Lessons"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                     Map["Lesson:Add"] = new UrlParams { Controller = "Lesson", Action = "Lessons" };
                     Map["Lesson:Edit"] = new UrlParams { Controller = "Lesson", Action = "Lessons" };
-                Map["Mark:Marks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+                Map["ScheduledLesson:ScheduledLessons"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+                    Map["ScheduledLesson:Add"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
+                    Map["ScheduledLesson:Edit"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
+            Map["Mark:Marks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                     Map["Mark:Add"] = new UrlParams { Controller = "Mark", Action = "Marks" };
                     Map["Mark:Edit"] = new UrlParams { Controller = "Mark", Action = "Marks" };
                 Map["StartTime:StartTimes"] = new UrlParams { Controller = "Data", Action = "DataIndex" };

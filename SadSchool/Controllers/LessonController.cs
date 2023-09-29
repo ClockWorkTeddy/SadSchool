@@ -1,11 +1,9 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
-using SadSchool.ViewModels;
 using SadSchool.Services;
-using Microsoft.AspNetCore.Authorization;
+using SadSchool.ViewModels;
 
 namespace SadSchool.Controllers
 {
@@ -25,19 +23,22 @@ namespace SadSchool.Controllers
         {
             var lessons = new List<LessonViewModel>();
 
-            foreach (var lesson in _context.ScheduledLessons.Include(l => l.Teacher)
-                                                   .Include(l => l.Subject)
-                                                   .Include(l => l.Class)
-                                                   .Include(l => l.StartTime).ToList())
+            foreach (var lesson in _context.Lessons
+                .Include(l => l.ScheduledLesson.Class)
+                .Include(l => l.ScheduledLesson.Teacher)
+                .Include(l => l.ScheduledLesson.StartTime)
+                .Include(l => l.ScheduledLesson.Subject))
             {
                 lessons.Add(new LessonViewModel
                 {
                     Id = lesson.Id,
-                    StartTimeValue = lesson?.StartTime?.Value,
-                    SubjectName = lesson?.Subject?.Name,
-                    ClassName = lesson?.Class?.Name,
-                    TeacherName = $"{lesson?.Teacher?.FirstName} {lesson?.Teacher?.LastName}",
-                    Date = lesson?.Day
+                    Date = lesson?.Date,
+                    LessonData = $"{lesson?.ScheduledLesson?.Day} " +
+                                 $"{lesson?.ScheduledLesson?.StartTime?.Value} " + 
+                                 $"{lesson?.ScheduledLesson?.Subject?.Name} " +
+                                 $"{lesson?.ScheduledLesson?.Class?.Name} " +
+                                 $"{lesson?.ScheduledLesson?.Teacher?.FirstName} " +
+                                 $"{lesson?.ScheduledLesson?.Teacher?.LastName} "
                 });
             }
 
@@ -53,10 +54,7 @@ namespace SadSchool.Controllers
             {
                 LessonViewModel viewModel = new()
                 {
-                    Classes = GetClassesList(null),
-                    Subjects = GetSubjectsList(null),
-                    Teachers = GetTeachersList(null),
-                    StartTimes = GetStartTimesList(null)
+                    ScheduledLessons = GetScheduledLessonsList(null)
                 };
 
                 _navigationService.RefreshBackParams(RouteData);
@@ -67,70 +65,39 @@ namespace SadSchool.Controllers
             return RedirectToAction("Lessons");
         }
 
-        private List<SelectListItem> GetClassesList(int? classId)
+        private List<SelectListItem> GetScheduledLessonsList(int? lessonId)
         {
-            var classes = _context.Classes.ToList();
+            var scheduledLessons = _context.ScheduledLessons
+                .Include(sl => sl.Subject)
+                .Include(sl => sl.Class)
+                .Include(sl => sl.Teacher)
+                .Include(sl => sl.StartTime).ToList();
 
-            return classes.Select(theClass => new SelectListItem
+            return scheduledLessons.Select(scheduledLesson => new SelectListItem
             {
-                Value = theClass.Id.ToString(),
-                Text = theClass.Name,
-                Selected = theClass.Id == classId
-            }).ToList();
-        }
-
-        private List<SelectListItem> GetSubjectsList(int? subjectId)
-        {
-            var subjects = _context.Subjects.ToList();
-
-            return subjects.Select(subject => new SelectListItem
-            {
-                Value = subject.Id.ToString(),
-                Text = subject.Name,
-                Selected = subject.Id == subjectId
-            }).ToList();
-        }
-
-        private List<SelectListItem> GetTeachersList(int? teacherId)
-        {
-            var teachers = _context.Teachers.ToList();
-
-            return teachers.Select(teacher => new SelectListItem
-            {
-                Value = teacher.Id.ToString(),
-                Text = $"{teacher.FirstName} {teacher.LastName}",
-                Selected = teacher.Id == teacherId
-            }).ToList();
-        }
-
-        private List<SelectListItem> GetStartTimesList(int? startId)
-        {
-            var starts = _context.StartTimes.ToList();
-
-            return starts.Select(start => new SelectListItem
-            {
-                Value = start.Id.ToString(),
-                Text = start.Value,
-                Selected = start.Id == startId
+                Value = scheduledLesson.Id.ToString(),
+                Text = $"{scheduledLesson.Subject?.Name} " +
+                       $"{scheduledLesson.Class?.Name} " +
+                       $"{scheduledLesson.Teacher?.FirstName} " +
+                       $"{scheduledLesson.Teacher?.LastName} " +
+                       $"{scheduledLesson.StartTime?.Value}",
+                Selected = lessonId?.ToString() == scheduledLesson.Id.ToString()
             }).ToList();
         }
 
         [HttpPost]
-        public async Task<IActionResult> Add(LessonViewModel viewModel)
+        public IActionResult Add(LessonViewModel viewModel)
         {
             if (ModelState.IsValid)
             {
-                var lesson = new ScheduledLesson
+                var lesson = new Lesson
                 {
-                    ClassId = viewModel.ClassId,
-                    SubjectId = viewModel.SubjectId,
-                    TeacherId = viewModel.TeacherId,
-                    StartTimeId = viewModel.StartTimeId,
-                    Day = viewModel.Date
+                    Date = viewModel.Date,
+                    ScheduledLessonId = viewModel.ScheduledLessonId,
                 };
 
-                _context.ScheduledLessons.Add(lesson);
-                await _context.SaveChangesAsync();
+                _context.Lessons.Add(lesson);
+                _context.SaveChanges();
             }
 
             return RedirectToAction("Lessons");
@@ -141,15 +108,13 @@ namespace SadSchool.Controllers
         {
             if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                var editedLesson = _context.ScheduledLessons.Find(id);
+                var editedLesson = _context.Lessons.Find(id);
 
                 LessonViewModel viewModel = new()
                 {
-                    Date = editedLesson?.Day,
-                    StartTimes = GetStartTimesList(editedLesson.StartTimeId),
-                    Subjects = GetSubjectsList(editedLesson.SubjectId),
-                    Teachers = GetTeachersList(editedLesson.TeacherId),
-                    Classes = GetClassesList(editedLesson.ClassId)
+                    Id = editedLesson.Id,
+                    Date = editedLesson.Date,
+                    ScheduledLessons = GetScheduledLessonsList(editedLesson.ScheduledLessonId)
                 };
 
                 _navigationService.RefreshBackParams(RouteData);
@@ -161,42 +126,37 @@ namespace SadSchool.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Edit(LessonViewModel viewModel)
+        public IActionResult Edit(LessonViewModel viewModel)
         {
             if (ModelState.IsValid && viewModel != null)
             {
-                var Lesson = new ScheduledLesson
+                var lesson = new Lesson
                 {
                     Id = viewModel.Id,
-                    Day = viewModel.Date,
-                    ClassId = viewModel.ClassId,
-                    SubjectId = viewModel.SubjectId,
-                    TeacherId = viewModel.TeacherId,
-                    StartTimeId = viewModel.StartTimeId
+                    Date = viewModel.Date,
+                    ScheduledLessonId = viewModel.ScheduledLessonId
                 };
 
-                _context.ScheduledLessons.Update(Lesson);
-                await _context.SaveChangesAsync();
+                _context.Lessons.Update(lesson);
+                _context.SaveChanges();
 
                 return RedirectToAction("Lessons");
             }
-            else
-            {
-                return View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
-            }
+
+            return View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public IActionResult Delete(int id)
         {
             if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
             {
-                var lesson = await _context.ScheduledLessons.FindAsync(id);
+                var lesson = _context.Lessons.Find(id);
 
                 if (lesson != null)
                 {
-                    _context.ScheduledLessons.Remove(lesson);
-                    await _context.SaveChangesAsync();
+                    _context.Lessons.Remove(lesson);
+                    _context.SaveChanges();
                 }
             }
 

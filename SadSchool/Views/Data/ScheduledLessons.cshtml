@@ -1,4 +1,4 @@
-﻿@model List<SadSchool.ViewModels.LessonViewModel>
+﻿@model List<SadSchool.ViewModels.ScheduledLessonViewModel>
 
 <!DOCTYPE html>
 <html lang="en">
@@ -17,10 +17,10 @@
             {
                 <div class="row" style="margin-top:30px">
                     <div class="col-12 d-flex justify-content-center">
-                        <a class="btn btn-sad btn-main-sad blinker-sad"
-                           role="button"
-                           style="display: flex; align-items: center; justify-content: center;"
-                           asp-controller="Lesson" asp-action="Add">Add Lesson</a>
+                    <a class="btn btn-sad btn-main-sad blinker-sad"
+                       role="button"
+                       style="display: flex; align-items: center; justify-content: center;"
+                       asp-controller="ScheduledLesson" asp-action="Add">Add Scheduled Lesson</a>
                     </div>
                 </div>
             }
@@ -30,8 +30,11 @@
                         <thead>
                             <tr>
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width:100px">#</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Starts</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Subject</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Class</th>
+                                <th scope="col" class="h3-sad blinker-sad border-dark">Teacher</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Date</th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark">LessonData</th>
                                 @if (!User.IsInRole("user"))
                                 {
                                     <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
@@ -48,23 +51,32 @@
                                     <div class="blinker-sad">@lesson.Id</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@lesson.Date</div>
+                                    <div class="blinker-sad">@lesson.StartTimeValue</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@lesson.LessonData</div>
+                                    <div class="blinker-sad">@lesson.SubjectName</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@lesson.ClassName</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@lesson.TeacherName</div>
+                                </td>
+                                <td class="td-sad">
+                                    <div class="blinker-sad">@lesson.Day</div>
                                 </td>
                                 @if (!User.IsInRole("user"))
                                 {
                                     <td class="td-sad">
                                         <div class="d-flex justify-content-center">
                                             <a class="btn btn-sad btn-service-sad blinker-sad"
-                                               role="button"
-                                               style="display: flex; align-items: center; justify-content: center;"
-                                               asp-controller="Lesson" asp-action="Edit" asp-route-id="@lesson.Id">Edit</a>
+                                            role="button"
+                                            style="display: flex; align-items: center; justify-content: center;"
+                                            asp-controller="ScheduledLesson" asp-action="Edit" asp-route-id="@lesson.Id">Edit</a>
                                         </div>
                                     </td>
                                     <td class="td-sad">
-                                        <form asp-action="Delete" asp-route-id="@lesson.Id" asp-controller="Lesson" method="post">
+                                        <form asp-action="Delete" asp-route-id="@lesson.Id" asp-controller="ScheduledLesson" method="post">
                                             <div class="d-flex justify-content-center">
                                                 <button type="submit" class="btn btn-sad btn-service-sad blinker-danger-sad">
                                                     Delete

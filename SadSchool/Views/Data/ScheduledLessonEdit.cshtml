@@ -1,0 +1,42 @@
+﻿@model SadSchool.ViewModels.ScheduledLessonViewModel;
+
+<div class="text-center blinker-sad h3-sad">
+    Edit the Lesson
+</div>
+<form method="post" asp-controller="Lesson" asp-action="Edit">
+    <div class="container" style="padding-top:30px">
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div class="container d-flex" style="flex-direction:column; align-items:center;
+                                                     text-align:center; padding-block:10px">
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="Day"></label>
+                    <input asp-for="Day" class="input-sad blinker-sad" />
+                    <span asp-validation-for="Day"></span>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="ClassId">Class</label>
+                    <select asp-for="ClassId" asp-items="@Model.Classes" class="input-sad blinker-sad">
+                    </select>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="SubjectId">Subject</label>
+                    <select asp-for="SubjectId" asp-items="@Model.Subjects" class="input-sad blinker-sad">
+                    </select>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="TeacherId">Teacher</label>
+                    <select asp-for="TeacherId" asp-items="@Model.Teachers" class="input-sad blinker-sad">
+                    </select>
+
+                    <label class="blinker-sad" style="margin-top: 5px" asp-for="StartTimeId">Starts</label>
+                    <select asp-for="StartTimeId" asp-items="@Model.StartTimes" class="input-sad blinker-sad">
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                <div>
+                    <input type="submit" value="Save" class="btn btn-sad btn-service-sad blinker-sad" />
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
