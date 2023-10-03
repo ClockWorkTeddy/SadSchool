@@ -18,5 +18,8 @@ namespace SadSchool.Services.Schedule
         public string Day { get; set; }
         public string ClassName { get; set; }
         public List<string> LessonName { get; set; }
+
+        public override string ToString() =>
+            String.Join("\r\n", LessonName);
     }
 }

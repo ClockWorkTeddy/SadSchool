@@ -14,7 +14,8 @@
         <div class="container scroll-sad" style="max-width: 800px; max-height: 600px">
             <div class="row justify-content-center" style="margin-top:30px">
                 <div class="col-12 d-flex justify-content-center">
-                    <a class="btn btn-sad btn-main-sad blinker-sad" role="button">Schedule</a>
+                    <a class="btn btn-sad btn-main-sad blinker-sad" role="button"
+                       asp-controller="Schedule" asp-action="GetSchedule">Schedule</a>
                 </div>
             </div>
             @if (@User.Identity.IsAuthenticated)
