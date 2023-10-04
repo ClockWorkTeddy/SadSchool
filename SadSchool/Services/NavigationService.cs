@@ -33,7 +33,7 @@
                 Map["ScheduledLesson:ScheduledLessons"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                     Map["ScheduledLesson:Add"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
                     Map["ScheduledLesson:Edit"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
-            Map["Mark:Marks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+                Map["Mark:Marks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                     Map["Mark:Add"] = new UrlParams { Controller = "Mark", Action = "Marks" };
                     Map["Mark:Edit"] = new UrlParams { Controller = "Mark", Action = "Marks" };
                 Map["StartTime:StartTimes"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
@@ -48,6 +48,7 @@
                 Map["Teacher:Teachers"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                     Map["Teacher:Add"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
                     Map["Teacher:Edit"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
+                Map["Schedule:GetSchedule"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
             Map["Stuff:Stuff"] = new UrlParams { Controller = "Home", Action = "Index" };
                 Map["Users:Users"] = new UrlParams { Controller = "Stuff", Action = "Stuff" };
                     Map["Users:Register"] = new UrlParams { Controller = "Users", Action = "Users" };

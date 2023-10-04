@@ -31,6 +31,8 @@ namespace SadSchool.Controllers
             ScheduleService service = new ScheduleService(scheduledLessons);
             var scheduleCells = service.GetScheduleCells();
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/Representation/Schedule.cshtml", new ScheduleViewModel() 
             { 
                 Classes = service.Classes,

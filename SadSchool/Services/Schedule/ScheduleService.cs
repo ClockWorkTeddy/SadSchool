@@ -35,15 +35,16 @@ namespace SadSchool.Services.Schedule
                     cell = new ScheduleCell
                     {
                         Day = scheduledLesson.Day,
+                        StartTime = scheduledLesson.StartTime.Value,
                         ClassName = scheduledLesson.Class.Name,
-                        LessonName = new List<string> { scheduledLesson.Subject.Name }
+                        LessonInfo = new List<string> { $"{scheduledLesson.StartTime.Value}: {scheduledLesson.Subject.Name}" }
                     };
 
                     _unsortedCells.Add(cell);
                 }
                 else
                 {
-                    cell.LessonName.Add(scheduledLesson.Subject.Name);
+                    cell.LessonInfo.Add($"{scheduledLesson.StartTime.Value}: {scheduledLesson.Subject.Name}");
                 }
             }
         }

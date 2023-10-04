@@ -16,10 +16,11 @@ namespace SadSchool.Services.Schedule
     public class ScheduleCell
     {
         public string Day { get; set; }
+        public string StartTime { get; set; }
         public string ClassName { get; set; }
-        public List<string> LessonName { get; set; }
+        public List<string> LessonInfo { get; set; }
 
         public override string ToString() =>
-            String.Join("\r\n", LessonName);
+            String.Join("\r\n", $"{StartTime}: {LessonInfo}");
     }
 }

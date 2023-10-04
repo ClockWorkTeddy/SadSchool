@@ -176,7 +176,7 @@ namespace SadSchool.Controllers
                 _context.ScheduledLessons.Update(Lesson);
                 await _context.SaveChangesAsync();
 
-                return RedirectToAction("Lessons");
+                return RedirectToAction("ScheduledLessons");
             }
 
             return View(@"~/Views/Data/ScheduledLessonEdit.cshtml", viewModel);
