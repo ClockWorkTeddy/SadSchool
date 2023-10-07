@@ -121,13 +121,13 @@ footer {
 }
 
 .input-sad {
-    height:50px;
-    border-radius:25px;
-    border-width:3px;
-    width:200px;
-    border-image:none;
-    border-style:solid;
-    font-weight:600;
+    height: 50px;
+    border-radius: 25px;
+    border-width: 3px;
+    width: 200px;
+    border-image: none;
+    border-style: solid;
+    font-weight: 600;
     font-size: 22px;
     padding-bottom: 3px;
     padding-left: 15px;
