@@ -150,3 +150,7 @@ footer {
 .scroll-sad::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
 }
+
+.tooltip {
+    border-bottom: 1px dotted white;
+}

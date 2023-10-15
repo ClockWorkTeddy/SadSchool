@@ -35,16 +35,28 @@ namespace SadSchool.Services.Schedule
                     cell = new ScheduleCell
                     {
                         Day = scheduledLesson.Day,
-                        StartTime = scheduledLesson.StartTime.Value,
                         ClassName = scheduledLesson.Class.Name,
-                        LessonInfo = new List<string> { $"{scheduledLesson.StartTime.Value}: {scheduledLesson.Subject.Name}" }
+                        LessonInfos = new List<LessonInfo> 
+                        { 
+                            new LessonInfo
+                            {
+                                Teacher = $"{scheduledLesson.Teacher.FirstName} {scheduledLesson.Teacher.LastName}",
+                                StartTime = scheduledLesson.StartTime.Value,
+                                Name = scheduledLesson.Subject.Name
+                            }
+                        }
                     };
 
                     _unsortedCells.Add(cell);
                 }
                 else
                 {
-                    cell.LessonInfo.Add($"{scheduledLesson.StartTime.Value}: {scheduledLesson.Subject.Name}");
+                    cell.LessonInfos.Add(new LessonInfo
+                    {
+                        Teacher = $"{scheduledLesson.Teacher.FirstName} {scheduledLesson.Teacher.LastName}",
+                        StartTime = scheduledLesson.StartTime.Value,
+                        Name = scheduledLesson.Subject.Name
+                    });
                 }
             }
         }
