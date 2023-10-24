@@ -149,15 +149,16 @@ namespace SadSchool.Controllers
 
         private List<SelectListItem> GetLessonsList(int? lessonId)
         {
-            var lessons = _context.ScheduledLessons
-                .Include(l => l.StartTime)
-                .Include(l => l.Subject)
-                .Include(l => l.Class).ToList();
+            var lessons = _context.Lessons
+                .Include(l => l.ScheduledLesson.Class)
+                .Include(l => l.ScheduledLesson.StartTime)
+                .Include(l => l.ScheduledLesson.Subject)
+                .ToList();
 
             return lessons.Select(lesson => new SelectListItem
             {
                 Value = lesson.Id.ToString(),
-                Text = $"{lesson.StartTime.Value} {lesson.Subject.Name} {lesson.Class.Name} {lesson.Day}",
+                Text = $"{lesson.Date} {lesson.ScheduledLesson}",
                 Selected = lesson.Id == lessonId
             }).ToList();
         }
