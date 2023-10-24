@@ -33,12 +33,7 @@ namespace SadSchool.Controllers
                 {
                     Id = lesson.Id,
                     Date = lesson?.Date,
-                    LessonData = $"{lesson?.ScheduledLesson?.Day} " +
-                                 $"{lesson?.ScheduledLesson?.StartTime?.Value} " + 
-                                 $"{lesson?.ScheduledLesson?.Subject?.Name} " +
-                                 $"{lesson?.ScheduledLesson?.Class?.Name} " +
-                                 $"{lesson?.ScheduledLesson?.Teacher?.FirstName} " +
-                                 $"{lesson?.ScheduledLesson?.Teacher?.LastName} "
+                    LessonData = $"{lesson.ScheduledLesson} "
                 });
             }
 
@@ -73,16 +68,15 @@ namespace SadSchool.Controllers
                 .Include(sl => sl.Teacher)
                 .Include(sl => sl.StartTime).ToList();
 
-            return scheduledLessons.Select(scheduledLesson => new SelectListItem
-            {
-                Value = scheduledLesson.Id.ToString(),
-                Text = $"{scheduledLesson.Subject?.Name} " +
-                       $"{scheduledLesson.Class?.Name} " +
-                       $"{scheduledLesson.Teacher?.FirstName} " +
-                       $"{scheduledLesson.Teacher?.LastName} " +
-                       $"{scheduledLesson.StartTime?.Value}",
-                Selected = lessonId?.ToString() == scheduledLesson.Id.ToString()
-            }).ToList();
+            return scheduledLessons
+                .OrderBy(scheduledLesson => scheduledLesson.Class.Name, new MixedNumericStringComparer())
+                .OrderBy(scheduledLesson => GetDayOfWeekNumber(scheduledLesson.Day))
+                .Select(scheduledLesson => new SelectListItem
+                {
+                    Value = scheduledLesson.Id.ToString(),
+                    Text = $"{scheduledLesson}",
+                    Selected = lessonId?.ToString() == scheduledLesson.Id.ToString()
+                }).ToList();
         }
 
         [HttpPost]
@@ -161,6 +155,25 @@ namespace SadSchool.Controllers
             }
 
             return RedirectToAction("Lessons");
+        }
+
+        int GetDayOfWeekNumber(string day)
+        {
+            switch (day)
+            {
+                case "Mon":
+                    return 1;
+                case "Tue":
+                    return 2;
+                case "Wed":
+                    return 3;
+                case "Thu":
+                    return 4;
+                case "Fri":
+                    return 5;
+                default:
+                    return int.MaxValue; // Place unknown days at the end
+            }
         }
     }
 }

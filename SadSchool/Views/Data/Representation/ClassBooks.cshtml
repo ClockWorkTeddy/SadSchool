@@ -1,0 +1,26 @@
+﻿@model SadSchool.ViewModels.ScheduleViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="container scroll-sad" style="max-width: 800px; max-height: 600px">
+            <div class="row justify-content-center" style="margin-top:30px">
+                <div class="col-12 d-flex justify-content-center">
+                    <a class="btn btn-sad btn-main-sad blinker-sad" role="button"
+                       asp-controller="Schedule" asp-action="GetSchedule">Schedule</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
