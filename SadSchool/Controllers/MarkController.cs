@@ -25,15 +25,16 @@ namespace SadSchool.Controllers
 
             foreach (var mark in _context.Marks
                 .Include(m => m.Student)
-                .Include(m => m.Lesson))
+                .Include(m => m.Lesson.ScheduledLesson.StartTime)
+                .Include(m => m.Lesson.ScheduledLesson.Class)
+                .Include(m => m.Lesson.ScheduledLesson.Subject))
             { 
                 marks.Add(new MarkViewModel
                 {
                     Id = mark.Id,
                     Value = mark.Value,
                     Student = $"{mark.Student?.FirstName} {mark.Student?.LastName}",
-                    Lesson = $"{mark.Lesson?.ScheduledLesson?.Subject?.Name} " +
-                             $"{mark.Lesson?.Date} {mark.Lesson?.ScheduledLesson?.StartTime?.Value}"
+                    Lesson = $"{mark.Lesson}"
                 });
             }
 

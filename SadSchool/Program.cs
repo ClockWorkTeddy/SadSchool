@@ -3,6 +3,8 @@ using SadSchool.Models;
 using Azure.Identity;
 using Microsoft.AspNetCore.Identity;
 using SadSchool.Services;
+using SadSchool.Controllers.Contracts;
+using SadSchool.Services.ClassBook;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,6 +26,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
 }).AddEntityFrameworkStores<AuthDbContext>();
 
 builder.Services.AddSingleton<INavigationService, NavigationService>();
+builder.Services.AddScoped<IClassBookService, ClassBookService>();
 
 var app = builder.Build();
 
