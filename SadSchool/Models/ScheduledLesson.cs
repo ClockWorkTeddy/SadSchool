@@ -23,4 +23,8 @@ public partial class ScheduledLesson
     public virtual Teacher? Teacher { get; set; } = null!;
 
     public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
+
+    public override string ToString() =>
+        $"{Day} {Class?.Name} {StartTime?.Value} {Subject?.Name} {Teacher}";
+            
 }

@@ -49,6 +49,9 @@
                     Map["Teacher:Add"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
                     Map["Teacher:Edit"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
                 Map["Schedule:GetSchedule"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+                Map["ClassBooks:ClassBooks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+                    Map["ClassBooks:ClassBook"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBooks" };
+                        Map["ClassBooks:ClassBookTable"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBook" };       
             Map["Stuff:Stuff"] = new UrlParams { Controller = "Home", Action = "Index" };
                 Map["Users:Users"] = new UrlParams { Controller = "Stuff", Action = "Stuff" };
                     Map["Users:Register"] = new UrlParams { Controller = "Users", Action = "Users" };
