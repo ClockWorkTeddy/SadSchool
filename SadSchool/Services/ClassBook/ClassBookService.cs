@@ -31,6 +31,7 @@ namespace SadSchool.Services.ClassBook
 
             GetRawMarks();
             GetMarkData();
+            GetMarkTable();
 
             return new ClassBookViewModel
             {
@@ -42,12 +43,29 @@ namespace SadSchool.Services.ClassBook
             };
         }
 
+        private void GetMarkTable()
+        {
+            _markCellsTable = new MarkCell[_students.Count, _dates.Count];
+
+            for (int i = 0; i < _students.Count; i++)
+            {
+                for (int j = 0; j < _dates.Count; j++)
+                {
+                    _markCellsTable[i, j] = _markCells.FirstOrDefault(mc => mc.Date == _dates[j] && mc.StudentName == _students[i]);
+                }
+            }
+        }
+
         private void GetRawMarks()
         {
             var allMarks = _context.Marks
                 .Include(m => m.Student)
-                .Include(m => m.Lesson.ScheduledLesson.Class)
-                .Include(m => m.Lesson.ScheduledLesson.Subject)
+                .Include(m => m.Lesson.ScheduledLesson)
+                    .ThenInclude(sl => sl.Subject)
+                .Include(m => m.Lesson.ScheduledLesson)
+                    .ThenInclude(sl => sl.Class)
+                .Include(m => m.Lesson.ScheduledLesson)
+                    .ThenInclude(sl => sl.StartTime)
                 .ToList(); 
             
             _rawMarks = allMarks.Where(m => m.Lesson?.ScheduledLesson?.Subject?.Name == _subjectName 
@@ -58,7 +76,7 @@ namespace SadSchool.Services.ClassBook
         {
             _markCells = _rawMarks.Select(mc => new MarkCell
             {
-                Date = mc.Lesson.Date,
+                Date = $"{mc.Lesson.Date} {mc.Lesson.ScheduledLesson.StartTime.Value}",
                 Mark = mc.Value,
                 StudentName = $"{mc.Student.LastName} {mc.Student.FirstName}"
             }).ToList();
