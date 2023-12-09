@@ -1,10 +1,14 @@
-﻿namespace SadSchool.Services
+﻿using SadSchool.Models;
+
+namespace SadSchool.Services
 {
     public interface INavigationService
     {
         public string Controller { get; set; }
         public string Action { get; set; }
+        public string ClassName { get; }
         public void RefreshBackParams(RouteData routeData);
+        public void StoreClassName(string className);
     }
 
     public struct UrlParams
@@ -18,7 +22,12 @@
         public string Controller { get; set; }
         public string Action { get; set; }
 
+        public string ClassName { get; private set; }
+
         private Dictionary<string, UrlParams> Map = new Dictionary<string, UrlParams>();
+
+        public void StoreClassName(string className) =>
+            ClassName = className;
 
         public NavigationService()
         {
@@ -51,7 +60,7 @@
                 Map["Schedule:GetSchedule"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                 Map["ClassBooks:ClassBooks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                     Map["ClassBooks:ClassBook"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBooks" };
-                        Map["ClassBooks:ClassBookTable"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBook" };       
+                        Map["ClassBooks:ClassBookTable"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBook" };
             Map["Stuff:Stuff"] = new UrlParams { Controller = "Home", Action = "Index" };
                 Map["Users:Users"] = new UrlParams { Controller = "Stuff", Action = "Stuff" };
                     Map["Users:Register"] = new UrlParams { Controller = "Users", Action = "Users" };

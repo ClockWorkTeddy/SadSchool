@@ -32,6 +32,13 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult ClassBook(string className)
         {
+            var classMarks = _context.Marks.Where(m => m.Lesson.ScheduledLesson.Class.Name == className).ToList();
+
+            if (className != null)
+                _navigationService.StoreClassName(className);
+            else
+                className = _navigationService.ClassName;
+
             _navigationService.RefreshBackParams(RouteData);
 
             var subjects = _context.Subjects.Select(subject => subject.Name).ToList();
