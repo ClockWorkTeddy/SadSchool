@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using SadSchool.Services;
 using SadSchool.Controllers.Contracts;
 using SadSchool.Services.ClassBook;
+using SadSchool.Services.ApiServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,6 +28,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
 
 builder.Services.AddSingleton<INavigationService, NavigationService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
+builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

@@ -20,4 +20,9 @@ public partial class Student
     public virtual Class? Class { get; set; } = null!;
 
     public virtual ICollection<Mark> Marks { get; set; } = null!;
+
+    public override string ToString()
+    {
+        return $"{FirstName} {LastName}";
+    }
 }

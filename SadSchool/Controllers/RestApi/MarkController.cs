@@ -6,6 +6,7 @@ using Microsoft.IdentityModel.Tokens;
 using SadSchool.Models;
 using System.Diagnostics;
 using System.Configuration;
+using SadSchool.Services.ApiServices;
 
 namespace SadSchool.Controllers.RestApi
 {
@@ -16,11 +17,13 @@ namespace SadSchool.Controllers.RestApi
         private readonly SadSchoolContext _context;
         private readonly IConfiguration _configuration;
         private readonly string _apiKey = string.Empty;
-        public MarkController(SadSchoolContext context, IConfiguration configuration)
+        private readonly IMarksAnalyticsService _marksAnalyticsService;
+        public MarkController(SadSchoolContext context, IConfiguration configuration, IMarksAnalyticsService markAnalyticSevice)
         {
             _context = context;
             _configuration = configuration;
             _apiKey = _configuration["api-key"];
+            _marksAnalyticsService = markAnalyticSevice;
         }
 
         [HttpGet]
@@ -79,6 +82,24 @@ namespace SadSchool.Controllers.RestApi
             {
                 return Unauthorized();
             }
+        }
+
+        [HttpGet("{studentId}/{subjectId}")]
+        public IActionResult GetAverageMark(int studentId, int subjectId) 
+        {
+            var apiKey = HttpContext.Request.Headers["api-key"].FirstOrDefault();
+
+            if (apiKey == _apiKey)
+            {
+                var marks = _marksAnalyticsService.GetAverageMarks(studentId, subjectId);
+
+                return Ok(marks);
+            }
+            else
+            {
+                return Unauthorized();
+            }
+
         }
     }
 }
