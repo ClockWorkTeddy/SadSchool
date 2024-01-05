@@ -1,12 +1,8 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Mvc;
 using SadSchool.Models;
-using System.Diagnostics;
-using System.Configuration;
 using SadSchool.Services.ApiServices;
+using SadSchool.ViewModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace SadSchool.Controllers.RestApi
 {
@@ -99,7 +95,6 @@ namespace SadSchool.Controllers.RestApi
             {
                 return Unauthorized();
             }
-
         }
     }
 }

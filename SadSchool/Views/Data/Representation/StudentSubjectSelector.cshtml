@@ -1,0 +1,46 @@
+﻿@using SadSchool.ViewModels
+@model StudentSubjectSelectorViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <form method="get" asp-controller="Mark" asp-action="GetAverageMarks">
+        <div class="container" style="padding-top:30px; max-width: 800px">
+            <div class="row">
+                <div class="col-6 d-flex" style="justify-content:end">
+                    <div class="container d-flex" style="flex-direction:column; text-align:center; padding-block:10px; width: fit-content">
+                        <label class="blinker-sad" style="margin-top: 5px" asp-for="SelectedStudentId">Student</label>
+                        <select asp-for="SelectedStudentId" asp-items="@Model.Students" class="input-sad blinker-sad">
+                        </select>
+                        <span asp-validation-for="SelectedStudentId" style="color:orange"></span>
+                    </div>
+                </div>
+                <div class="col-6 d-flex" style="justify-content:start">
+                    <div class="container d-flex" style="flex-direction:column; text-align:center; padding-block:10px; width: fit-content">
+                        <label class="blinker-sad" style="margin-top: 5px" asp-for="SelectedSubjectId">Subject</label>
+                        <select asp-for="SelectedSubjectId" asp-items="@Model.Subjects" class="input-sad blinker-sad">
+                        </select>
+                        <span asp-validation-for="SelectedSubjectId" style="color:orange"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 d-flex" style="justify-content:center; align-items:center">
+                    <div>
+                        <input type="submit" value="Show" class="btn btn-sad btn-main-sad blinker-sad" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

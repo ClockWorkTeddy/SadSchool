@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
 using SadSchool.ViewModels;
 using SadSchool.Services;
+using SadSchool.Services.ApiServices;
 
 namespace SadSchool.Controllers
 {
@@ -11,11 +12,13 @@ namespace SadSchool.Controllers
     {
         private readonly SadSchoolContext _context;
         private readonly INavigationService _navigationService;
+        private readonly IMarksAnalyticsService _marksAnalyticsService;
 
-        public MarkController(SadSchoolContext context, INavigationService navigationService)
+        public MarkController(SadSchoolContext context, INavigationService navigationService, IMarksAnalyticsService marksAnalyticsService)
         {
             _context = context;
             _navigationService = navigationService;
+            _marksAnalyticsService = marksAnalyticsService;
         }
 
         [HttpGet]
@@ -174,6 +177,78 @@ namespace SadSchool.Controllers
                 Text = $"{student.FirstName} {student.LastName}",
                 Selected = student.Id == studentId
             }).ToList();
+        }
+
+        [HttpGet]
+        public IActionResult GetStudentSubject()
+        {
+            StudentSubjectSelectorViewModel viewModel = new()
+            {
+                Students = GetStudents(),
+                Subjects = GetSubjects()
+            };
+
+            return View(@"~/Views/Data/Representation/StudentSubjectSelector.cshtml", viewModel);
+        }
+
+        private List<SelectListItem> GetStudents()
+        {
+            var students = _context.Students.ToList();
+            var studentsItemList = new List<SelectListItem>() 
+            { 
+                new SelectListItem { Value = 0.ToString(), Text = "", Selected = true } 
+            };
+
+            studentsItemList.AddRange(students.Select(student => new SelectListItem
+            {
+                Value = student.Id.ToString(),
+                Text = student.ToString(),
+                Selected = false
+            }).ToList());
+
+            return studentsItemList;
+        }
+
+        private List<SelectListItem> GetSubjects()
+        {
+            var subjects = _context.Subjects.ToList();
+            var subjectsList = new List<SelectListItem>()
+            {
+                new SelectListItem { Value = 0.ToString(), Text = "", Selected = true }
+            };
+
+            subjectsList.AddRange(subjects.Select(subject => new SelectListItem
+            {
+                Value = subject.Id.ToString(),
+                Text = subject.Name,
+                Selected = false
+            }).ToList());
+
+            return subjectsList;
+        }
+
+        [HttpGet]
+        public IActionResult GetAverageMarks(StudentSubjectSelectorViewModel viewModel)
+        {
+            var studentId = viewModel.SelectedStudentId;
+            var subjectId = viewModel.SelectedSubjectId;
+
+            var marks = _marksAnalyticsService.GetAverageMarks(studentId, subjectId);
+            var students = marks.Select(m => m.StudentName).Distinct().Order().ToList();
+            var subjects = marks.Select(m => m.SubjectName).Distinct().Order().ToList();
+
+            var aveMarksTable = new AverageMark[students.Count, subjects.Count];
+
+            for (int i = 0; i < students.Count; i++)
+                for (int j = 0; j < subjects.Count; j++)
+                    aveMarksTable[i, j] = marks.FirstOrDefault(m => m.StudentName == students[i] && m.SubjectName == subjects[j]);
+
+            return View(@"~/Views/Data/Representation/AverageMarks.cshtml", new AverageMarksViewModel
+            {
+                AverageMarksTable = aveMarksTable,
+                Subjects = subjects,
+                Students = students
+            });
         }
 
     }

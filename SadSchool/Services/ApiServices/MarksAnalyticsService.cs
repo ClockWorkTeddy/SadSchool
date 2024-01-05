@@ -5,7 +5,7 @@ namespace SadSchool.Services.ApiServices
 {
     public interface IMarksAnalyticsService
     {
-        List<AverageMark> GetAverageMarks(int? studentName = null, int? subjectName = null);
+        List<AverageMark> GetAverageMarks(int studentName, int subjectName);
     }
 
     public class MarksAnalyticsService : IMarksAnalyticsService
@@ -17,7 +17,7 @@ namespace SadSchool.Services.ApiServices
             _context = context;
         }
 
-        public List<AverageMark> GetAverageMarks(int? studentId = null, int? subjectId = null)
+        public List<AverageMark> GetAverageMarks(int studentId, int subjectId)
         {
             List<AverageMark> averageMarks = new();
             var students = GetStudents(studentId);
