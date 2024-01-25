@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SadSchool.Models;
 
 namespace SadSchool.Services.ApiServices
@@ -11,10 +12,12 @@ namespace SadSchool.Services.ApiServices
     public class MarksAnalyticsService : IMarksAnalyticsService
     {
         private SadSchoolContext _context;
+        private readonly ICacheService _cacheService;
 
-        public MarksAnalyticsService(SadSchoolContext context)
+        public MarksAnalyticsService(SadSchoolContext context, ICacheService caceService)
         {
             _context = context;
+            _cacheService = caceService;
         }
 
         public List<AverageMark> GetAverageMarks(int studentId, int subjectId)
@@ -38,9 +41,10 @@ namespace SadSchool.Services.ApiServices
         private List<Subject> GetSubjects(int? subjectId)
         {
             if (subjectId == null || subjectId < 1)
-                return _context.Subjects.ToList();
+                return _context.Set<Subject>().ToList();
             else
-                return _context.Subjects.Where(s => s.Id == subjectId).ToList();
+                return _cacheService.GetObject<Subject>(subjectId.Value);
+
         }
 
         private List<Student> GetStudents(int? studentId)

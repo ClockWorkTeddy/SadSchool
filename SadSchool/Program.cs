@@ -27,8 +27,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
 }).AddEntityFrameworkStores<AuthDbContext>();
 
 builder.Services.AddSingleton<INavigationService, NavigationService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

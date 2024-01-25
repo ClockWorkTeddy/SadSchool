@@ -88,7 +88,7 @@ namespace SadSchool.Services.ClassBook
         private void GetDates()
         {
             _dates = _markCells.Select(cell => cell.Date).Distinct().ToList();
-            _dates.Order();
+            _dates = _dates.Order().ToList();
         }
 
         private void GetStudents() =>

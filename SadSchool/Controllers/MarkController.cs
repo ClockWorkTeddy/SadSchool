@@ -5,6 +5,7 @@ using SadSchool.Models;
 using SadSchool.ViewModels;
 using SadSchool.Services;
 using SadSchool.Services.ApiServices;
+using Microsoft.Extensions.Caching.Memory;
 
 namespace SadSchool.Controllers
 {
@@ -13,12 +14,17 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext _context;
         private readonly INavigationService _navigationService;
         private readonly IMarksAnalyticsService _marksAnalyticsService;
-
-        public MarkController(SadSchoolContext context, INavigationService navigationService, IMarksAnalyticsService marksAnalyticsService)
+        private readonly IMemoryCache _memoryCache;
+        public MarkController(
+            SadSchoolContext context, 
+            INavigationService navigationService, 
+            IMarksAnalyticsService marksAnalyticsService,
+            IMemoryCache memoryCache)
         {
             _context = context;
             _navigationService = navigationService;
             _marksAnalyticsService = marksAnalyticsService;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet]
@@ -188,6 +194,8 @@ namespace SadSchool.Controllers
                 Subjects = GetSubjects()
             };
 
+            _navigationService.RefreshBackParams(RouteData);
+
             return View(@"~/Views/Data/Representation/StudentSubjectSelector.cshtml", viewModel);
         }
 
@@ -242,6 +250,8 @@ namespace SadSchool.Controllers
             for (int i = 0; i < students.Count; i++)
                 for (int j = 0; j < subjects.Count; j++)
                     aveMarksTable[i, j] = marks.FirstOrDefault(m => m.StudentName == students[i] && m.SubjectName == subjects[j]);
+
+            _navigationService.RefreshBackParams(RouteData);
 
             return View(@"~/Views/Data/Representation/AverageMarks.cshtml", new AverageMarksViewModel
             {
