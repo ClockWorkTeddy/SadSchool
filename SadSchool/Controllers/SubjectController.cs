@@ -9,11 +9,13 @@ namespace SadSchool.Controllers
     {
         private readonly SadSchoolContext _context;
         private readonly INavigationService _navigationService;
+        private readonly ICacheService _cacheService;
 
-        public SubjectController(SadSchoolContext context, INavigationService navigationService)
+        public SubjectController(SadSchoolContext context, INavigationService navigationService, ICacheService cacheService)
         {
             _context = context;
             _navigationService = navigationService;
+            _cacheService = cacheService;
         }
 
         [HttpGet]
@@ -98,6 +100,7 @@ namespace SadSchool.Controllers
 
                 _context.Subjects.Update(subject);
                 _context.SaveChanges();
+                _cacheService.RefreshObject(subject);
                 return RedirectToAction("Subjects");
             }
             else

@@ -1,9 +1,7 @@
 ﻿namespace SadSchool.Models;
 
-public partial class ScheduledLesson
+public partial class ScheduledLesson : BaseModel
 {
-    public int Id { get; set; }
-
     public int? StartTimeId { get; set; }
 
     public int? SubjectId { get; set; }

@@ -3,10 +3,8 @@ using System.Collections.Generic;
 
 namespace SadSchool.Models;
 
-public partial class Teacher
+public partial class Teacher : BaseModel
 {
-    public int Id { get; set; }
-
     public string FirstName { get; set; } = null!;
 
     public string? LastName { get; set; }

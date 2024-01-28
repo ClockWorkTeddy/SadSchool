@@ -6,6 +6,7 @@ namespace SadSchool.Services
     public interface ICacheService
     {
         List<T> GetObject<T>(int id) where T : class;
+        void RefreshObject<T>(T obj) where T : class;
     }
     public class CacheService : ICacheService
     {
@@ -29,6 +30,14 @@ namespace SadSchool.Services
             }
 
             return new List<T> { cachedObject as T };
+        }
+
+        public void RefreshObject<T>(T obj) where T : class
+        {
+            var cacheKey = $"{typeof(T)}:{(obj as BaseModel).Id}";
+
+            if (_memoryCache.TryGetValue(cacheKey,out object? cachedObject))
+                _memoryCache.Set(cacheKey, obj as T);
         }
     }
 }

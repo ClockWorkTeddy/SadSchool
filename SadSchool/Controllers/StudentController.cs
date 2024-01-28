@@ -11,11 +11,12 @@ namespace SadSchool.Controllers
     {
         private readonly SadSchoolContext _context;
         private readonly INavigationService _navigationService;
-
-        public StudentController(SadSchoolContext context, INavigationService navigationService)
+        private readonly ICacheService _cacheService;
+        public StudentController(SadSchoolContext context, INavigationService navigationService, ICacheService cacheService)
         {
             _context = context;
             _navigationService = navigationService;
+            _cacheService = cacheService;
         }
 
         [HttpGet]
@@ -137,6 +138,8 @@ namespace SadSchool.Controllers
 
                 _context.Students.Update(student);
                 await _context.SaveChangesAsync();
+                _cacheService.RefreshObject(student);
+
                 return RedirectToAction("Students");
             }
             else
