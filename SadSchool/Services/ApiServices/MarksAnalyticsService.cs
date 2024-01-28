@@ -52,7 +52,7 @@ namespace SadSchool.Services.ApiServices
             if (studentId == null || studentId < 1)
                 return _context.Students.ToList();
             else
-                return _context.Students.Where(s => s.Id == studentId).ToList();
+                return _cacheService.GetObject<Student>(studentId.Value);
         }
 
         private AverageMark GetAveragesMark(Student student, Subject subject)
