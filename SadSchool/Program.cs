@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Identity;
 using SadSchool.Services;
 using SadSchool.Controllers.Contracts;
 using SadSchool.Services.ClassBook;
+using SadSchool.Services.ApiServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -26,7 +27,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
 }).AddEntityFrameworkStores<AuthDbContext>();
 
 builder.Services.AddSingleton<INavigationService, NavigationService>();
-builder.Services.AddScoped<IClassBookService, ClassBookService>();
+builder.Services.AddScoped<ICacheService, CacheService>();
+builder.Services.AddTransient<IClassBookService, ClassBookService>();
+builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 
 var app = builder.Build();
 

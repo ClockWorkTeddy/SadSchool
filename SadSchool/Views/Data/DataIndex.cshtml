@@ -21,6 +21,10 @@
                     <a class="btn btn-sad btn-main-sad blinker-sad" role="button"
                        asp-controller="ClassBooks" asp-action="ClassBooks">Class Books</a>
                 </div>
+                <div class="col-4 d-flex justify-content-center">
+                    <a class="btn btn-sad btn-main-sad blinker-sad" role="button"
+                       asp-controller="Mark" asp-action="GetStudentSubject">Average Marks</a>
+                </div>
             </div>
             @if (@User.Identity.IsAuthenticated)
             {     

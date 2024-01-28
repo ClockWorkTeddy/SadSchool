@@ -1,0 +1,53 @@
+﻿@using SadSchool.ViewModels
+@model AverageMarksViewModel
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="/lib/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/styles.css">
+    <title>Document</title>
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="container" style="max-width: 800px;">
+             <div class="row justify-content-center" style="margin-top:30px">
+                <div class="col-12 border border-dark scroll-sad" style="max-height: 680px; padding-top: 13px">
+                    <table class="table table-bordered border-dark">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="h3-lght-sad blinker-sad border-dark" style="text-align:center; vertical-align:middle">Student\Subject</th>
+                                @foreach(var subject in Model.Subjects)
+                                {
+                                    <th scope="col" class="h3-lght-sad blinker-sad border-dark" style="text-align:center">@subject</th>
+                                }
+                            </tr>
+                        </thead>
+                        @for(int i = 0; i < Model.Students.Count; i++)
+                        {
+                            <tr>
+                                <td class="h3-lght-sad blinker-sad border-dark" style="vertical-align: middle">
+                                    <div class="blinker-sad">@Model.Students[i]</div>
+                                </td>
+                                @for (int j = 0; j < Model.Subjects.Count; j++)
+                                {
+                                    <td class="td-sad" style="text-align:start; vertical-align:middle">
+                                        @if (Model.AverageMarksTable[i, j] != null)
+                                        {
+                                            <div class="blinker-sad h3-sad" style="text-align:center; font-style:italic">@Model.AverageMarksTable[i, j]</div>
+                                        }
+                                    </td>
+                                }
+                            </tr>
+                        }
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
