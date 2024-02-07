@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using SadSchool.Controllers.Contracts;
 using SadSchool.Models;
 
 namespace SadSchool.Services.ApiServices

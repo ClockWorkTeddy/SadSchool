@@ -1,11 +1,15 @@
-using Microsoft.EntityFrameworkCore;
-using SadSchool.Models;
-using Azure.Identity;
+// <copyright file="Program.cs" company="ClockWorkTeddy">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
+
 using Microsoft.AspNetCore.Identity;
-using SadSchool.Services;
+using Microsoft.EntityFrameworkCore;
 using SadSchool.Controllers.Contracts;
-using SadSchool.Services.ClassBook;
+using SadSchool.Models;
+using SadSchool.Services;
 using SadSchool.Services.ApiServices;
+using SadSchool.Services.ClassBook;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -18,16 +22,18 @@ var connStrAuth = "Data Source=.\\auth.db";
 builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlite(connStrSad));
 builder.Services.AddDbContext<AuthDbContext>(_ => _.UseSqlite(connStrAuth));
 
-builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts => {
-    opts.Password.RequiredLength = 1;  
+builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
+{
+    opts.Password.RequiredLength = 1;
     opts.Password.RequireNonAlphanumeric = false;
-    opts.Password.RequireLowercase = false; 
-    opts.Password.RequireUppercase = false; 
-    opts.Password.RequireDigit = false; 
+    opts.Password.RequireLowercase = false;
+    opts.Password.RequireUppercase = false;
+    opts.Password.RequireDigit = false;
 }).AddEntityFrameworkStores<AuthDbContext>();
 
+SelectCacheSource(builder);
+
 builder.Services.AddSingleton<INavigationService, NavigationService>();
-builder.Services.AddScoped<ICacheService, CacheService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 
@@ -37,6 +43,7 @@ var app = builder.Build();
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
+
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
@@ -54,3 +61,16 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+void SelectCacheSource(WebApplicationBuilder builder)
+{
+    try
+    {
+        builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
+        builder.Services.AddScoped<ICacheService, RedisCache>();
+    }
+    catch
+    {
+        builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+    }
+}

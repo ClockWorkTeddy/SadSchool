@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using SadSchool.Models;
 using SadSchool.ViewModels;
 using SadSchool.Services;
+using SadSchool.Controllers.Contracts;
 
 namespace SadSchool.Controllers
 {

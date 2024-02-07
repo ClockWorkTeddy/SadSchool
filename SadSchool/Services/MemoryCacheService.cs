@@ -1,19 +1,15 @@
 ﻿using Microsoft.Extensions.Caching.Memory;
+using SadSchool.Controllers.Contracts;
 using SadSchool.Models;
 
 namespace SadSchool.Services
 {
-    public interface ICacheService
-    {
-        List<T> GetObject<T>(int id) where T : class;
-        void RefreshObject<T>(T obj) where T : class;
-    }
-    public class CacheService : ICacheService
+    public class MemoryCacheService : ICacheService
     {
         private readonly SadSchoolContext _context;
         private readonly IMemoryCache _memoryCache;
 
-        public CacheService(SadSchoolContext context, IMemoryCache memoryCache) 
+        public MemoryCacheService(SadSchoolContext context, IMemoryCache memoryCache) 
         {
             _context = context;
             _memoryCache = memoryCache;
