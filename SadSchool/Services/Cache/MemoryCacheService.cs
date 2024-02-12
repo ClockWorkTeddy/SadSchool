@@ -2,14 +2,14 @@
 using SadSchool.Controllers.Contracts;
 using SadSchool.Models;
 
-namespace SadSchool.Services
+namespace SadSchool.Services.Cache
 {
     public class MemoryCacheService : ICacheService
     {
         private readonly SadSchoolContext _context;
         private readonly IMemoryCache _memoryCache;
 
-        public MemoryCacheService(SadSchoolContext context, IMemoryCache memoryCache) 
+        public MemoryCacheService(SadSchoolContext context, IMemoryCache memoryCache)
         {
             _context = context;
             _memoryCache = memoryCache;
@@ -32,7 +32,7 @@ namespace SadSchool.Services
         {
             var cacheKey = $"{typeof(T)}:{(obj as BaseModel).Id}";
 
-            if (_memoryCache.TryGetValue(cacheKey,out object? cachedObject))
+            if (_memoryCache.TryGetValue(cacheKey, out object? cachedObject))
                 _memoryCache.Set(cacheKey, obj as T);
         }
     }

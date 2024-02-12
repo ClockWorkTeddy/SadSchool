@@ -1,49 +1,75 @@
-﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using SadSchool.ViewModels;
-using System.Data;
+﻿// <copyright file="AccountController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Manages account operations.
+    /// </summary>
     public class AccountController : Controller
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<IdentityUser> signInManager;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AccountController"/> class.
+        /// </summary>
+        /// <param name="signInManager">User sign in manager.</param>
         public AccountController(SignInManager<IdentityUser> signInManager)
         {
-            _signInManager = signInManager;
+            this.signInManager = signInManager;
         }
 
+        /// <summary>
+        /// Go to login dialog.
+        /// </summary>
+        /// <returns>Login view.</returns>
         [HttpGet]
         public IActionResult Login()
         {
-            return View(new LoginViewModel());
+            return this.View(new LoginViewModel());
         }
 
+        /// <summary>
+        /// Processes login procedure.
+        /// </summary>
+        /// <param name="model"><see cref="LoginViewModel"/> DTO.</param>
+        /// <returns>Login result.</returns>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
         {
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
-                var result = await _signInManager.PasswordSignInAsync(model.UserName, 
-                                                                      model.Password, false, false);
+                var result = await this.signInManager.PasswordSignInAsync(
+                    model.UserName, model.Password, false, false);
+
                 if (result.Succeeded)
-                    return RedirectToAction("Index", "Home");
+                {
+                    return this.RedirectToAction("Index", "Home");
+                }
                 else
-                    ModelState.AddModelError("Password", "Think twice, little friend.");
+                {
+                    this.ModelState.AddModelError("Password", "Think twice, little friend.");
+                }
             }
 
-            return View(model);
+            return this.View(model);
         }
 
+        /// <summary>
+        /// Logout procedure.
+        /// </summary>
+        /// <returns>Redirects to Home/Index action.</returns>
         [HttpGet]
         public async Task<IActionResult> Logout()
         {
-            // удаляем аутентификационные куки
-            await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home");
+            await this.signInManager.SignOutAsync();
+            return this.RedirectToAction("Index", "Home");
         }
     }
 }

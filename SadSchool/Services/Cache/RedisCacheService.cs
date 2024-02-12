@@ -1,4 +1,4 @@
-﻿namespace SadSchool.Services
+﻿namespace SadSchool.Services.Cache
 {
     using Newtonsoft.Json;
     using SadSchool.Controllers.Contracts;
@@ -8,14 +8,14 @@
     /// <summary>
     /// Class for Redis caching.
     /// </summary>
-    public class RedisCache : ICacheService
+    public class RedisCacheService : ICacheService
     {
         private readonly IDatabase redis;
         private readonly SadSchoolContext context;
 
-        public RedisCache(IConnectionMultiplexer muxer, SadSchoolContext context) 
+        public RedisCacheService(IConnectionMultiplexer muxer, SadSchoolContext context)
         {
-            this.redis = muxer.GetDatabase();
+            redis = muxer.GetDatabase();
             this.context = context;
         }
 
@@ -33,11 +33,11 @@
 
             if (value == RedisValue.Null)
             {
-                T dbValue = this.context.Set<T>().Find(id);
+                T dbValue = context.Set<T>().Find(id);
                 string serializedValue = JsonConvert.SerializeObject(dbValue);
                 value = new RedisValue(serializedValue);
 
-                this.redis.SetAdd(rKey, value);
+                redis.StringSet(rKey, value);
             }
 
             var returnValue = JsonConvert.DeserializeObject<T>(value.ToString());
@@ -47,7 +47,13 @@
 
         public void RefreshObject<T>(T obj) where T : class
         {
-            throw new NotImplementedException();
+            var redisKey = new RedisKey($"{typeof(T)}:{(obj as BaseModel)?.Id}");
+            var redisValue = this.redis.StringGet(redisKey);
+
+            if (redisValue != RedisValue.Null)
+            {
+                this.redis.StringSet(redisKey, redisValue);
+            }
         }
     }
 }

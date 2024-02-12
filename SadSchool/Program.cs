@@ -8,6 +8,7 @@ using SadSchool.Controllers.Contracts;
 using SadSchool.Models;
 using SadSchool.Services;
 using SadSchool.Services.ApiServices;
+using SadSchool.Services.Cache;
 using SadSchool.Services.ClassBook;
 using StackExchange.Redis;
 
@@ -67,7 +68,7 @@ void SelectCacheSource(WebApplicationBuilder builder)
     try
     {
         builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
-        builder.Services.AddScoped<ICacheService, RedisCache>();
+        builder.Services.AddScoped<ICacheService, RedisCacheService>();
     }
     catch
     {
