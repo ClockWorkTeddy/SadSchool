@@ -69,7 +69,7 @@ namespace SadSchool.Controllers
                 .Include(sl => sl.StartTime).ToList();
 
             return scheduledLessons
-                .OrderBy(scheduledLesson => scheduledLesson.Class.Name, new MixedNumericStringComparer())
+                .OrderBy(scheduledLesson => scheduledLesson?.Class?.Name, new MixedNumericStringComparer())
                 .OrderBy(scheduledLesson => GetDayOfWeekNumber(scheduledLesson.Day))
                 .Select(scheduledLesson => new SelectListItem
                 {

@@ -59,8 +59,8 @@ namespace SadSchool.Services
                     Map["Teacher:Edit"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
                 Map["Schedule:GetSchedule"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                 Map["ClassBooks:ClassBooks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["ClassBooks:ClassBook"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBooks" };
-                        Map["ClassBooks:ClassBookTable"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBook" };
+                    Map["ClassBooks:ClassSelector"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBooks" };
+                        Map["ClassBooks:ClassBookTable"] = new UrlParams { Controller = "ClassBooks", Action = "ClassSelector" };
                 Map["Mark:GetStudentSubject"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
                     Map["Mark:GetAverageMarks"] = new UrlParams { Controller = "Mark", Action = "GetStudentSubject" };
             Map["Stuff:Stuff"] = new UrlParams { Controller = "Home", Action = "Index" };

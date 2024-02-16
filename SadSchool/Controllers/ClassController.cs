@@ -1,166 +1,216 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using SadSchool.Models;
-using SadSchool.ViewModels;
-using SadSchool.Services;
+﻿// <copyright file="ClassController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using Microsoft.EntityFrameworkCore;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Processes class entities.
+    /// </summary>
     public class ClassController : Controller
     {
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassController"/> class.
+        /// </summary>
+        /// <param name="context">DB context.</param>
+        /// <param name="navigationService">The service responses for "Back" button operations.</param>
         public ClassController(SadSchoolContext context, INavigationService navigationService)
         {
-            _context = context;
-            _navigationService = navigationService;
+            this.context = context;
+            this.navigationService = navigationService;
         }
 
+        /// <summary>
+        /// Gets classes view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for a classes view.</returns>
         [HttpGet]
         public IActionResult Classes()
         {
-            List<ClassViewModel> classes = new List<ClassViewModel>();
+            List<ClassViewModel> classes = new();
 
-            foreach (var theClass in _context.Classes.Include(c => c.Teacher).ToList())
+            foreach (var theClass in this.context.Classes.Include(c => c.Teacher).ToList())
+            {
                 classes.Add(new ClassViewModel
                 {
                     Id = theClass.Id,
                     Name = theClass.Name,
                     TeacherId = theClass.TeacherId,
-                    TeacherName = GetTeacherName(theClass.TeacherId),
-                    LeaderName = GetLeaderName(theClass.LeaderId)
+                    TeacherName = this.GetTeacherName(theClass.TeacherId),
+                    LeaderName = this.GetLeaderName(theClass.LeaderId),
                 });
+            }
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View(@"~/Views/Data/Classes.cshtml", classes);
+            return this.View(@"~/Views/Data/Classes.cshtml", classes);
+        }
+
+        /// <summary>
+        /// Gets add class view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for class add view.</returns>
+        [HttpGet]
+        public IActionResult Add()
+        {
+            if (this.CheckAdminOrModer())
+            {
+                ClassViewModel viewModel = new() { Teachers = this.GetTeachersList(null) };
+
+                this.navigationService.RefreshBackParams(this.RouteData);
+
+                return this.View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
+            }
+
+            return this.RedirectToAction("Classes");
+        }
+
+        /// <summary>
+        /// Adds <see cref="Class"/> instance to DB.
+        /// </summary>
+        /// <param name="viewModel"><paramref name="viewModel"/> with data for class instance.</param>
+        /// <returns><see cref="ViewResult"/> of redirect to "Classes" action.</returns>
+        [HttpPost]
+        public async Task<IActionResult> Add(ClassViewModel viewModel)
+        {
+            if (this.ModelState.IsValid)
+            {
+                var @class = new Class
+                {
+                    Name = viewModel.Name ?? string.Empty,
+                    TeacherId = viewModel.TeacherId,
+                };
+
+                this.context.Classes.Add(@class);
+                await this.context.SaveChangesAsync();
+
+                return this.RedirectToAction("Classes");
+            }
+            else
+            {
+                return this.View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
+            }
+        }
+
+        /// <summary>
+        /// Gets page for edit <see cref="Class"/> instance.
+        /// </summary>
+        /// <param name="id">Desirable <see cref="Class"/> id.</param>
+        /// <returns><see cref="ViewResult"/> of redirect to "Classes" action.</returns>
+        [HttpGet]
+        public IActionResult Edit(int id)
+        {
+            if (this.CheckAdminOrModer())
+            {
+                var editedClass = this.context.Classes.Find(id);
+
+                ClassViewModel viewModel = new()
+                {
+                    Name = editedClass?.Name,
+                    Teachers = this.GetTeachersList(editedClass?.TeacherId),
+                };
+
+                this.navigationService.RefreshBackParams(this.RouteData);
+
+                return this.View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
+            }
+
+            return this.RedirectToAction("Classes");
+        }
+
+        /// <summary>
+        /// Edits selected <see cref="Class"/> instance.
+        /// </summary>
+        /// <param name="viewModel">Edited data for selected <see cref="Class"/> instance.</param>
+        /// <returns>Redirect to "Classes" action or <see cref="ViewResult"/>.</returns>
+        [HttpPost]
+        public async Task<IActionResult> Edit(ClassViewModel viewModel)
+        {
+            if (this.ModelState.IsValid && viewModel != null)
+            {
+                var @class = new Class
+                {
+                    Id = viewModel.Id,
+                    Name = viewModel?.Name,
+                    TeacherId = viewModel?.TeacherId,
+                };
+
+                this.context.Classes.Update(@class);
+                await this.context.SaveChangesAsync();
+                return this.RedirectToAction("Classes");
+            }
+            else
+            {
+                return this.View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
+            }
+        }
+
+        /// <summary>
+        /// Removes selected <see cref="Class"/> instance.
+        /// </summary>
+        /// <param name="id">Desirable <see cref="Class"/> id.</param>
+        /// <returns><see cref="RedirectToActionResult"/> to action "Classes".</returns>
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (this.CheckAdminOrModer())
+            {
+                var @class = await this.context.Classes.FindAsync(id);
+
+                if (@class != null)
+                {
+                    this.context.Classes.Remove(@class);
+                    await this.context.SaveChangesAsync();
+                }
+
+                return this.RedirectToAction("Classes");
+            }
+
+            return this.RedirectToAction("Classes");
+        }
+
+        private List<SelectListItem> GetTeachersList(int? teacherId)
+        {
+            var teachers = this.context.Teachers.ToList();
+
+            return teachers.Select(teacher => new SelectListItem
+            {
+                Value = teacher.Id.ToString(),
+                Text = $"{teacher.FirstName} {teacher.LastName}",
+                Selected = teacher.Id == teacherId,
+            }).ToList();
         }
 
         private string GetLeaderName(int? leaderId)
         {
-            var leader = _context.Students.Find(leaderId);
+            var leader = this.context.Students.Find(leaderId);
 
             return $"{leader?.FirstName} {leader?.LastName}";
         }
 
         private string GetTeacherName(int? teacherId)
         {
-            var teacher = _context.Teachers.Find(teacherId);
+            var teacher = this.context.Teachers.Find(teacherId);
 
             return $"{teacher?.FirstName} {teacher?.LastName}";
         }
 
-        [HttpGet]
-        public IActionResult Add()
+        private bool CheckAdminOrModer()
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
-            {
-                ClassViewModel viewModel = new ClassViewModel() { Teachers = GetTeachersList(null) };
+            var isInRole = this.User.IsInRole("user");
+            var isAuthenticated = this.User?.Identity?.IsAuthenticated;
 
-                _navigationService.RefreshBackParams(RouteData);
-
-                return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
-            }
-                
-            return RedirectToAction("Classes");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Add(ClassViewModel viewModel)                                         
-        {
-            if (ModelState.IsValid)
-            {
-                var Class = new Class
-                {
-                    Name = viewModel.Name,
-                    TeacherId = viewModel.TeacherId,
-                };
-
-                _context.Classes.Add(Class);
-                await _context.SaveChangesAsync();
-
-                return RedirectToAction("Classes");
-            }
-            else
-            {
-                return View(@"~/Views/Data/ClassAdd.cshtml", viewModel);
-            }
-        }
-
-        [HttpGet]
-        public IActionResult Edit(int id)
-        {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
-            {
-
-                var editedClass = _context.Classes.Find(id);
-
-                ClassViewModel viewModel = new()
-                {
-                    Name = editedClass?.Name,
-                    Teachers = GetTeachersList(editedClass?.TeacherId)
-                };
-
-                _navigationService.RefreshBackParams(RouteData);
-
-                return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
-            }
-
-            return RedirectToAction("Classes");
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Edit(ClassViewModel viewModel)
-        {
-            if (ModelState.IsValid && viewModel != null)
-            {
-                var Class = new Class
-                {
-                    Id = viewModel.Id.Value,
-                    Name = viewModel.Name,
-                    TeacherId = viewModel.TeacherId,
-                };
-
-                _context.Classes.Update(Class);
-                await _context.SaveChangesAsync();
-                return RedirectToAction("Classes");
-            }
-            else
-            {
-                return View(@"~/Views/Data/ClassEdit.cshtml", viewModel);
-            }
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
-            {
-
-                var Class = await _context.Classes.FindAsync(id);
-
-                if (Class != null)
-                {
-                    _context.Classes.Remove(Class);
-                    await _context.SaveChangesAsync();
-                }
-
-                return RedirectToAction("Classes");
-            }
-
-           return RedirectToAction("Classes");
-        }
-        private List<SelectListItem> GetTeachersList(int? teacherId)
-        {
-            var teachers = _context.Teachers.ToList();
-
-            return teachers.Select(teacher => new SelectListItem
-            {
-                Value = teacher.Id.ToString(),
-                Text = $"{teacher.FirstName} {teacher.LastName}",
-                Selected = teacher.Id == teacherId
-            }).ToList();
+            return isAuthenticated == true && !isInRole;
         }
     }
 }

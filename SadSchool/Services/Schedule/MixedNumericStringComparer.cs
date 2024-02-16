@@ -22,15 +22,18 @@
 
         private void SplitNumericAndAlpha(string input, out int numericPart, out string alphaPart)
         {
-            numericPart = 0;
             alphaPart = string.Empty;
+            numericPart = 0;
 
-            int index = 0;
+            if (input != null)
+            {
+                int index = 0;
 
-            while (index < input.Length && char.IsDigit(input[index]))
-                numericPart = numericPart * 10 + (input[index++] - '0');
+                while (index < input.Length && char.IsDigit(input[index]))
+                    numericPart = numericPart * 10 + (input[index++] - '0');
 
-            alphaPart = input.Substring(index);
+                alphaPart = input.Substring(index);
+            }
         }
     }
 

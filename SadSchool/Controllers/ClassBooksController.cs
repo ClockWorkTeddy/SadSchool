@@ -1,64 +1,100 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SadSchool.Models;
-using SadSchool.Services;
-using SadSchool.Controllers.Contracts;
-using SadSchool.ViewModels;
-
+﻿
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.Services.ClassBook;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Manages class books processing.
+    /// </summary>
     public class ClassBooksController : Controller
     {
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
-        private readonly IClassBookService _classBookService;
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
+        private readonly IClassBookService classBookService;
 
-        public ClassBooksController(SadSchoolContext sadSchoolContext, INavigationService navigationService, IClassBookService classBookService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ClassBooksController"/> class.
+        /// </summary>
+        /// <param name="sadSchoolContext">DB Context.</param>
+        /// <param name="navigationService">A navigation service instance,
+        ///     that responces for the "Back" button operating.</param>
+        /// <param name="classBookService">A class books service instance,
+        ///     that responses for class book data operations.</param>
+        public ClassBooksController(
+            SadSchoolContext sadSchoolContext,
+            INavigationService navigationService,
+            IClassBookService classBookService)
         {
-            _classBookService = classBookService;
-            _context = sadSchoolContext;
-            _navigationService = navigationService;
+            this.classBookService = classBookService;
+            this.context = sadSchoolContext;
+            this.navigationService = navigationService;
         }
 
+        /// <summary>
+        /// Gets class books view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for a class book view.</returns>
         [HttpGet]
         public IActionResult ClassBooks()
         {
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            var class_names = _context.Classes.Select(cl => cl.Name).ToList();
+            var class_names = this.context.Classes.Select(cl => cl.Name).ToList();
 
-            return View(@"~/Views/Data/Representation/ClassBooks.cshtml", class_names);
+            return this.View(@"~/Views/Data/Representation/ClassBooks.cshtml", class_names);
         }
 
+        /// <summary>
+        /// Sends to the class selection page.
+        /// </summary>
+        /// <param name="className">Name of desirable class.</param>
+        /// <returns>A <see cref="ViewResult"/> for redirection to subject selection page.</returns>
         [HttpGet]
-        public IActionResult ClassBook(string className)
+        public IActionResult ClassSelector(string className)
         {
-            var classMarks = _context.Marks.Where(m => m.Lesson.ScheduledLesson.Class.Name == className).ToList();
+            var classMarks = this.context.Marks.Where(m => m.Lesson.ScheduledLesson.Class.Name == className).ToList();
 
             if (className != null)
-                _navigationService.StoreClassName(className);
+            {
+                this.navigationService.StoreClassName(className);
+            }
             else
-                className = _navigationService.ClassName;
+            {
+                className = this.navigationService.ClassName;
+            }
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            var subjects = _context.Subjects.Select(subject => subject.Name).ToList();
+            var subjects = this.context.Subjects.Select(subject => subject.Name).ToList();
 
-            return View(@"~/Views/Data/Representation/ClassSubjects.cshtml", 
+            return this.View(
+                @"~/Views/Data/Representation/ClassSubjects.cshtml",
                 new ClassSubjectViewModel
                 {
                     ClassName = className,
-                    Subjects = subjects
+                    Subjects = subjects,
                 });
         }
 
+        /// <summary>
+        /// Gets table with marks for specified <paramref name="subject"/> and <paramref name="className"/>.
+        /// </summary>
+        /// <param name="subject">Desirable subject name.</param>
+        /// <param name="className">Desirable class name.</param>
+        /// <returns><see cref="ViewResult"/> for ClassBook page.</returns>
         [HttpGet]
         public IActionResult ClassBookTable(string subject, string className)
         {
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            var viewModel = _classBookService.GetClassBookViewModel(subject, className);
+            var viewModel = this.classBookService.GetClassBookViewModel(subject, className);
 
-            return View(@"~/Views/Data/Representation/ClassBook.cshtml", viewModel);
+            return this.View(@"~/Views/Data/Representation/ClassBook.cshtml", viewModel);
         }
     }
 }
