@@ -4,7 +4,7 @@ namespace SadSchool.ViewModels
 {
     public class LessonViewModel
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? Date { get; set; }
         public int? ScheduledLessonId { get; set; }
         public string? LessonData { get; set; }

@@ -1,179 +1,213 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using SadSchool.Models;
-using SadSchool.Services;
-using SadSchool.ViewModels;
+﻿// <copyright file="LessonController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using Microsoft.EntityFrameworkCore;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Processes operations with <see cref="Lesson"/> entities.
+    /// </summary>
     public class LessonController : Controller
     {
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
+        private readonly IAuthService authService;
 
-        public LessonController(SadSchoolContext context, INavigationService navigationService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LessonController"/> class.
+        /// </summary>
+        /// <param name="context">DB context.</param>
+        /// <param name="navigationService">Service that operates "Back" button.</param>
+        /// <param name="authService">Service that checks user authentication.</param>
+        public LessonController(
+            SadSchoolContext context,
+            INavigationService navigationService,
+            IAuthService authService)
         {
-            _context = context;
-            _navigationService = navigationService;
+            this.context = context;
+            this.navigationService = navigationService;
+            this.authService = authService;
         }
 
+        /// <summary>
+        /// Gets lessons list view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for lessons main page.</returns>
         [HttpGet]
         public IActionResult Lessons()
         {
             var lessons = new List<LessonViewModel>();
 
-            foreach (var lesson in _context.Lessons
-                .Include(l => l.ScheduledLesson.Class)
-                .Include(l => l.ScheduledLesson.Teacher)
-                .Include(l => l.ScheduledLesson.StartTime)
-                .Include(l => l.ScheduledLesson.Subject))
+            foreach (var lesson in this.context.Lessons)
             {
                 lessons.Add(new LessonViewModel
                 {
                     Id = lesson.Id,
                     Date = lesson?.Date,
-                    LessonData = $"{lesson.ScheduledLesson} "
+                    LessonData = $"{lesson?.ScheduledLesson} ",
                 });
             }
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View(@"~/Views/Data/Lessons.cshtml", lessons);
+            return this.View(@"~/Views/Data/Lessons.cshtml", lessons);
         }
 
+        /// <summary>
+        /// Gets <see cref="Lesson"/> entity add-form.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for <see cref="Lesson"/> add form ot redirects to Lessons.</returns>
         [HttpGet]
         public IActionResult Add()
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
                 LessonViewModel viewModel = new()
                 {
-                    ScheduledLessons = GetScheduledLessonsList(null)
+                    ScheduledLessons = this.GetScheduledLessonsList(null),
                 };
 
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/LessonAdd.cshtml", viewModel);
+                return this.View(@"~/Views/Data/LessonAdd.cshtml", viewModel);
             }
 
-            return RedirectToAction("Lessons");
+            return this.RedirectToAction("Lessons");
         }
 
-        private List<SelectListItem> GetScheduledLessonsList(int? lessonId)
-        {
-            var scheduledLessons = _context.ScheduledLessons
-                .Include(sl => sl.Subject)
-                .Include(sl => sl.Class)
-                .Include(sl => sl.Teacher)
-                .Include(sl => sl.StartTime).ToList();
-
-            return scheduledLessons
-                .OrderBy(scheduledLesson => scheduledLesson?.Class?.Name, new MixedNumericStringComparer())
-                .OrderBy(scheduledLesson => GetDayOfWeekNumber(scheduledLesson.Day))
-                .Select(scheduledLesson => new SelectListItem
-                {
-                    Value = scheduledLesson.Id.ToString(),
-                    Text = $"{scheduledLesson}",
-                    Selected = lessonId?.ToString() == scheduledLesson.Id.ToString()
-                }).ToList();
-        }
-
+        /// <summary>
+        /// Adds new <see cref="Lesson"/> entity to DB.
+        /// </summary>
+        /// <param name="viewModel"><see cref="LessonViewModel"/> with data about the lesson.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for Lessons view.</returns>
         [HttpPost]
         public IActionResult Add(LessonViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
                 var lesson = new Lesson
                 {
                     Date = viewModel.Date,
-                    ScheduledLessonId = viewModel.ScheduledLessonId,
+                    ScheduledLesson = this.context.ScheduledLessons.Find(viewModel.ScheduledLessonId),
                 };
 
-                _context.Lessons.Add(lesson);
-                _context.SaveChanges();
+                this.context.Lessons.Add(lesson);
+                this.context.SaveChanges();
             }
 
-            return RedirectToAction("Lessons");
+            return this.RedirectToAction("Lessons");
         }
 
+        /// <summary>
+        /// Gets <see cref="Lesson"/> entity edit-form.
+        /// </summary>
+        /// <param name="id">Edited lesson id.</param>
+        /// <returns><see cref="ViewResult"/> for the entity-edit form or <see cref="RedirectToActionResult"/> for Lessons view.</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var editedLesson = _context.Lessons.Find(id);
+                var editedLesson = this.context.Lessons.Find(id);
 
                 LessonViewModel viewModel = new()
                 {
-                    Id = editedLesson.Id,
-                    Date = editedLesson.Date,
-                    ScheduledLessons = GetScheduledLessonsList(editedLesson.ScheduledLessonId)
+                    Id = editedLesson?.Id,
+                    Date = editedLesson?.Date,
+                    ScheduledLessons = this.GetScheduledLessonsList(editedLesson?.ScheduledLessonId),
                 };
 
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
+                return this.View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
             }
 
-            return RedirectToAction("Lessons");
+            return this.RedirectToAction("Lessons");
         }
 
+        /// <summary>
+        /// Edits <see cref="Lesson"/> entity in DB.
+        /// </summary>
+        /// <param name="viewModel"><see cref="LessonViewModel"/> with new data.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for "Lessons" action or <see cref="ViewResult"/> for LessonEdit view.</returns>
         [HttpPost]
         public IActionResult Edit(LessonViewModel viewModel)
         {
-            if (ModelState.IsValid && viewModel != null)
+            if (this.ModelState.IsValid && viewModel != null)
             {
                 var lesson = new Lesson
                 {
                     Id = viewModel.Id,
                     Date = viewModel.Date,
-                    ScheduledLessonId = viewModel.ScheduledLessonId
+                    ScheduledLessonId = viewModel.ScheduledLessonId,
+                    ScheduledLesson = this.context.ScheduledLessons.Find(viewModel.ScheduledLessonId),
                 };
 
-                _context.Lessons.Update(lesson);
-                _context.SaveChanges();
+                this.context.Lessons.Update(lesson);
+                this.context.SaveChanges();
 
-                return RedirectToAction("Lessons");
+                return this.RedirectToAction("Lessons");
             }
 
-            return View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
+            return this.View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
         }
 
+        /// <summary>
+        /// Deletes <see cref="Lesson"/> entity from DB.
+        /// </summary>
+        /// <param name="id">Desirable instance id.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for action "Lessons".</returns>
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var lesson = _context.Lessons.Find(id);
+                var lesson = this.context.Lessons.Find(id);
 
                 if (lesson != null)
                 {
-                    _context.Lessons.Remove(lesson);
-                    _context.SaveChanges();
+                    this.context.Lessons.Remove(lesson);
+                    this.context.SaveChanges();
                 }
             }
 
-            return RedirectToAction("Lessons");
+            return this.RedirectToAction("Lessons");
         }
 
-        int GetDayOfWeekNumber(string day)
+        private List<SelectListItem> GetScheduledLessonsList(int? lessonId)
         {
-            switch (day)
+            var scheduledLessons = this.context.ScheduledLessons.ToList();
+
+            return scheduledLessons
+                .OrderBy(scheduledLesson => scheduledLesson?.Class?.Name, new MixedNumericStringComparer())
+                .OrderBy(scheduledLesson => this.GetDayOfWeekNumber(scheduledLesson.Day))
+                .Select(scheduledLesson => new SelectListItem
+                {
+                    Value = scheduledLesson.Id.ToString(),
+                    Text = $"{scheduledLesson}",
+                    Selected = lessonId?.ToString() == scheduledLesson.Id.ToString(),
+                }).ToList();
+        }
+
+        private int GetDayOfWeekNumber(string? day)
+        {
+            return day switch
             {
-                case "Mon":
-                    return 1;
-                case "Tue":
-                    return 2;
-                case "Wed":
-                    return 3;
-                case "Thu":
-                    return 4;
-                case "Fri":
-                    return 5;
-                default:
-                    return int.MaxValue; // Place unknown days at the end
-            }
+                "Mon" => 1,
+                "Tue" => 2,
+                "Wed" => 3,
+                "Thu" => 4,
+                "Fri" => 5,
+                _ => int.MaxValue, // Place unknown days at the end
+            };
         }
     }
 }

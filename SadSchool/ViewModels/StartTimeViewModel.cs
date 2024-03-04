@@ -2,7 +2,7 @@
 {
     public class StartTimeViewModel
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? StartTime { get; set; } = null!;
     }
 }

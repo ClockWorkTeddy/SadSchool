@@ -1,54 +1,73 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SadSchool.Models;
-using SadSchool.Services;
-using SadSchool.ViewModels;
-using System.Diagnostics;
+﻿// <copyright file="HomeController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using System.Diagnostics;
+    using Microsoft.AspNetCore.Mvc;
+    using SadSchool.Models;
+    using SadSchool.Services;
+
+    /// <summary>
+    /// Main controller for site layout.
+    /// </summary>
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
+        private readonly ILogger<HomeController> logger;
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="HomeController"/> class.
+        /// </summary>
+        /// <param name="logger"><see cref="ILogger"/> instance.</param>
+        /// <param name="context">DB context.</param>
+        /// <param name="navigationService">Service for "Back" button operating.</param>
         public HomeController(
-            ILogger<HomeController> logger, 
-            SadSchoolContext context, 
-            INavigationService navigationService )
+            ILogger<HomeController> logger,
+            SadSchoolContext context,
+            INavigationService navigationService)
         {
-            _logger = logger;
-            _context = context;
-            _navigationService = navigationService;
+            this.logger = logger;
+            this.context = context;
+            this.navigationService = navigationService;
         }
 
+        /// <summary>
+        /// Processes index view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for index view.</returns>
         public IActionResult Index()
         {
-            return View();
+            return this.View();
         }
 
+        /// <summary>
+        /// Gets About view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for about view.</returns>
         public IActionResult About()
         {
             try
             {
-                _navigationService.RefreshBackParams(RouteData);
-                return View();
+                this.navigationService.RefreshBackParams(this.RouteData);
+                return this.View();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                return View(ex.Message);
+                return this.View(ex.Message);
             }
         }
 
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
+        /// <summary>
+        /// Processes error cases.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/>View for errors.</returns>
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+            return this.View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? this.HttpContext.TraceIdentifier });
         }
     }
 }

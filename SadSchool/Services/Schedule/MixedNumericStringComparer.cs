@@ -1,8 +1,8 @@
 ﻿namespace SadSchool.Services
 {
-    public class MixedNumericStringComparer : IComparer<string>
+    public class MixedNumericStringComparer : IComparer<string?>
     {
-        public int Compare(string x, string y)
+        public int Compare(string? x, string? y)
         {
             int numX, numY;
             string alphaX, alphaY;

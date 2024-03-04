@@ -1,32 +1,51 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using SadSchool.Models;
-using SadSchool.ViewModels;
-using SadSchool.Services;
+﻿// <copyright file="ScheduledLessonController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Processes requests for scheduled lesson data.
+    /// </summary>
     public class ScheduledLessonController : Controller
     {
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
+        private readonly IAuthService authService;
 
-        public ScheduledLessonController(SadSchoolContext context, INavigationService navigationService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ScheduledLessonController"/> class.
+        /// </summary>
+        /// <param name="context">DB context instance.</param>
+        /// <param name="navigationService">Service processes "Back" button.</param>
+        /// <param name="authService">Service processes user authorization check.</param>
+        public ScheduledLessonController(
+            SadSchoolContext context,
+            INavigationService navigationService,
+            IAuthService authService)
         {
-            _context = context;
-            _navigationService = navigationService;
+            this.context = context;
+            this.navigationService = navigationService;
+            this.authService = authService;
         }
 
+        /// <summary>
+        /// Gets the scheduled lessons view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for the Scheduled lessons form.</returns>
         [HttpGet]
         public IActionResult ScheduledLessons()
         {
             var lessons = new List<ScheduledLessonViewModel>();
 
-            foreach (var lesson in _context.ScheduledLessons.Include(l => l.Teacher)
-                                                   .Include(l => l.Subject)
-                                                   .Include(l => l.Class)
-                                                   .Include(l => l.StartTime).ToList())
+            foreach (var lesson in this.context.ScheduledLessons.ToList())
             {
                 lessons.Add(new ScheduledLessonViewModel
                 {
@@ -35,88 +54,50 @@ namespace SadSchool.Controllers
                     SubjectName = lesson?.Subject?.Name,
                     ClassName = lesson?.Class?.Name,
                     TeacherName = $"{lesson?.Teacher?.FirstName} {lesson?.Teacher?.LastName}",
-                    Day = lesson?.Day
+                    Day = lesson?.Day,
                 });
             }
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View(@"~/Views/Data/ScheduledLessons.cshtml", lessons);
+            return this.View(@"~/Views/Data/ScheduledLessons.cshtml", lessons);
         }
 
+        /// <summary>
+        /// Gets the add scheduled lesson view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for the Scheduled lesson add form or
+        ///     <see cref="RedirectToActionResult"/> for the "ScheduledLessons" actiion.</returns>
         [HttpGet]
         public IActionResult Add()
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
                 ScheduledLessonViewModel viewModel = new()
                 {
-                    Classes = GetClassesList(null),
-                    Subjects = GetSubjectsList(null),
-                    Teachers = GetTeachersList(null),
-                    StartTimes = GetStartTimesList(null)
+                    Classes = this.GetClassesList(null),
+                    Subjects = this.GetSubjectsList(null),
+                    Teachers = this.GetTeachersList(null),
+                    StartTimes = this.GetStartTimesList(null),
                 };
 
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/ScheduledLessonAdd.cshtml", viewModel);
+                return this.View(@"~/Views/Data/ScheduledLessonAdd.cshtml", viewModel);
             }
 
-            return RedirectToAction("ScheduledLessons");
+            return this.RedirectToAction("ScheduledLessons");
         }
 
-        private List<SelectListItem> GetClassesList(int? classId)
-        {
-            var classes = _context.Classes.ToList();
-
-            return classes.Select(theClass => new SelectListItem
-            {
-                Value = theClass.Id.ToString(),
-                Text = theClass.Name,
-                Selected = theClass.Id == classId
-            }).ToList();
-        }
-
-        private List<SelectListItem> GetSubjectsList(int? subjectId)
-        {
-            var subjects = _context.Subjects.ToList();
-
-            return subjects.Select(subject => new SelectListItem
-            {
-                Value = subject.Id.ToString(),
-                Text = subject.Name,
-                Selected = subject.Id == subjectId
-            }).ToList();
-        }
-
-        private List<SelectListItem> GetTeachersList(int? teacherId)
-        {
-            var teachers = _context.Teachers.ToList();
-
-            return teachers.Select(teacher => new SelectListItem
-            {
-                Value = teacher.Id.ToString(),
-                Text = $"{teacher.FirstName} {teacher.LastName}",
-                Selected = teacher.Id == teacherId
-            }).ToList();
-        }
-
-        private List<SelectListItem> GetStartTimesList(int? startId)
-        {
-            var starts = _context.StartTimes.ToList();
-
-            return starts.Select(start => new SelectListItem
-            {
-                Value = start.Id.ToString(),
-                Text = start.Value,
-                Selected = start.Id == startId
-            }).ToList();
-        }
-
+        /// <summary>
+        /// Adds a new scheduled lesson.
+        /// </summary>
+        /// <param name="viewModel">View model instance with data.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for the "ScheduledLessons" action.</returns>
         [HttpPost]
         public async Task<IActionResult> Add(ScheduledLessonViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
                 var lesson = new ScheduledLesson
                 {
@@ -124,80 +105,144 @@ namespace SadSchool.Controllers
                     SubjectId = viewModel.SubjectId,
                     TeacherId = viewModel.TeacherId,
                     StartTimeId = viewModel.StartTimeId,
-                    Day = viewModel.Day
+                    Day = viewModel.Day,
                 };
 
-                _context.ScheduledLessons.Add(lesson);
-                await _context.SaveChangesAsync();
+                this.context.ScheduledLessons.Add(lesson);
+                await this.context.SaveChangesAsync();
             }
 
-            return RedirectToAction("ScheduledLessons");
+            return this.RedirectToAction("ScheduledLessons");
         }
 
+        /// <summary>
+        /// Gets the edit scheduled lesson view.
+        /// </summary>
+        /// <param name="id">Desirable <see cref="Lesson"/> id.</param>
+        /// <returns><see cref="ViewResult"/> for "ScheduledLessonEdit" view or
+        ///     <see cref="RedirectToActionResult"/> for the "ScheduledLessons" action in case of failure.</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var editedLesson = _context.ScheduledLessons.Find(id);
+                var editedLesson = this.context.ScheduledLessons.Find(id);
 
                 ScheduledLessonViewModel viewModel = new()
                 {
                     Day = editedLesson?.Day,
-                    StartTimes = GetStartTimesList(editedLesson.StartTimeId),
-                    Subjects = GetSubjectsList(editedLesson.SubjectId),
-                    Teachers = GetTeachersList(editedLesson.TeacherId),
-                    Classes = GetClassesList(editedLesson.ClassId)
+                    StartTimes = this.GetStartTimesList(editedLesson?.StartTimeId),
+                    Subjects = this.GetSubjectsList(editedLesson?.SubjectId),
+                    Teachers = this.GetTeachersList(editedLesson?.TeacherId),
+                    Classes = this.GetClassesList(editedLesson?.ClassId),
                 };
 
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/ScheduledLessonEdit.cshtml", viewModel);
+                return this.View(@"~/Views/Data/ScheduledLessonEdit.cshtml", viewModel);
             }
 
-            return RedirectToAction("ScheduledLessons");
+            return this.RedirectToAction("ScheduledLessons");
         }
 
+        /// <summary>
+        /// Edits a scheduled lesson.
+        /// </summary>
+        /// <param name="viewModel">ViewModel instance with data.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for the "ScheduledLessons" action or
+        ///     <see cref="ViewResult"/> for "ScheduledLessonEdit" view in case of failure.</returns>
         [HttpPost]
         public async Task<IActionResult> Edit(ScheduledLessonViewModel viewModel)
         {
-            if (ModelState.IsValid && viewModel != null)
+            if (this.authService.IsAutorized(this.User))
             {
-                var Lesson = new ScheduledLesson
+                var lesson = new ScheduledLesson
                 {
                     Id = viewModel.Id,
                     Day = viewModel.Day,
                     ClassId = viewModel.ClassId,
                     SubjectId = viewModel.SubjectId,
                     TeacherId = viewModel.TeacherId,
-                    StartTimeId = viewModel.StartTimeId
+                    StartTimeId = viewModel.StartTimeId,
                 };
 
-                _context.ScheduledLessons.Update(Lesson);
-                await _context.SaveChangesAsync();
+                this.context.ScheduledLessons.Update(lesson);
+                await this.context.SaveChangesAsync();
 
-                return RedirectToAction("ScheduledLessons");
+                return this.RedirectToAction("ScheduledLessons");
             }
 
-            return View(@"~/Views/Data/ScheduledLessonEdit.cshtml", viewModel);
-            
+            return this.View(@"~/Views/Data/ScheduledLessonEdit.cshtml", viewModel);
         }
 
+        /// <summary>
+        /// Delets a scheduled lesson.
+        /// </summary>
+        /// <param name="id">Deleted lesson id.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for the "ScheduledLessons" action.</returns>
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var lesson = await _context.ScheduledLessons.FindAsync(id);
+                var lesson = await this.context.ScheduledLessons.FindAsync(id);
 
                 if (lesson != null)
                 {
-                    _context.ScheduledLessons.Remove(lesson);
-                    await _context.SaveChangesAsync();
+                    this.context.ScheduledLessons.Remove(lesson);
+                    await this.context.SaveChangesAsync();
                 }
             }
 
-            return RedirectToAction("ScheduledLessons");
+            return this.RedirectToAction("ScheduledLessons");
+        }
+
+        private List<SelectListItem> GetClassesList(int? classId)
+        {
+            var classes = this.context.Classes.ToList();
+
+            return classes.Select(theClass => new SelectListItem
+            {
+                Value = theClass.Id.ToString(),
+                Text = theClass.Name,
+                Selected = theClass.Id == classId,
+            }).ToList();
+        }
+
+        private List<SelectListItem> GetSubjectsList(int? subjectId)
+        {
+            var subjects = this.context.Subjects.ToList();
+
+            return subjects.Select(subject => new SelectListItem
+            {
+                Value = subject.Id.ToString(),
+                Text = subject.Name,
+                Selected = subject.Id == subjectId,
+            }).ToList();
+        }
+
+        private List<SelectListItem> GetTeachersList(int? teacherId)
+        {
+            var teachers = this.context.Teachers.ToList();
+
+            return teachers.Select(teacher => new SelectListItem
+            {
+                Value = teacher.Id.ToString(),
+                Text = $"{teacher.FirstName} {teacher.LastName}",
+                Selected = teacher.Id == teacherId,
+            }).ToList();
+        }
+
+        private List<SelectListItem> GetStartTimesList(int? startId)
+        {
+            var starts = this.context.StartTimes.ToList();
+
+            return starts.Select(start => new SelectListItem
+            {
+                Value = start.Id.ToString(),
+                Text = start.Value,
+                Selected = start.Id == startId,
+            }).ToList();
         }
     }
 }

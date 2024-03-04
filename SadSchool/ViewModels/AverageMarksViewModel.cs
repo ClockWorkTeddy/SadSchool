@@ -5,7 +5,7 @@ namespace SadSchool.ViewModels
 {
     public class AverageMarksViewModel
     {
-        public AverageMark[,] AverageMarksTable;
+        public AverageMark?[,] AverageMarksTable;
         public List<string> Students;
         public List<string> Subjects;
     }

@@ -7,6 +7,7 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.EntityFrameworkCore;
+    using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
     using SadSchool.Services;
     using SadSchool.ViewModels;
@@ -18,16 +19,19 @@ namespace SadSchool.Controllers
     {
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
+        private readonly IAuthService authService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassController"/> class.
         /// </summary>
         /// <param name="context">DB context.</param>
         /// <param name="navigationService">The service responses for "Back" button operations.</param>
-        public ClassController(SadSchoolContext context, INavigationService navigationService)
+        /// <param name="authService">The service responses for user authorization.</param>
+        public ClassController(SadSchoolContext context, INavigationService navigationService, IAuthService authService)
         {
             this.context = context;
             this.navigationService = navigationService;
+            this.authService = authService;
         }
 
         /// <summary>
@@ -63,7 +67,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Add()
         {
-            if (this.CheckAdminOrModer())
+            if (this.authService.IsAutorized(this.User))
             {
                 ClassViewModel viewModel = new() { Teachers = this.GetTeachersList(null) };
 
@@ -110,7 +114,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            if (this.CheckAdminOrModer())
+            if (this.authService.IsAutorized(this.User))
             {
                 var editedClass = this.context.Classes.Find(id);
 
@@ -163,7 +167,7 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (this.CheckAdminOrModer())
+            if (this.authService.IsAutorized(this.User))
             {
                 var @class = await this.context.Classes.FindAsync(id);
 
@@ -203,14 +207,6 @@ namespace SadSchool.Controllers
             var teacher = this.context.Teachers.Find(teacherId);
 
             return $"{teacher?.FirstName} {teacher?.LastName}";
-        }
-
-        private bool CheckAdminOrModer()
-        {
-            var isInRole = this.User.IsInRole("user");
-            var isAuthenticated = this.User?.Identity?.IsAuthenticated;
-
-            return isAuthenticated == true && !isInRole;
         }
     }
 }

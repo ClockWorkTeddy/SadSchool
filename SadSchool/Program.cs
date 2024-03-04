@@ -20,7 +20,7 @@ builder.Services.AddControllersWithViews();
 var connStrSad = "Data Source=.\\sad_school.db";
 var connStrAuth = "Data Source=.\\auth.db";
 
-builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlite(connStrSad));
+builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlite(connStrSad).UseLazyLoadingProxies());
 builder.Services.AddDbContext<AuthDbContext>(_ => _.UseSqlite(connStrAuth));
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
@@ -35,6 +35,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
 SelectCacheSource(builder);
 
 builder.Services.AddSingleton<INavigationService, NavigationService>();
+builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 

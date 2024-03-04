@@ -5,7 +5,7 @@ namespace SadSchool.ViewModels
 {
     public class ScheduledLessonViewModel
     {
-        public int Id { get; set; }
+        public int? Id { get; set; }
         public string? Day { get; set; }
 
         [Required(ErrorMessage = "You have to choose a start time!")]

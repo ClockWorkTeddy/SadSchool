@@ -1,31 +1,56 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using SadSchool.Models;
-using SadSchool.ViewModels;
-using SadSchool.Services;
-using SadSchool.Controllers.Contracts;
+﻿// <copyright file="StudentController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.AspNetCore.Mvc.Rendering;
+    using Microsoft.EntityFrameworkCore;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Processes requests for student data.
+    /// </summary>
     public class StudentController : Controller
     {
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
-        private readonly ICacheService _cacheService;
-        public StudentController(SadSchoolContext context, INavigationService navigationService, ICacheService cacheService)
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
+        private readonly ICacheService cacheService;
+        private readonly IAuthService authService;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StudentController"/> class.
+        /// </summary>
+        /// <param name="context">DB context instance.</param>
+        /// <param name="navigationService">Service processes the "Back" button.</param>
+        /// <param name="cacheService">Memory cache instance.</param>
+        /// <param name="authService">Service processes user authorization check.</param>"
+        public StudentController(
+            SadSchoolContext context,
+            INavigationService navigationService,
+            ICacheService cacheService,
+            IAuthService authService)
         {
-            _context = context;
-            _navigationService = navigationService;
-            _cacheService = cacheService;
+            this.context = context;
+            this.navigationService = navigationService;
+            this.cacheService = cacheService;
+            this.authService = authService;
         }
 
+        /// <summary>
+        /// Gets the students view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for the Students view.</returns>
         [HttpGet]
         public IActionResult Students()
         {
             var students = new List<StudentViewModel>();
 
-            foreach (var student in _context.Students.Include(s => s.Class).ToList())
+            foreach (var student in this.context.Students.ToList())
             {
                 students.Add(new StudentViewModel
                 {
@@ -34,158 +59,181 @@ namespace SadSchool.Controllers
                     LastName = student.LastName,
                     DateOfBirth = student.DateOfBirth,
                     Sex = student.Sex,
-                    ClassName = student.Class?.Name
+                    ClassName = student.Class?.Name,
                 });
             }
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View(@"~/Views/Data/Students.cshtml", students);
+            return this.View(@"~/Views/Data/Students.cshtml", students);
         }
 
+        /// <summary>
+        /// Gets the student add form.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for the "StudentAdd" view or
+        ///     <see cref="RedirectToActionResult"/> for the "Students" action.</returns>
         [HttpGet]
         public IActionResult Add()
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-
                 StudentViewModel viewModel = new StudentViewModel()
                 {
-                    Classes = GetClassesList(null),
-                    Sexes = GetSexes(null)
+                    Classes = this.GetClassesList(null),
+                    Sexes = this.GetSexes(null),
                 };
 
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/StudentAdd.cshtml", viewModel);
+                return this.View(@"~/Views/Data/StudentAdd.cshtml", viewModel);
             }
 
-            return RedirectToAction("Students");
+            return this.RedirectToAction("Students");
         }
 
-        private List<SelectListItem> GetClassesList(int? classId)
-        {
-            var classes = _context.Classes.ToList();
-
-            return classes.Select(Class => new SelectListItem
-            {
-                Value = Class.Id.ToString(),
-                Text = $"{Class.Name}",
-                Selected = Class.Id == classId
-            }).ToList();
-        }
-
+        /// <summary>
+        /// Adds a new student.
+        /// </summary>
+        /// <param name="viewModel">View model with data.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for the "Students" action.</returns>
         [HttpPost]
         public async Task<IActionResult> Add(StudentViewModel viewModel)
         {
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
                 var student = new Student
                 {
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
                     ClassId = viewModel.ClassId,
-                    Class = _context.Classes.Find(viewModel.ClassId),
+                    Class = this.context.Classes.Find(viewModel.ClassId),
                     DateOfBirth = viewModel.DateOfBirth,
-                    Sex = viewModel.Sex
+                    Sex = viewModel.Sex,
                 };
 
-                _context.Students.Add(student);
-                await _context.SaveChangesAsync();
+                this.context.Students.Add(student);
+                await this.context.SaveChangesAsync();
             }
 
-            return RedirectToAction("Students");
+            return this.RedirectToAction("Students");
         }
 
+        /// <summary>
+        /// Gets the student edit form.
+        /// </summary>
+        /// <param name="id">Edited item id.</param>
+        /// <returns><see cref="ViewResult"/> for the "StudentEdit" view or
+        ///     <see cref="RedirectToActionResult"/> to the "Students" action.</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-
-                var editedStudent = _context.Students.Find(id);
+                var editedStudent = this.context.Students.Find(id);
 
                 StudentViewModel viewModel = new()
                 {
                     FirstName = editedStudent?.FirstName,
                     LastName = editedStudent?.LastName,
                     DateOfBirth = editedStudent?.DateOfBirth,
-                    Sexes = GetSexes(editedStudent?.Sex),
-                    Classes = GetClassesList(editedStudent?.ClassId)
+                    Sexes = this.GetSexes(editedStudent?.Sex),
+                    Classes = this.GetClassesList(editedStudent?.ClassId),
                 };
 
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+                return this.View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
             }
-                
-            return RedirectToAction("Students");
+
+            return this.RedirectToAction("Students");
         }
 
+        /// <summary>
+        /// Edits a student.
+        /// </summary>
+        /// <param name="viewModel">View model with data.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for the "Students" action or
+        ///     <see cref="ViewResult"/> for the "StudentEdit" view.</returns>
         [HttpPost]
         public async Task<IActionResult> Edit(StudentViewModel viewModel)
         {
-            if (ModelState.IsValid && viewModel != null)
+            if (this.ModelState.IsValid && viewModel != null)
             {
                 var student = new Student
                 {
-                    Id = viewModel.Id.Value,
+                    Id = viewModel.Id,
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
                     DateOfBirth = viewModel.DateOfBirth,
                     Sex = viewModel.Sex,
-                    ClassId = viewModel.ClassId
+                    ClassId = viewModel.ClassId,
                 };
 
-                _context.Students.Update(student);
-                await _context.SaveChangesAsync();
-                _cacheService.RefreshObject(student);
+                this.context.Students.Update(student);
+                await this.context.SaveChangesAsync();
+                this.cacheService.RefreshObject(student);
 
-                return RedirectToAction("Students");
+                return this.RedirectToAction("Students");
             }
-            else
+
+            return this.View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+        }
+
+        /// <summary>
+        /// Deletes a student.
+        /// </summary>
+        /// <param name="id">Deleted item id.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for the "Students" actions.</returns>
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
+        {
+            if (this.authService.IsAutorized(this.User))
             {
-                return View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+                var student = await this.context.Students.FindAsync(id);
+
+                if (student != null)
+                {
+                    this.context.Students.Remove(student);
+                    await this.context.SaveChangesAsync();
+                }
             }
+
+            return this.RedirectToAction("Students");
+        }
+
+        private List<SelectListItem> GetClassesList(int? classId)
+        {
+            var classes = this.context.Classes.ToList();
+
+            return classes.Select(@class => new SelectListItem
+            {
+                Value = @class.Id.ToString(),
+                Text = $"{@class.Name}",
+                Selected = @class.Id == classId,
+            }).ToList();
         }
 
         private List<SelectListItem> GetSexes(bool? sex)
         {
-            List<SelectListItem> sexes = new List<SelectListItem>
+            List<SelectListItem> sexes = new()
             {
                 new SelectListItem()
                 {
                     Value = "False",
                     Text = "Male",
-                    Selected = sex.HasValue ? !sex.Value : false
+                    Selected = sex.HasValue ? !sex.Value : false,
                 },
 
                 new SelectListItem()
                 {
                     Value = "True",
                     Text = "Female",
-                    Selected = sex.HasValue ? sex.Value : false
-                }
+                    Selected = sex.HasValue ? sex.Value : false,
+                },
             };
 
             return sexes;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Delete(int id)
-        {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
-            {
-                var student = await _context.Students.FindAsync(id);
-
-                if (student != null)
-                {
-                    _context.Students.Remove(student);
-                    await _context.SaveChangesAsync();
-                }
-            }
-
-            return RedirectToAction("Students");
         }
     }
 }

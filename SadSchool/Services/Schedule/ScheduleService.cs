@@ -35,7 +35,7 @@ namespace SadSchool.Services.Schedule
                     cell = new ScheduleCell
                     {
                         Day = scheduledLesson.Day,
-                        ClassName = scheduledLesson.Class.Name,
+                        ClassName = scheduledLesson.Class?.Name,
                         LessonInfos = new List<LessonInfo> 
                         { 
                             new LessonInfo
