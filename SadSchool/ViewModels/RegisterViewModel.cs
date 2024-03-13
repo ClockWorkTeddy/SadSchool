@@ -29,6 +29,6 @@ namespace SadSchool.ViewModels
         [Display(Name = "Password confirm")]
         public string PasswordConfirm { get; set; }
 
-        public List<string>? RolesForDisplay { get; set; }
+        public List<string?>? RolesForDisplay { get; set; }
     }
 }

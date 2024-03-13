@@ -1,27 +1,50 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SadSchool.Models;
-using SadSchool.ViewModels;
-using SadSchool.Services;
+﻿// <copyright file="TeacherController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Processes requests for teacher data.
+    /// </summary>
     public class TeacherController : Controller
     {
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
+        private readonly IAuthService authService;
 
-        public TeacherController(SadSchoolContext context, INavigationService navigationService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TeacherController"/> class.
+        /// </summary>
+        /// <param name="context">DB context.</param>
+        /// <param name="navigationService">Services processes "Back" button.</param>
+        /// <param name="authService">Service processes user authorization check.</param>
+        public TeacherController(
+            SadSchoolContext context,
+            INavigationService navigationService,
+            IAuthService authService)
         {
-            _context = context;
-            _navigationService = navigationService;
+            this.context = context;
+            this.navigationService = navigationService;
+            this.authService = authService;
         }
 
+        /// <summary>
+        /// Gets the teachers view.
+        /// </summary>
+        /// <returns><see cref="IActionResult"/> for the "Teachers" view.</returns>
         [HttpGet]
         public IActionResult Teachers()
         {
-            List<TeacherViewModel> teachers = new List<TeacherViewModel>();
+            List<TeacherViewModel> teachers = new();
 
-            foreach (var t in _context.Teachers)
+            foreach (var t in this.context.Teachers)
             {
                 teachers.Add(new TeacherViewModel
                 {
@@ -29,54 +52,69 @@ namespace SadSchool.Controllers
                     FirstName = t.FirstName,
                     LastName = t.LastName,
                     DateOfBirth = t.DateOfBirth?.ToString(),
-                    Grade = t.Grade
+                    Grade = t.Grade,
                 });
             }
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View(@"~/Views/Data/Teachers.cshtml", teachers);
+            return this.View(@"~/Views/Data/Teachers.cshtml", teachers);
         }
 
+        /// <summary>
+        /// Gets the form for adding a new teacher.
+        /// </summary>
+        /// <returns><see cref="IActionResult"/> for the "TeacherAdd" view or
+        ///     for the "Teachers" redirect to action.</returns>
         [HttpGet]
         public IActionResult Add()
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/TeacherAdd.cshtml");
+                return this.View(@"~/Views/Data/TeacherAdd.cshtml");
             }
-                
-            return RedirectToAction("Teachers");
+
+            return this.RedirectToAction("Teachers");
         }
 
+        /// <summary>
+        /// Receives the data from the form and adds a new teacher to the database.
+        /// </summary>
+        /// <param name="model">ViewModel with data.</param>
+        /// <returns><see cref="IActionResult"/> reditrect to the "Teachers" action.</returns>
         [HttpPost]
         public IActionResult Add(TeacherViewModel model)
         {
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
                 var teacher = new Teacher
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
                     DateOfBirth = model.DateOfBirth,
-                    Grade = model.Grade
+                    Grade = model.Grade,
                 };
 
-                _context.Teachers.Add(teacher);
-                _context.SaveChanges();
+                this.context.Teachers.Add(teacher);
+                this.context.SaveChanges();
             }
 
-            return RedirectToAction("Teachers");
+            return this.RedirectToAction("Teachers");
         }
 
+        /// <summary>
+        /// Gets the form for editing a teacher.
+        /// </summary>
+        /// <param name="id">Edited item id.</param>
+        /// <returns><see cref="IActionResult"/> for the "TeacherEdit" view.</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var editedTeacher = _context.Teachers.FirstOrDefault(_ => _.Id == id);
+                var editedTeacher = this.context.Teachers.FirstOrDefault(_ => _.Id == id);
 
                 if (editedTeacher != null)
                 {
@@ -85,22 +123,28 @@ namespace SadSchool.Controllers
                         FirstName = editedTeacher.FirstName,
                         LastName = editedTeacher.LastName,
                         DateOfBirth = editedTeacher.DateOfBirth?.ToString(),
-                        Grade = editedTeacher.Grade
+                        Grade = editedTeacher.Grade,
                     };
 
-                    _navigationService.RefreshBackParams(RouteData);
+                    this.navigationService.RefreshBackParams(this.RouteData);
 
-                    return View(@"~/Views/Data/TeacherEdit.cshtml", model);
+                    return this.View(@"~/Views/Data/TeacherEdit.cshtml", model);
                 }
             }
 
-            return RedirectToAction("Teachers");
+            return this.RedirectToAction("Teachers");
         }
 
+        /// <summary>
+        /// Edits a teacher.
+        /// </summary>
+        /// <param name="viewModel">View model object with data.</param>
+        /// <returns><see cref="IActionResult"/> for the "Teachers" redirect to action in case of success
+        ///     or for the "TeacherEdit" view in case of failure.</returns>
         [HttpPost]
-        public async Task<IActionResult> Edit( TeacherViewModel viewModel )
+        public async Task<IActionResult> Edit(TeacherViewModel viewModel)
         {
-            if (ModelState.IsValid && viewModel != null)
+            if (this.ModelState.IsValid && viewModel != null)
             {
                 var teacher = new Teacher
                 {
@@ -108,35 +152,40 @@ namespace SadSchool.Controllers
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
                     DateOfBirth = viewModel.DateOfBirth,
-                    Grade = viewModel.Grade
+                    Grade = viewModel.Grade,
                 };
 
-                _context.Teachers.Update(teacher);
-                await _context.SaveChangesAsync();
+                this.context.Teachers.Update(teacher);
+                await this.context.SaveChangesAsync();
 
-                return RedirectToAction("Teachers");
+                return this.RedirectToAction("Teachers");
             }
             else
             {
-                return View(@"~/Views/Data/TeacherEdit.cshtml", viewModel);
+                return this.View(@"~/Views/Data/TeacherEdit.cshtml", viewModel);
             }
         }
 
+        /// <summary>
+        /// Deletes a teacher.
+        /// </summary>
+        /// <param name="id">Deleted item id.</param>
+        /// <returns><see cref="IActionResult"/> for the "Teachers" action.</returns>
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var teacher = _context.Teachers.FirstOrDefault(_ => _.Id == id);
+                var teacher = this.context.Teachers.FirstOrDefault(_ => _.Id == id);
 
                 if (teacher != null)
                 {
-                    _context.Teachers.Remove(teacher);
-                    _context.SaveChanges();
+                    this.context.Teachers.Remove(teacher);
+                    this.context.SaveChanges();
                 }
             }
 
-            return RedirectToAction("Teachers");
+            return this.RedirectToAction("Teachers");
         }
     }
 }

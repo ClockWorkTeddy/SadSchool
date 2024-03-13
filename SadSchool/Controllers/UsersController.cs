@@ -1,178 +1,259 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
-using SadSchool.Models;
-using SadSchool.ViewModels;
-using System.Data;
-using SadSchool.Services;
+﻿// <copyright file="UsersController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using System.Data;
+    using Microsoft.AspNetCore.Identity;
+    using Microsoft.AspNetCore.Mvc;
+    using Microsoft.EntityFrameworkCore;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Processes requests for user data.
+    /// </summary>
     public class UsersController : Controller
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly RoleManager<IdentityRole> _roleManager;
-        private readonly AuthDbContext _context;
-        private readonly INavigationService _navigationService;
+        private readonly UserManager<IdentityUser> userManager;
+        private readonly RoleManager<IdentityRole> roleManager;
+        private readonly AuthDbContext context;
+        private readonly INavigationService navigationService;
+        private readonly IAuthService authService;
 
-        public UsersController(UserManager<IdentityUser> userManager, 
-                               RoleManager<IdentityRole> roleManager,
-                               AuthDbContext context,
-                               INavigationService navigationService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UsersController"/> class.
+        /// </summary>
+        /// <param name="userManager">User manager instance.</param>
+        /// <param name="roleManager">Role manager instance.</param>
+        /// <param name="context">DB context instance.</param>
+        /// <param name="navigationService">Processes the "Back" button operations.</param>
+        /// <param name="authService">Service processes user authorization check.</param>
+        public UsersController(
+            UserManager<IdentityUser> userManager,
+            RoleManager<IdentityRole> roleManager,
+            AuthDbContext context,
+            INavigationService navigationService,
+            IAuthService authService)
         {
-            _userManager = userManager;
-            _roleManager = roleManager;
-            _context = context;
-            _navigationService = navigationService;
+            this.userManager = userManager;
+            this.roleManager = roleManager;
+            this.context = context;
+            this.navigationService = navigationService;
+            this.authService = authService;
         }
 
+        /// <summary>
+        /// Gets the register view.
+        /// </summary>
+        /// <returns><see cref="IActionResult"/> for the "Register" view.</returns>
         [HttpGet]
         public IActionResult Register()
         {
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View("~/Views/Account/Register.cshtml", 
-                        new RegisterViewModel() { RolesForDisplay = GetRolesForDisplay() });
+            return this.View(
+                "~/Views/Account/Register.cshtml",
+                new RegisterViewModel() { RolesForDisplay = this.GetRolesForDisplay() });
         }
 
-        private List<string> GetRolesForDisplay()
-        {
-            var roles = _context.Roles.ToList();
-            
-            return roles.Where(_ => _.Name != "admin").Select(_ => _.Name).ToList();
-        }
-
+        /// <summary>
+        /// Registers a new user.
+        /// </summary>
+        /// <param name="model">View model with data.</param>
+        /// <returns><see cref="IActionResult"/> for the "Index" view in case of no rights or success or
+        ///     for the "Register" form in case of failure.</returns>
         [HttpPost]
         public async Task<IActionResult> Register(RegisterViewModel model)
         {
-            if (!(User.Identity.IsAuthenticated && User.IsInRole("admin")))
-                return View("Index");
+            if (!this.authService.IsAdmin(this.User))
+            {
+                return this.View("Index");
+            }
 
             var roleName = model.RoleName;
 
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
-                if (_roleManager.Roles.First(_ => _.Name == roleName) == null)
+                if (this.roleManager.Roles.First(_ => _.Name == roleName) == null)
                 {
                     var role = new IdentityRole(roleName);
-                    await _roleManager.CreateAsync(role);
+                    await this.roleManager.CreateAsync(role);
                 }
 
                 IdentityUser user = new IdentityUser { UserName = model.UserName };
 
-                var result = await _userManager.CreateAsync(user, model.Password);
+                var result = await this.userManager.CreateAsync(user, model.Password);
 
                 if (result.Succeeded)
                 {
-                    await _userManager.AddToRoleAsync(user, roleName);
+                    await this.userManager.AddToRoleAsync(user, roleName);
 
-                    return RedirectToAction("Index", "Home");
+                    return this.RedirectToAction("Index", "Home");
                 }
                 else
                 {
                     foreach (var error in result.Errors)
-                        ModelState.AddModelError(string.Empty, error.Description);
+                    {
+                        this.ModelState.AddModelError(string.Empty, error.Description);
+                    }
                 }
             }
 
-            return View(model);
+            return this.View(model);
         }
 
+        /// <summary>
+        /// Processes the roles.
+        /// </summary>
+        /// <returns><see cref="IActionResult"/> for the "Roles" view.</returns>
         [HttpGet]
         public async Task<IActionResult> RolesProcessing()
         {
-            var roles = _context.Roles.ToList();
+            var roles = this.context.Roles.ToList();
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View("~/Views/Users/Roles.cshtml", roles);
+            return await Task.FromResult(this.View("~/Views/Users/Roles.cshtml", roles));
         }
 
+        /// <summary>
+        /// Gets the form for adding a new role.
+        /// </summary>
+        /// <returns><see cref="IActionResult"/> for the "AddRole" view.</returns>
         [HttpGet]
         public async Task<IActionResult> AddRole()
         {
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View("~/Views/Users/AddRole.cshtml");
+            return await Task.FromResult(this.View("~/Views/Users/AddRole.cshtml"));
         }
 
+        /// <summary>
+        /// Adds a new role.
+        /// </summary>
+        /// <param name="model">View model with data.</param>
+        /// <returns><see cref="IActionResult"/> for the "AddRole" view.</returns>
         [HttpPost]
         public async Task<IActionResult> AddRole(NewRoleViewModel model)
         {
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
                 var role = new IdentityRole(model.RoleName);
 
-                var result = await _roleManager.CreateAsync(role);
+                var result = await this.roleManager.CreateAsync(role);
 
                 if (result.Succeeded)
-                    return RedirectToAction("RolesProcessing", "Users");
+                {
+                    return this.RedirectToAction("RolesProcessing", "Users");
+                }
                 else
+                {
                     foreach (var error in result.Errors)
-                        ModelState.AddModelError(string.Empty, error.Description);
+                    {
+                        this.ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
-            return View(model);
+            return this.View(model);
         }
 
+        /// <summary>
+        /// Deletes a role.
+        /// </summary>
+        /// <param name="id">Deleted role id.</param>
+        /// <returns><see cref="IActionResult"/> for the redirect to action "RolesProcessing".</returns>
         [HttpPost]
         public async Task<IActionResult> DeleteRole(string id)
         {
-            var role = _context.Roles.First(_ => _.Id == id);
+            var role = this.context.Roles.First(_ => _.Id == id);
 
             if (role != null)
             {
-                var result = await _roleManager.DeleteAsync(role);
+                var result = await this.roleManager.DeleteAsync(role);
 
                 if (result.Succeeded)
-                    return RedirectToAction("RolesProcessing", "Users");
+                {
+                    return this.RedirectToAction("RolesProcessing", "Users");
+                }
                 else
+                {
                     foreach (var error in result.Errors)
-                        ModelState.AddModelError(string.Empty, error.Description);
+                    {
+                        this.ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
-            return RedirectToAction("RolesProcessing", "Users");
+            return this.RedirectToAction("RolesProcessing", "Users");
         }
 
+        /// <summary>
+        /// Gets the users view.
+        /// </summary>
+        /// <returns><see cref="IActionResult"/> for the "Users" view.</returns>
         [HttpGet]
         public async Task<IActionResult> Users()
         {
-            var usersViewModel = GetUsersListForView();
+            var usersViewModel = this.GetUsersListForView();
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View("~/Views/Stuff/Users.cshtml", usersViewModel);
+            return await Task.FromResult(this.View("~/Views/Stuff/Users.cshtml", usersViewModel));
         }
 
+        /// <summary>
+        /// Deletes a user.
+        /// </summary>
+        /// <param name="id">Deleted user id.</param>
+        /// <returns><see cref="IActionResult"/> for the redirect to action "Users".</returns>
         [HttpPost]
         public async Task<IActionResult> DeleteUser(string id)
         {
-            var user = _context.Users.First(_ => _.Id == id);
+            var user = this.context.Users.First(_ => _.Id == id);
 
             if (user != null)
             {
-                var result = await _userManager.DeleteAsync(user);
+                var result = await this.userManager.DeleteAsync(user);
 
                 if (result.Succeeded)
-                    return RedirectToAction("Users", "Users");
+                {
+                    return this.RedirectToAction("Users", "Users");
+                }
                 else
+                {
                     foreach (var error in result.Errors)
-                        ModelState.AddModelError(string.Empty, error.Description);
+                    {
+                        this.ModelState.AddModelError(string.Empty, error.Description);
+                    }
+                }
             }
 
-            return RedirectToAction("Users", "Users");
+            return this.RedirectToAction("Users", "Users");
+        }
+
+        private List<string?> GetRolesForDisplay()
+        {
+            var roles = this.context.Roles.ToList();
+
+            return roles.Where(_ => _.Name != "admin").Select(_ => _.Name).ToList();
         }
 
         private List<UsersViewModel> GetUsersListForView()
         {
             List<UsersViewModel> result = new List<UsersViewModel>();
 
-            foreach (var user in _context.Users)
+            foreach (var user in this.context.Users)
             {
                 result.Add(new UsersViewModel()
                 {
                     Id = user.Id,
-                    UserName = user.UserName,
-                    Role = _userManager.GetRolesAsync(user).Result.FirstOrDefault()?.ToString()
+                    UserName = user?.UserName,
+                    Role = this.userManager.GetRolesAsync(user!).Result.FirstOrDefault()?.ToString(),
                 });
             }
 

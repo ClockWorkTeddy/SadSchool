@@ -16,7 +16,7 @@ namespace SadSchool.Migrations
                 {
                     id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    value = table.Column<string>(type: "TEXT", nullable: true)
+                    value = table.Column<string>(type: "TEXT", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -29,7 +29,7 @@ namespace SadSchool.Migrations
                 {
                     id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false)
+                    name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
                 },
                 constraints: table =>
                 {
@@ -45,7 +45,7 @@ namespace SadSchool.Migrations
                     first_name = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     last_name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
                     date_of_birth = table.Column<string>(type: "TEXT", nullable: true),
-                    grade = table.Column<int>(type: "INTEGER", nullable: true)
+                    grade = table.Column<int>(type: "INTEGER", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -60,7 +60,7 @@ namespace SadSchool.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     name = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
                     teacher_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    leader_id = table.Column<int>(type: "INTEGER", nullable: true)
+                    leader_id = table.Column<int>(type: "INTEGER", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -83,7 +83,7 @@ namespace SadSchool.Migrations
                     subject_id = table.Column<int>(type: "INTEGER", nullable: true),
                     class_id = table.Column<int>(type: "INTEGER", nullable: true),
                     teacher_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    day = table.Column<string>(type: "TEXT", nullable: true)
+                    day = table.Column<string>(type: "TEXT", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -124,7 +124,7 @@ namespace SadSchool.Migrations
                     last_name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
                     class_id = table.Column<int>(type: "INTEGER", nullable: true),
                     date_of_birth = table.Column<string>(type: "TEXT", nullable: true),
-                    sex = table.Column<bool>(type: "INTEGER", nullable: true)
+                    sex = table.Column<bool>(type: "INTEGER", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -144,7 +144,7 @@ namespace SadSchool.Migrations
                     id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Date = table.Column<string>(type: "TEXT", nullable: true),
-                    scheduled_lesson_id = table.Column<int>(type: "INTEGER", nullable: true)
+                    scheduled_lesson_id = table.Column<int>(type: "INTEGER", nullable: true),
                 },
                 constraints: table =>
                 {
@@ -165,7 +165,7 @@ namespace SadSchool.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     value = table.Column<string>(type: "TEXT", nullable: false),
                     lesson_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    student_id = table.Column<int>(type: "INTEGER", nullable: true)
+                    student_id = table.Column<int>(type: "INTEGER", nullable: true),
                 },
                 constraints: table =>
                 {

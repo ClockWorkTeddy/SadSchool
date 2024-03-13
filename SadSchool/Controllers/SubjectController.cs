@@ -1,130 +1,178 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using SadSchool.ViewModels;
-using SadSchool.Models;
-using SadSchool.Services;
-using SadSchool.Controllers.Contracts;
+﻿// <copyright file="SubjectController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Controllers
 {
+    using Microsoft.AspNetCore.Mvc;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+    using SadSchool.Services;
+    using SadSchool.ViewModels;
+
+    /// <summary>
+    /// Processes requests for subject data.
+    /// </summary>
     public class SubjectController : Controller
     {
-        private readonly SadSchoolContext _context;
-        private readonly INavigationService _navigationService;
-        private readonly ICacheService _cacheService;
+        private readonly SadSchoolContext context;
+        private readonly INavigationService navigationService;
+        private readonly ICacheService cacheService;
+        private readonly IAuthService authService;
 
-        public SubjectController(SadSchoolContext context, INavigationService navigationService, ICacheService cacheService)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SubjectController"/> class.
+        /// </summary>
+        /// <param name="context">DB context instance.</param>
+        /// <param name="navigationService">Service processes the "Back" button.</param>
+        /// <param name="cacheService">Cahce instance.</param>
+        /// <param name="authService">Service processes user authorization check.</param>
+        public SubjectController(
+            SadSchoolContext context,
+            INavigationService navigationService,
+            ICacheService cacheService,
+            IAuthService authService)
         {
-            _context = context;
-            _navigationService = navigationService;
-            _cacheService = cacheService;
+            this.context = context;
+            this.navigationService = navigationService;
+            this.cacheService = cacheService;
+            this.authService = authService;
         }
 
+        /// <summary>
+        /// Gets the subjects view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for the "Subjects" view.</returns>
         [HttpGet]
         public IActionResult Subjects()
         {
-            List<SubjectViewModel> subjects = new List<SubjectViewModel>();
+            List<SubjectViewModel> subjects = new();
 
-            foreach (var s in _context.Subjects)
+            foreach (var s in this.context.Subjects)
             {
                 subjects.Add(new SubjectViewModel
                 {
                     Id = s.Id,
-                    Name = s.Name
+                    Name = s.Name,
                 });
             }
 
-            _navigationService.RefreshBackParams(RouteData);
+            this.navigationService.RefreshBackParams(this.RouteData);
 
-            return View(@"~/Views/Data/Subjects.cshtml", subjects);
+            return this.View(@"~/Views/Data/Subjects.cshtml", subjects);
         }
 
+        /// <summary>
+        /// Gets the form for adding a new subject.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for the "SubjectAdd" view or
+        ///     <see cref="RedirectToActionResult"/> for the "Subjects" action.</returns>
         [HttpGet]
         public IActionResult Add()
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/SubjectAdd.cshtml");
+                return this.View(@"~/Views/Data/SubjectAdd.cshtml");
             }
-                
-            return RedirectToAction("Subjects");
+
+            return this.RedirectToAction("Subjects");
         }
 
+        /// <summary>
+        /// Adds a new subject.
+        /// </summary>
+        /// <param name="model">View model with data.</param>
+        /// <returns><see cref="RedirectToActionResult"/> for the "Subjects".</returns>
         [HttpPost]
         public IActionResult Add(SubjectViewModel model)
         {
-            if (ModelState.IsValid)
+            if (this.ModelState.IsValid)
             {
                 var subject = new Subject
                 {
-                    Name = model.Name
+                    Name = model?.Name,
                 };
 
-                _context.Subjects.Add(subject);
-                _context.SaveChanges();
+                this.context.Subjects.Add(subject);
+                this.context.SaveChanges();
             }
 
-            return RedirectToAction("Subjects");
+            return this.RedirectToAction("Subjects");
         }
 
+        /// <summary>
+        /// Gets the form for editing a subject.
+        /// </summary>
+        /// <param name="id">Edited item id.</param>
+        /// <returns><see cref="IActionResult"/> for the "SubjectEdit" view or the "Subjects" action.</returns>
         [HttpGet]
         public IActionResult Edit(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var editedSubject = _context.Subjects.Find(id);
+                var editedSubject = this.context.Subjects.Find(id);
 
                 var model = new SubjectViewModel
                 {
-                    Name = editedSubject?.Name
+                    Name = editedSubject?.Name,
                 };
 
-                _navigationService.RefreshBackParams(RouteData);
+                this.navigationService.RefreshBackParams(this.RouteData);
 
-                return View(@"~/Views/Data/SubjectEdit.cshtml", model);
+                return this.View(@"~/Views/Data/SubjectEdit.cshtml", model);
             }
-                
-            return RedirectToAction("Subjects");
+
+            return this.RedirectToAction("Subjects");
         }
 
+        /// <summary>
+        /// Edits a subject.
+        /// </summary>
+        /// <param name="model">View model with data.</param>
+        /// <returns><see cref="IActionResult"/> for the "Subjects" action or for the "SubjectEdit" view.</returns>
         [HttpPost]
         public IActionResult Edit(SubjectViewModel model)
         {
-            if (ModelState.IsValid && model != null)
+            if (this.ModelState.IsValid && model != null)
             {
                 var subject = new Subject
                 {
                     Id = model.Id,
-                    Name = model.Name
+                    Name = model.Name,
                 };
 
-                _context.Subjects.Update(subject);
-                _context.SaveChanges();
-                _cacheService.RefreshObject(subject);
-                return RedirectToAction("Subjects");
+                this.context.Subjects.Update(subject);
+                this.context.SaveChanges();
+                this.cacheService.RefreshObject(subject);
+
+                return this.RedirectToAction("Subjects");
             }
-            else
-            {
-                return View(@"~/Views/Data/SubjectEdit.cshtml", model);
-            }
+
+            return this.View(@"~/Views/Data/SubjectEdit.cshtml", model);
         }
 
+        /// <summary>
+        /// Deletes a subject.
+        /// </summary>
+        /// <param name="id">Deleted item id.</param>
+        /// <returns><see cref="IActionResult"/> for the "Subjects" action.</returns>
         [HttpPost]
         public IActionResult Delete(int id)
         {
-            if (User.Identity.IsAuthenticated && !User.IsInRole("user"))
+            if (this.authService.IsAutorized(this.User))
             {
-                var subject = _context.Subjects.Find(id);
+                var subject = this.context.Subjects.Find(id);
 
                 if (subject != null)
                 {
-                    _context.Subjects.Remove(subject);
-                    _context.SaveChanges();
+                    this.context.Subjects.Remove(subject);
+                    this.context.SaveChanges();
                 }
             }
 
-            return RedirectToAction("Subjects");
-        }   
+            return this.RedirectToAction("Subjects");
+        }
     }
 }

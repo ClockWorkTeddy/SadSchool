@@ -17,5 +17,12 @@ namespace SadSchool.Controllers.Contracts
         /// <param name="user"><see cref="ClaimsPrincipal"/> object of current user.</param>
         /// <returns>Does user have rights or not.</returns>
         bool IsAutorized(ClaimsPrincipal user);
+
+        /// <summary>
+        /// Check if the user is authentificated and in admin role.
+        /// </summary>
+        /// <param name="user"><see cref="ClaimsPrincipal"/> object for user instance.</param>
+        /// <returns>Is a user has admin rights.</returns>
+        public bool IsAdmin(ClaimsPrincipal user);
     }
 }

@@ -30,5 +30,22 @@ namespace SadSchool.Services
                 return false;
             }
         }
+
+        /// <summary>
+        /// Check if the user is authentificated and in admin role.
+        /// </summary>
+        /// <param name="user"><see cref="ClaimsPrincipal"/> object for user instance.</param>
+        /// <returns>Is a user has admin rights.</returns>
+        public bool IsAdmin(ClaimsPrincipal user)
+        {
+            if (user?.Identity?.IsAuthenticated != null)
+            {
+                var isAuthenticated = user.Identity.IsAuthenticated;
+
+                return isAuthenticated && user.IsInRole("admin");
+            }
+
+            return false;
+        }
     }
 }

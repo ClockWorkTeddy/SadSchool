@@ -6,7 +6,6 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.EntityFrameworkCore;
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
     using SadSchool.Services;
@@ -27,7 +26,7 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <param name="context">DB context instance.</param>
         /// <param name="navigationService">Service processes the "Back" button.</param>
-        /// <param name="cacheService">Memory cache instance.</param>
+        /// <param name="cacheService">Cache instance.</param>
         /// <param name="authService">Service processes user authorization check.</param>"
         public StudentController(
             SadSchoolContext context,

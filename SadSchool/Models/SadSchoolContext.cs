@@ -1,36 +1,76 @@
-﻿using System;
-using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
+﻿// <copyright file="SadSchoolContext.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Models;
 
+using Microsoft.EntityFrameworkCore;
+
+/// <summary>
+/// SadSchool database context.
+/// </summary>
 public partial class SadSchoolContext : DbContext
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SadSchoolContext"/> class. The default constructor.
+    /// </summary>
     public SadSchoolContext()
     {
     }
 
+    /// <summary>
+    /// Initializes a new instance of the <see cref="SadSchoolContext"/> class.
+    /// </summary>
+    /// <param name="options">DB context options.</param>
     public SadSchoolContext(DbContextOptions<SadSchoolContext> options)
         : base(options)
     {
     }
 
+    /// <summary>
+    /// Gets or sets the classes table.
+    /// </summary>
     public virtual DbSet<Class> Classes { get; set; }
 
+    /// <summary>
+    /// Gets or sets the lessons table.
+    /// </summary>
     public virtual DbSet<Lesson> Lessons { get; set; }
 
+    /// <summary>
+    /// Gets or sets the scheduled lessons table.
+    /// </summary>
     public virtual DbSet<ScheduledLesson> ScheduledLessons { get; set; }
 
+    /// <summary>
+    /// Gets or sets the start times (schedule positions) table.
+    /// </summary>
     public virtual DbSet<StartTime> StartTimes { get; set; }
 
+    /// <summary>
+    /// Gets or sets the students table.
+    /// </summary>
     public virtual DbSet<Student> Students { get; set; }
 
+    /// <summary>
+    /// Gets or sets the subjects table.
+    /// </summary>
     public virtual DbSet<Subject> Subjects { get; set; }
 
+    /// <summary>
+    /// Gets or sets the teachers table.
+    /// </summary>
     public virtual DbSet<Teacher> Teachers { get; set; }
 
+    /// <summary>
+    /// Gets or sets the marks table.
+    /// </summary>
     public virtual DbSet<Mark> Marks { get; set; }
 
+    /// <summary>
+    /// Fluent API configuration.
+    /// </summary>
+    /// <param name="modelBuilder">Model builder object.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Mark>(entity =>
@@ -175,7 +215,7 @@ public partial class SadSchoolContext : DbContext
             entity.Property(e => e.LastName).HasMaxLength(30).HasColumnName("last_name");
         });
 
-        OnModelCreatingPartial(modelBuilder);
+        this.OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

@@ -1,13 +1,25 @@
-﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore;
+﻿// <copyright file="AuthDbContext.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Models
 {
+    using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+    using Microsoft.EntityFrameworkCore;
+
+    /// <summary>
+    /// The database context for the authentication.
+    /// </summary>
     public class AuthDbContext : IdentityDbContext
     {
-        public AuthDbContext(DbContextOptions<AuthDbContext> options) : base(options)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="AuthDbContext"/> class.
+        /// </summary>
+        /// <param name="options">Object with options data.</param>
+        public AuthDbContext(DbContextOptions<AuthDbContext> options)
+            : base(options)
         {
-            Database.EnsureCreated();
+            this.Database.EnsureCreated();
         }
     }
 }
