@@ -234,7 +234,7 @@ namespace SadSchool.Controllers
             var students = marks.Select(m => m.StudentName).Distinct().Order().ToList();
             var subjects = marks.Select(m => m.SubjectName).Distinct().Order().ToList();
 
-            var aveMarksTable = new AverageMark?[students.Count, subjects.Count];
+            var aveMarksTable = new AverageMarkModel?[students.Count, subjects.Count];
 
             for (int i = 0; i < students.Count; i++)
             {

@@ -5,6 +5,7 @@
 namespace SadSchool.Controllers.RestApi
 {
     using Microsoft.AspNetCore.Mvc;
+    using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
     using SadSchool.Services.ApiServices;
 
@@ -114,7 +115,7 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="studentId">Desirable student id.</param>
         /// <param name="subjectId">Desirable subject id.</param>
-        /// <returns>List of <see cref="AverageMark"/>.</returns>
+        /// <returns>List of <see cref="AverageMarkModel"/>.</returns>
         [HttpGet("{studentId}/{subjectId}")]
         public IActionResult GetAverageMark(int studentId, int subjectId)
         {

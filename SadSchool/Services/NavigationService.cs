@@ -1,86 +1,97 @@
-﻿using SadSchool.Models;
+﻿// <copyright file="NavigationService.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Services
 {
-    public interface INavigationService
-    {
-        public string Controller { get; set; }
-        public string Action { get; set; }
-        public string ClassName { get; }
-        public void RefreshBackParams(RouteData routeData);
-        public void StoreClassName(string className);
-    }
+    using SadSchool.Controllers.Contracts;
 
-    public struct UrlParams
-    {
-        public string Controller { get; set; }
-        public string Action { get; set; }
-    }
-
+    /// <summary>
+    /// Navigation service, pcoresses the "Back" button functions.
+    /// </summary>
     public class NavigationService : INavigationService
     {
-        public string Controller { get; set; }
-        public string Action { get; set; }
+        private Dictionary<string, UrlParams> map = new();
 
-        public string ClassName { get; private set; }
-
-        private Dictionary<string, UrlParams> Map = new Dictionary<string, UrlParams>();
-
-        public void StoreClassName(string className) =>
-            ClassName = className;
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="NavigationService"/> class.
+        /// </summary>
         public NavigationService()
         {
-            Map["Home:About"] = new UrlParams { Controller = "Home", Action = "Index" };
-            Map["Data:DataIndex"] = new UrlParams { Controller = "Home", Action = "Index" };
-                Map["Class:Classes"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["Class:Add"] = new UrlParams { Controller = "Class", Action = "Classes" };
-                    Map["Class:Edit"] = new UrlParams { Controller = "Class", Action = "Classes" };
-                Map["Lesson:Lessons"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["Lesson:Add"] = new UrlParams { Controller = "Lesson", Action = "Lessons" };
-                    Map["Lesson:Edit"] = new UrlParams { Controller = "Lesson", Action = "Lessons" };
-                Map["ScheduledLesson:ScheduledLessons"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["ScheduledLesson:Add"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
-                    Map["ScheduledLesson:Edit"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
-                Map["Mark:Marks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["Mark:Add"] = new UrlParams { Controller = "Mark", Action = "Marks" };
-                    Map["Mark:Edit"] = new UrlParams { Controller = "Mark", Action = "Marks" };
-                Map["StartTime:StartTimes"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["StartTime:Add"] = new UrlParams { Controller = "StartTime", Action = "StartTimes" };
-                    Map["StartTime:Edit"] = new UrlParams { Controller = "StartTime", Action = "StartTimes" };
-                Map["Student:Students"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["Student:Add"] = new UrlParams { Controller = "Student", Action = "Students" };
-                    Map["Student:Edit"] = new UrlParams { Controller = "Student", Action = "Students" };
-                Map["Subject:Subjects"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["Subject:Add"] = new UrlParams { Controller = "Subject", Action = "Subjects" };
-                    Map["Subject:Edit"] = new UrlParams { Controller = "Subject", Action = "Subjects" };
-                Map["Teacher:Teachers"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["Teacher:Add"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
-                    Map["Teacher:Edit"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
-                Map["Schedule:GetSchedule"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                Map["ClassBooks:ClassBooks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["ClassBooks:ClassSelector"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBooks" };
-                        Map["ClassBooks:ClassBookTable"] = new UrlParams { Controller = "ClassBooks", Action = "ClassSelector" };
-                Map["Mark:GetStudentSubject"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
-                    Map["Mark:GetAverageMarks"] = new UrlParams { Controller = "Mark", Action = "GetStudentSubject" };
-            Map["Stuff:Stuff"] = new UrlParams { Controller = "Home", Action = "Index" };
-                Map["Users:Users"] = new UrlParams { Controller = "Stuff", Action = "Stuff" };
-                    Map["Users:Register"] = new UrlParams { Controller = "Users", Action = "Users" };
-                    Map["Users:RolesProcessing"] = new UrlParams { Controller = "Users", Action = "Users" };
-                        Map["Users:AddRole"] = new UrlParams { Controller = "Users", Action = "RolesProcessing" };
+            this.map["Home:About"] = new UrlParams { Controller = "Home", Action = "Index" };
+            this.map["Data:DataIndex"] = new UrlParams { Controller = "Home", Action = "Index" };
+            this.map["Class:Classes"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["Class:Add"] = new UrlParams { Controller = "Class", Action = "Classes" };
+            this.map["Class:Edit"] = new UrlParams { Controller = "Class", Action = "Classes" };
+            this.map["Lesson:Lessons"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["Lesson:Add"] = new UrlParams { Controller = "Lesson", Action = "Lessons" };
+            this.map["Lesson:Edit"] = new UrlParams { Controller = "Lesson", Action = "Lessons" };
+            this.map["ScheduledLesson:ScheduledLessons"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["ScheduledLesson:Add"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
+            this.map["ScheduledLesson:Edit"] = new UrlParams { Controller = "ScheduledLesson", Action = "ScheduledLessons" };
+            this.map["Mark:Marks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["Mark:Add"] = new UrlParams { Controller = "Mark", Action = "Marks" };
+            this.map["Mark:Edit"] = new UrlParams { Controller = "Mark", Action = "Marks" };
+            this.map["StartTime:StartTimes"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["StartTime:Add"] = new UrlParams { Controller = "StartTime", Action = "StartTimes" };
+            this.map["StartTime:Edit"] = new UrlParams { Controller = "StartTime", Action = "StartTimes" };
+            this.map["Student:Students"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["Student:Add"] = new UrlParams { Controller = "Student", Action = "Students" };
+            this.map["Student:Edit"] = new UrlParams { Controller = "Student", Action = "Students" };
+            this.map["Subject:Subjects"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["Subject:Add"] = new UrlParams { Controller = "Subject", Action = "Subjects" };
+            this.map["Subject:Edit"] = new UrlParams { Controller = "Subject", Action = "Subjects" };
+            this.map["Teacher:Teachers"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["Teacher:Add"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
+            this.map["Teacher:Edit"] = new UrlParams { Controller = "Teacher", Action = "Teachers" };
+            this.map["Schedule:GetSchedule"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["ClassBooks:ClassBooks"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["ClassBooks:ClassSelector"] = new UrlParams { Controller = "ClassBooks", Action = "ClassBooks" };
+            this.map["ClassBooks:ClassBookTable"] = new UrlParams { Controller = "ClassBooks", Action = "ClassSelector" };
+            this.map["Mark:GetStudentSubject"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
+            this.map["Mark:GetAverageMarks"] = new UrlParams { Controller = "Mark", Action = "GetStudentSubject" };
+            this.map["Stuff:Stuff"] = new UrlParams { Controller = "Home", Action = "Index" };
+            this.map["Users:Users"] = new UrlParams { Controller = "Stuff", Action = "Stuff" };
+            this.map["Users:Register"] = new UrlParams { Controller = "Users", Action = "Users" };
+            this.map["Users:RolesProcessing"] = new UrlParams { Controller = "Users", Action = "Users" };
+            this.map["Users:AddRole"] = new UrlParams { Controller = "Users", Action = "RolesProcessing" };
         }
 
+        /// <summary>
+        /// Gets or sets the controller name.
+        /// </summary>
+        public string Controller { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets or sets the action name.
+        /// </summary>
+        public string Action { get; set; } = string.Empty;
+
+        /// <summary>
+        /// Gets the class name.
+        /// </summary>
+        public string ClassName { get; private set; } = string.Empty;
+
+        /// <summary>
+        /// Stores the class name.
+        /// </summary>
+        /// <param name="className">Class name.</param>
+        public void StoreClassName(string className) =>
+            this.ClassName = className;
+
+        /// <summary>
+        /// Refreshes the "Back" button parameters.
+        /// </summary>
+        /// <param name="routeData">Controller and action names of the route.</param>
         public void RefreshBackParams(RouteData routeData)
         {
-            string adress = GetAdress(routeData);
+            string adress = this.GetAdress(routeData);
 
-            Controller = Map[adress].Controller;
-            Action = Map[adress].Action;
+            this.Controller = this.map[adress].Controller;
+            this.Action = this.map[adress].Action;
         }
 
-        private string GetAdress(RouteData routeData)
-        {
-            return routeData?.Values["controller"]?.ToString() + ":" + routeData?.Values["action"]?.ToString();
-        }
+        private string GetAdress(RouteData routeData) =>
+            routeData?.Values["controller"]?.ToString() + ":" + routeData?.Values["action"]?.ToString();
     }
 }

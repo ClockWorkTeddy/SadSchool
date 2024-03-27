@@ -5,7 +5,7 @@
 namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Services;
+    using SadSchool.Controllers.Contracts;
 
     /// <summary>
     /// Processes "Data" main page.

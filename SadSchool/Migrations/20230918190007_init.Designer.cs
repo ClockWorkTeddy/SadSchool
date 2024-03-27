@@ -12,7 +12,7 @@ namespace SadSchool.Migrations
 {
     [DbContext(typeof(SadSchoolContext))]
     [Migration("20230918190007_init")]
-    partial class init
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,26 +1,41 @@
-﻿namespace SadSchool.Services
+﻿// <copyright file="MixedNumericStringComparer.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+namespace SadSchool.Services
 {
+    /// <summary>
+    /// Compares strings that contain a mix of numeric and non-numeric characters.
+    /// </summary>
     public class MixedNumericStringComparer : IComparer<string?>
     {
+        /// <summary>
+        /// Compares two strings that contain a mix of numeric and non-numeric characters.
+        /// </summary>
+        /// <param name="x">The first string.</param>
+        /// <param name="y">The second string.</param>
+        /// <returns>Comparation result: -1, 0 or 1.</returns>
         public int Compare(string? x, string? y)
         {
             int numX, numY;
             string alphaX, alphaY;
 
             // Separate numeric and non-numeric parts
-            SplitNumericAndAlpha(x, out numX, out alphaX);
-            SplitNumericAndAlpha(y, out numY, out alphaY);
+            this.SplitNumericAndAlpha(x, out numX, out alphaX);
+            this.SplitNumericAndAlpha(y, out numY, out alphaY);
 
             // Compare numeric parts first
             int numComparison = numX.CompareTo(numY);
 
             if (numComparison == 0)
+            {
                 return string.Compare(alphaX, alphaY, StringComparison.Ordinal);
+            }
 
             return numComparison;
         }
 
-        private void SplitNumericAndAlpha(string input, out int numericPart, out string alphaPart)
+        private void SplitNumericAndAlpha(string? input, out int numericPart, out string alphaPart)
         {
             alphaPart = string.Empty;
             numericPart = 0;
@@ -30,11 +45,12 @@
                 int index = 0;
 
                 while (index < input.Length && char.IsDigit(input[index]))
-                    numericPart = numericPart * 10 + (input[index++] - '0');
+                {
+                    numericPart = (numericPart * 10) + (input[index++] - '0');
+                }
 
                 alphaPart = input.Substring(index);
             }
         }
     }
-
 }

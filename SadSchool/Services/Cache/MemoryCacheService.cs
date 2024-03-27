@@ -1,39 +1,66 @@
-﻿using Microsoft.Extensions.Caching.Memory;
-using SadSchool.Controllers.Contracts;
-using SadSchool.Models;
+﻿// <copyright file="MemoryCacheService.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Services.Cache
 {
+    using Microsoft.Extensions.Caching.Memory;
+    using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
+
+    /// <summary>
+    /// Memory cache service.
+    /// </summary>
     public class MemoryCacheService : ICacheService
     {
-        private readonly SadSchoolContext _context;
-        private readonly IMemoryCache _memoryCache;
+        private readonly SadSchoolContext context;
+        private readonly IMemoryCache memoryCache;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="MemoryCacheService"/> class.
+        /// </summary>
+        /// <param name="context">DB context instance.</param>
+        /// <param name="memoryCache">Memory cache instance.</param>
         public MemoryCacheService(SadSchoolContext context, IMemoryCache memoryCache)
         {
-            _context = context;
-            _memoryCache = memoryCache;
+            this.context = context;
+            this.memoryCache = memoryCache;
         }
 
-        public List<T> GetObject<T>(int id) where T : class
+        /// <summary>
+        /// Returns the object from the cache or from the database if it's not in the cache.
+        /// </summary>
+        /// <typeparam name="T">Desirable object type.</typeparam>
+        /// <param name="id">Desirable object id.</param>
+        /// <returns>List with the found object.</returns>
+        public List<T?> GetObject<T>(int id)
+            where T : class
         {
             var cacheKey = $"{typeof(T)}:{id}";
 
-            if (!_memoryCache.TryGetValue(cacheKey, out object? cachedObject))
+            if (!this.memoryCache.TryGetValue(cacheKey, out object? cachedObject))
             {
-                cachedObject = _context.Set<T>().Find(id);
-                _memoryCache.Set(cacheKey, cachedObject);
+                cachedObject = this.context.Set<T>().Find(id);
+                this.memoryCache.Set(cacheKey, cachedObject);
             }
 
-            return new List<T> { cachedObject as T };
+            return new List<T?> { cachedObject as T };
         }
 
-        public void RefreshObject<T>(T obj) where T : class
+        /// <summary>
+        /// Refreshes the object data if the object data was refreshed by the user.
+        /// </summary>
+        /// <typeparam name="T">Desirable object type.</typeparam>
+        /// <param name="obj">Object that being refreshed.</param>
+        public void RefreshObject<T>(T obj)
+            where T : class
         {
-            var cacheKey = $"{typeof(T)}:{(obj as BaseModel).Id}";
+            var cacheKey = $"{typeof(T)}:{(obj as BaseModel)?.Id}";
 
-            if (_memoryCache.TryGetValue(cacheKey, out object? cachedObject))
-                _memoryCache.Set(cacheKey, obj as T);
+            if (this.memoryCache.TryGetValue(cacheKey, out object? cachedObject))
+            {
+                this.memoryCache.Set(cacheKey, obj as T);
+            }
         }
     }
 }
