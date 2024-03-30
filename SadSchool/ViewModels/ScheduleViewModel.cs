@@ -1,11 +1,29 @@
-﻿using SadSchool.Services.Schedule;
+﻿// <copyright file="ScheduleViewModel.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.ViewModels
 {
+    using SadSchool.Services.Schedule;
+
+    /// <summary>
+    /// Represents the schedule view model.
+    /// </summary>
     public class ScheduleViewModel
     {
-        public readonly List<string> Days = new() { "Mon", "Tue", "Wed", "Thu", "Fri" };
+        /// <summary>
+        /// Gets the list of days.
+        /// </summary>
+        public List<string> Days { get; } = new() { "Mon", "Tue", "Wed", "Thu", "Fri" };
+
+        /// <summary>
+        /// Gets or sets the list of classes.
+        /// </summary>
         public List<string> Classes { get; set; } = new();
-        public ScheduleCell[,] Cells { get; set; }
+
+        /// <summary>
+        /// Gets or sets the list of SheduleCells.
+        /// </summary>
+        public ScheduleCell[,]? Cells { get; set; }
     }
 }
