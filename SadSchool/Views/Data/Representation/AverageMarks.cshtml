@@ -20,9 +20,12 @@
                         <thead>
                             <tr>
                                 <th scope="col" class="h3-lght-sad blinker-sad border-dark" style="text-align:center; vertical-align:middle">Student\Subject</th>
-                                @foreach(var subject in Model.Subjects)
+                                @if (Model.Subjects != null)
                                 {
-                                    <th scope="col" class="h3-lght-sad blinker-sad border-dark" style="text-align:center">@subject</th>
+                                    @foreach(var subject in Model.Subjects)
+                                    {
+                                        <th scope="col" class="h3-lght-sad blinker-sad border-dark" style="text-align:center">@subject</th>
+                                    }
                                 }
                             </tr>
                         </thead>
@@ -32,7 +35,7 @@
                                 <td class="h3-lght-sad blinker-sad border-dark" style="vertical-align: middle">
                                     <div class="blinker-sad">@Model.Students[i]</div>
                                 </td>
-                                @for (int j = 0; j < Model.Subjects.Count; j++)
+                                @for (int j = 0; j < Model!.Subjects!.Count; j++)
                                 {
                                     <td class="td-sad" style="text-align:start; vertical-align:middle">
                                         @if (Model.AverageMarksTable[i, j] != null)

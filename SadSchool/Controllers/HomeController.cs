@@ -6,8 +6,8 @@ namespace SadSchool.Controllers
 {
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Models;
     using SadSchool.Controllers.Contracts;
+    using SadSchool.Models;
 
     /// <summary>
     /// Main controller for site layout.

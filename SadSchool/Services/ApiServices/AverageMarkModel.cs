@@ -1,4 +1,4 @@
-﻿// <copyright file="AverageMark.cs" company="ClockWorkTeddy">
+﻿// <copyright file="AverageMarkModel.cs" company="ClockWorkTeddy">
 // Written by ClockWorkTeddy.
 // </copyright>
 

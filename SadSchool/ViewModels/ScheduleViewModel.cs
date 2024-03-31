@@ -19,11 +19,11 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets the list of classes.
         /// </summary>
-        public List<string> Classes { get; set; } = new();
+        public List<string?> Classes { get; set; } = new();
 
         /// <summary>
         /// Gets or sets the list of SheduleCells.
         /// </summary>
-        public ScheduleCell[,]? Cells { get; set; }
+        public ScheduleCell[,] Cells { get; set; } = new ScheduleCell[,] { };
     }
 }

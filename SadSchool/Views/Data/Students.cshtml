@@ -63,7 +63,10 @@
                                     <div class="blinker-sad">@student.DateOfBirth</div>
                                 </td>
                                 <td class="td-sad">
-                                    <div class="blinker-sad">@(student.Sex.Value ? "Female" : "Male")</div>
+                                    @if (student.Sex != null)
+                                    {
+                                        <div class="blinker-sad">@(student.Sex.Value ? "Female" : "Male")</div>
+                                    }
                                 </td>
                                 @if (!User.IsInRole("user"))
                                 {

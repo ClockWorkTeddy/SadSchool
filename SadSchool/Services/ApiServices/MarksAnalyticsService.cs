@@ -44,7 +44,7 @@ namespace SadSchool.Services.ApiServices
             {
                 foreach (var subject in subjects)
                 {
-                    var averageMark = this.GetAveragesMark(student, subject);
+                    var averageMark = this.GetAveragesMark(student, subject!);
 
                     if (averageMark.MarkValue != 0)
                     {
@@ -56,11 +56,11 @@ namespace SadSchool.Services.ApiServices
             return averageMarks;
         }
 
-        private List<Subject> GetSubjects(int? subjectId)
+        private List<Subject?> GetSubjects(int? subjectId)
         {
             if (subjectId == null || subjectId < 1)
             {
-                return this.context.Set<Subject>().ToList();
+                return this.context.Set<Subject>().ToList<Subject?>();
             }
             else
             {
@@ -76,7 +76,7 @@ namespace SadSchool.Services.ApiServices
             }
             else
             {
-                return this.cacheService.GetObject<Student>(studentId.Value);
+                return this.cacheService.GetObject<Student>(studentId.Value)!;
             }
         }
 
@@ -91,7 +91,7 @@ namespace SadSchool.Services.ApiServices
             var foundMarks = marks.Where(m => m?.Student?.ToString() == student.ToString()
                 && m?.Lesson?.ScheduledLesson?.Subject?.Name == subject.Name).ToList();
 
-            var sum = foundMarks.Sum(mdr => int.Parse(mdr.Value));
+            var sum = foundMarks.Sum(mdr => int.Parse(mdr.Value!));
 
             return new AverageMarkModel
             {

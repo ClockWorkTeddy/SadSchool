@@ -12,7 +12,7 @@ namespace SadSchool.Models
         /// <summary>
         /// Gets or sets mark value (from 1 to 5, 5 is the best).
         /// </summary>
-        public string Value { get; set; } = string.Empty;
+        public string? Value { get; set; } = string.Empty;
 
         /// <summary>
         /// Gets or sets the lesson id during which the mark has been received.

@@ -80,7 +80,7 @@ namespace SadSchool.Controllers
             {
                 if (this.roleManager.Roles.First(_ => _.Name == roleName) == null)
                 {
-                    var role = new IdentityRole(roleName);
+                    var role = new IdentityRole(roleName ?? string.Empty);
                     await this.roleManager.CreateAsync(role);
                 }
 
@@ -90,7 +90,7 @@ namespace SadSchool.Controllers
 
                 if (result.Succeeded)
                 {
-                    await this.userManager.AddToRoleAsync(user, roleName);
+                    await this.userManager.AddToRoleAsync(user, roleName ?? string.Empty);
 
                     return this.RedirectToAction("Index", "Home");
                 }

@@ -1,5 +1,5 @@
 // <copyright file="Program.cs" company="ClockWorkTeddy">
-// Copyright (c) PlaceholderCompany. All rights reserved.
+// Written by ClockWorkTeddy.
 // </copyright>
 
 using Microsoft.AspNetCore.Identity;

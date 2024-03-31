@@ -12,7 +12,7 @@ public partial class Teacher : BaseModel
     /// <summary>
     /// Gets or sets the first name of the teacher.
     /// </summary>
-    public string FirstName { get; set; } = null!;
+    public string? FirstName { get; set; } = null!;
 
     /// <summary>
     /// Gets or sets the last name of the teacher.

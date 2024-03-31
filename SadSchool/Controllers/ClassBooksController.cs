@@ -1,4 +1,7 @@
-﻿
+﻿// <copyright file="ClassBooksController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
 namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
@@ -57,7 +60,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult ClassSelector(string className)
         {
-            var classMarks = this.context.Marks.Where(m => m.Lesson.ScheduledLesson.Class.Name == className).ToList();
+            var classMarks = this.context.Marks.Where(m => m.Lesson!.ScheduledLesson!.Class!.Name == className).ToList();
 
             if (className != null)
             {

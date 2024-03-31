@@ -13,7 +13,7 @@
 <body>
     <div class="container-fluid">
         <div class="container scroll-sad" style="max-width: 800px; max-height: 600px">
-            @for (int i = 0; i < Model.Subjects.Count / 3; i++)
+            @for (int i = 0; i < Model!.Subjects!.Count / 3; i++)
             {
                 <div class="row justify-content-center" style="margin-top:30px">
                     @for (int j = 0; j < 3; j++)

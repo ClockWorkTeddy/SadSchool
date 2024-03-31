@@ -14,7 +14,7 @@
     <div class="container-fluid">
         <div class="row">
             <div class="col-2">
-                @if(ViewContext.RouteData.Values["action"].ToString() != "Index")
+                @if(ViewContext?.RouteData?.Values["action"]?.ToString() != "Index")
                 {
                     <a class="btn btn-sad btn-sub-service-sad blinker-sad"
                        asp-controller="@NavigationService.Controller" asp-action="@NavigationService.Action"
@@ -33,7 +33,7 @@
                 <div class="container" style="display:flex; align-items:center; 
                                               justify-content: flex-end;padding-top:2px">
                     <div class = "row">
-                        @if (!User.Identity.IsAuthenticated)
+                        @if (User.Identity != null && !User.Identity.IsAuthenticated)
                         {
                             <partial name="~/Views/Account/_PartialLogIn.cshtml" />
                         }
@@ -67,9 +67,4 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
-<script>
-    function goBack() {
-        window.history.back();
-    }
-</script>
 </html>

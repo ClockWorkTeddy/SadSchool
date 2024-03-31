@@ -15,6 +15,6 @@ namespace SadSchool.ViewModels
         /// Gets or sets the role name.
         /// </summary>
         [Required]
-        public string? RoleName { get; set; }
+        public string RoleName { get; set; } = string.Empty;
     }
 }

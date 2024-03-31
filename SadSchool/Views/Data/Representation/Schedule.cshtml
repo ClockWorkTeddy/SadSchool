@@ -36,7 +36,7 @@
                                     <td class="td-sad" style="text-align:start; vertical-align:top">
                                         @if (Model.Cells[i, j] != null)
                                         {
-                                            @foreach (var lesson in Model.Cells[i, j].LessonInfos)
+                                            @foreach (var lesson in Model!.Cells[i, j]!.LessonInfos!)
                                             {
                                                 <div class="blinker-sad" title="@lesson.Teacher">@($"{lesson.StartTime}: {lesson.Name}")</div>
                                             }

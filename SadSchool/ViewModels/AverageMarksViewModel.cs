@@ -24,6 +24,6 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets the list of subjects.
         /// </summary>
-        public List<string> Subjects { get; set; } = new();
+        public List<string?>? Subjects { get; set; } = new();
     }
 }

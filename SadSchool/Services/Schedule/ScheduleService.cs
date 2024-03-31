@@ -33,11 +33,11 @@ namespace SadSchool.Services.Schedule
         /// Gets the schedule cells.
         /// </summary>
         /// <returns>Schedule cells table.</returns>
-        public ScheduleCell?[,] GetScheduleCells()
+        public ScheduleCell[,] GetScheduleCells()
         {
             this.GetOverallCells();
 
-            return this.SortCells();
+            return this.SortCells()!;
         }
 
         private void GetOverallCells()

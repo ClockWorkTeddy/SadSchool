@@ -1,4 +1,8 @@
-﻿namespace SadSchool.Services
+﻿// <copyright file="UrlParams.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+namespace SadSchool.Services
 {
     /// <summary>
     /// Url parameters for the navigation service.
