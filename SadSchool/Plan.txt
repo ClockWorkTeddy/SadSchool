@@ -1,1 +1,4 @@
-﻿1. Create REST-API???
+﻿1. Redis Azure
+2. Mongo
+3. SeriLog
+4. Mapperly?
