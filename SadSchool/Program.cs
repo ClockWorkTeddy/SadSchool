@@ -32,7 +32,9 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
     opts.Password.RequireDigit = false;
 }).AddEntityFrameworkStores<AuthDbContext>();
 
-SelectCacheSource(builder);
+var redisSecretService = new RedisSecretService();
+
+SelectCacheSource(builder, redisSecretService);
 
 builder.Services.AddSingleton<INavigationService, NavigationService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
@@ -64,11 +66,18 @@ app.MapControllerRoute(
 
 app.Run();
 
-void SelectCacheSource(WebApplicationBuilder builder)
+void SelectCacheSource(WebApplicationBuilder builder, RedisSecretService redisSecretService)
 {
     try
     {
-        builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect("localhost"));
+        var redisConnStr = redisSecretService?.GetSecret();
+
+        if (redisConnStr == null)
+        {
+            throw new Exception("Redis connection string is null");
+        }
+
+        builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnStr));
         builder.Services.AddScoped<ICacheService, RedisCacheService>();
     }
     catch
