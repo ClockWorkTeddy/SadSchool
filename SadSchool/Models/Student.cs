@@ -42,6 +42,7 @@ public partial class Student : BaseModel
     /// <summary>
     /// Gets or sets the marks list.
     /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<Mark> Marks { get; set; } = null!;
 
     /// <summary>

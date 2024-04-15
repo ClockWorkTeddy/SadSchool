@@ -27,11 +27,13 @@ public partial class Class : BaseModel
     /// <summary>
     /// Gets or sets class's lessons list.
     /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<ScheduledLesson>? Lessons { get; set; } = new List<ScheduledLesson>();
 
     /// <summary>
     /// Gets or sets class's students list.
     /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<Student>? Students { get; set; } = new List<Student>();
 
     /// <summary>

@@ -43,7 +43,13 @@ namespace SadSchool.Services.Cache
             if (value == RedisValue.Null)
             {
                 T? dbValue = this.context.Set<T>().Find(id);
-                string serializedValue = JsonConvert.SerializeObject(dbValue);
+                string serializedValue = JsonConvert.SerializeObject(
+                    dbValue,
+                    Formatting.Indented,
+                    new JsonSerializerSettings()
+                    {
+                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                    });
                 value = new RedisValue(serializedValue);
 
                 this.redis.StringSet(rKey, value);

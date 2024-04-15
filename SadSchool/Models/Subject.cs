@@ -17,5 +17,6 @@ public partial class Subject : BaseModel
     /// <summary>
     /// Gets or sets the scheduled lessons list.
     /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 }

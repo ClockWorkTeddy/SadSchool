@@ -27,6 +27,7 @@ public partial class Lesson : BaseModel
     /// <summary>
     /// Gets or sets lesson's marks list.
     /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
 
     /// <summary>

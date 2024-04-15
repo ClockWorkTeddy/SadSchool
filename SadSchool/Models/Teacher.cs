@@ -32,11 +32,13 @@ public partial class Teacher : BaseModel
     /// <summary>
     /// Gets or sets the class id.
     /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<Class> Classes { get; set; } = new List<Class>();
 
     /// <summary>
     /// Gets or sets the scheduled lessons list.
     /// </summary>
+    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 
     /// <summary>

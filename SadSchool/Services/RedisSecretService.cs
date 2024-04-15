@@ -44,9 +44,16 @@ namespace SadSchool.Services
             }
 
             var keyVaultClient = new SecretClient(new Uri(keyVaultDest), new DefaultAzureCredential());
-            var redisSecret = keyVaultClient.GetSecret(redisSecretName);
 
-            return redisSecret.Value.Value;
+            try
+            {
+                var redisSecret = keyVaultClient.GetSecret(redisSecretName);
+                return redisSecret.Value.Value;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
