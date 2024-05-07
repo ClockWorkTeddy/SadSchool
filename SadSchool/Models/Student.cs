@@ -27,7 +27,7 @@ public partial class Student : BaseModel
     /// <summary>
     /// Gets or sets the date of birth.
     /// </summary>
-    public string? DateOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
 
     /// <summary>
     /// Gets or sets sex (male/female).

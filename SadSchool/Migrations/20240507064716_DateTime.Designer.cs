@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SadSchool.Models;
 
@@ -11,9 +12,11 @@ using SadSchool.Models;
 namespace SadSchool.Migrations
 {
     [DbContext(typeof(SadSchoolContext))]
-    partial class SadSchoolContextModelSnapshot : ModelSnapshot
+    [Migration("20240507064716_DateTime")]
+    partial class DateTime
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -1,15 +1,11 @@
-﻿// <copyright file="20230918190007_init.cs" company="ClockWorkTeddy">
-// Written by ClockWorkTeddy.
-// </copyright>
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
 namespace SadSchool.Migrations
 {
-    using Microsoft.EntityFrameworkCore.Migrations;
-
     /// <inheritdoc />
-    public partial class Init : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,9 +14,9 @@ namespace SadSchool.Migrations
                 name: "start_time",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    value = table.Column<string>(type: "TEXT", nullable: true),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -31,9 +27,9 @@ namespace SadSchool.Migrations
                 name: "subject",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: false),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -44,12 +40,12 @@ namespace SadSchool.Migrations
                 name: "teacher",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    first_name = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
-                    last_name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
-                    date_of_birth = table.Column<string>(type: "TEXT", nullable: true),
-                    grade = table.Column<int>(type: "INTEGER", nullable: true),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    first_name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    last_name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
+                    date_of_birth = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    grade = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -60,11 +56,11 @@ namespace SadSchool.Migrations
                 name: "class",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    name = table.Column<string>(type: "TEXT", maxLength: 10, nullable: false),
-                    teacher_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    leader_id = table.Column<int>(type: "INTEGER", nullable: true),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    name = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: true),
+                    teacher_id = table.Column<int>(type: "int", nullable: true),
+                    leader_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -81,13 +77,13 @@ namespace SadSchool.Migrations
                 name: "scheduled_lessons",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    start_time_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    subject_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    class_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    teacher_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    day = table.Column<string>(type: "TEXT", nullable: true),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    start_time_id = table.Column<int>(type: "int", nullable: true),
+                    subject_id = table.Column<int>(type: "int", nullable: true),
+                    class_id = table.Column<int>(type: "int", nullable: true),
+                    teacher_id = table.Column<int>(type: "int", nullable: true),
+                    day = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -122,13 +118,13 @@ namespace SadSchool.Migrations
                 name: "student",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    first_name = table.Column<string>(type: "TEXT", maxLength: 20, nullable: true),
-                    last_name = table.Column<string>(type: "TEXT", maxLength: 30, nullable: true),
-                    class_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    date_of_birth = table.Column<string>(type: "TEXT", nullable: true),
-                    sex = table.Column<bool>(type: "INTEGER", nullable: true),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    first_name = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: true),
+                    last_name = table.Column<string>(type: "nvarchar(30)", maxLength: 30, nullable: true),
+                    class_id = table.Column<int>(type: "int", nullable: true),
+                    date_of_birth = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    sex = table.Column<bool>(type: "bit", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -145,10 +141,10 @@ namespace SadSchool.Migrations
                 name: "lesson",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Date = table.Column<string>(type: "TEXT", nullable: true),
-                    scheduled_lesson_id = table.Column<int>(type: "INTEGER", nullable: true),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    date = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    scheduled_lesson_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -165,11 +161,11 @@ namespace SadSchool.Migrations
                 name: "mark",
                 columns: table => new
                 {
-                    id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    value = table.Column<string>(type: "TEXT", nullable: false),
-                    lesson_id = table.Column<int>(type: "INTEGER", nullable: true),
-                    student_id = table.Column<int>(type: "INTEGER", nullable: true),
+                    id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    value = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    lesson_id = table.Column<int>(type: "int", nullable: true),
+                    student_id = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {

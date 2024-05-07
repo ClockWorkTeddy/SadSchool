@@ -22,7 +22,7 @@ public partial class Teacher : BaseModel
     /// <summary>
     /// Gets or sets the date of birth of the teacher.
     /// </summary>
-    public string? DateOfBirth { get; set; }
+    public DateOnly? DateOfBirth { get; set; }
 
     /// <summary>
     /// Gets or sets the grade of the teacher.

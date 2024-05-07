@@ -56,7 +56,7 @@ namespace SadSchool.Controllers
                     Id = student.Id,
                     FirstName = student.FirstName,
                     LastName = student.LastName,
-                    DateOfBirth = student.DateOfBirth,
+                    DateOfBirth = student.DateOfBirth.ToString(),
                     Sex = student.Sex,
                     ClassName = student.Class?.Name,
                 });
@@ -101,13 +101,18 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
+                var dateData = viewModel.DateOfBirth
+                    .Split('-')
+                    .Select(d => Convert.ToInt32(d))
+                    .ToList();
+
                 var student = new Student
                 {
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
                     ClassId = viewModel.ClassId,
                     Class = this.context.Classes.Find(viewModel.ClassId),
-                    DateOfBirth = viewModel.DateOfBirth,
+                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
                     Sex = viewModel.Sex,
                 };
 
@@ -135,7 +140,7 @@ namespace SadSchool.Controllers
                 {
                     FirstName = editedStudent?.FirstName,
                     LastName = editedStudent?.LastName,
-                    DateOfBirth = editedStudent?.DateOfBirth,
+                    DateOfBirth = editedStudent?.DateOfBirth.ToString(),
                     Sexes = this.GetSexes(editedStudent?.Sex),
                     Classes = this.GetClassesList(editedStudent?.ClassId),
                 };
@@ -159,12 +164,17 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid && viewModel != null)
             {
+                var dateData = viewModel.DateOfBirth
+                    .Split('-')
+                    .Select(d => Convert.ToInt32(d))
+                    .ToList();
+
                 var student = new Student
                 {
                     Id = viewModel.Id,
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
-                    DateOfBirth = viewModel.DateOfBirth,
+                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
                     Sex = viewModel.Sex,
                     ClassId = viewModel.ClassId,
                 };
