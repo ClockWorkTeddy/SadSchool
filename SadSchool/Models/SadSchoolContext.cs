@@ -161,6 +161,7 @@ public partial class SadSchoolContext : DbContext
             entity.ToTable("lesson");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Date).HasColumnName("date");
             entity.Property(e => e.ScheduledLessonId).HasColumnName("scheduled_lesson_id");
 
             entity.HasOne(d => d.ScheduledLesson)

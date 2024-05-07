@@ -13,6 +13,7 @@ using SadSchool.Services.ClassBook;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
+SetUpConfiguration(builder);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
@@ -20,7 +21,7 @@ builder.Services.AddControllersWithViews();
 var connStrSad = "Data Source=.\\sad_school.db";
 var connStrAuth = "Data Source=.\\auth.db";
 
-builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlite(connStrSad).UseLazyLoadingProxies());
+builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlServer(builder.Configuration["sad_school_conn_str"]).UseLazyLoadingProxies());
 builder.Services.AddDbContext<AuthDbContext>(_ => _.UseSqlite(connStrAuth));
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
@@ -32,7 +33,7 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
     opts.Password.RequireDigit = false;
 }).AddEntityFrameworkStores<AuthDbContext>();
 
-var redisSecretService = new RedisSecretService();
+var redisSecretService = new RedisSecretService(builder.Configuration);
 
 SelectCacheSource(builder, redisSecretService);
 
@@ -84,4 +85,16 @@ void SelectCacheSource(WebApplicationBuilder builder, RedisSecretService redisSe
     {
         builder.Services.AddScoped<ICacheService, MemoryCacheService>();
     }
+}
+
+void SetUpConfiguration(WebApplicationBuilder builder)
+{
+    IConfiguration configuration = new ConfigurationBuilder()
+        .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+        .Build();
+
+    ConfigurationManager confManager = new ConfigurationManager();
+    confManager.AddConfiguration(configuration);
+
+    builder.Configuration.AddConfiguration(confManager);
 }

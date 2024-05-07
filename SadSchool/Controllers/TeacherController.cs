@@ -89,11 +89,16 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
+                var dateData = model.DateOfBirth
+                    .Split('-')
+                    .Select(d => Convert.ToInt32(d))
+                    .ToList();
+
                 var teacher = new Teacher
                 {
                     FirstName = model.FirstName,
                     LastName = model.LastName,
-                    DateOfBirth = model.DateOfBirth,
+                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
                     Grade = model.Grade,
                 };
 
@@ -146,12 +151,17 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid && viewModel != null)
             {
+                var dateData = viewModel.DateOfBirth
+                    .Split('-')
+                    .Select(d => Convert.ToInt32(d))
+                    .ToList();
+
                 var teacher = new Teacher
                 {
                     Id = viewModel.Id,
                     FirstName = viewModel.FirstName,
                     LastName = viewModel.LastName,
-                    DateOfBirth = viewModel.DateOfBirth,
+                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
                     Grade = viewModel.Grade,
                 };
 

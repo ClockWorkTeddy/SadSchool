@@ -15,19 +15,23 @@ namespace SadSchool.Services
         private readonly string destVariableName = "EnvVarKeys";
         private readonly string keyName = "RedisSecretName";
 
+        private readonly ConfigurationManager confManager;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RedisSecretService"/> class.
+        /// </summary>
+        /// <param name="configurationManager">configuration manager</param>
+        public RedisSecretService(ConfigurationManager configurationManager)
+        {
+            this.confManager = configurationManager;
+        }
+
         /// <summary>
         /// Gets the secret data.
         /// </summary>
         /// <returns>String with redis conn string.</returns>
         public string? GetSecret()
         {
-            IConfiguration configuration = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .Build();
-
-            var confManager = new ConfigurationManager();
-            confManager.AddConfiguration(configuration);
-
             var varKeyVault = confManager[this.destVariableName];
 
             if (string.IsNullOrEmpty(varKeyVault))

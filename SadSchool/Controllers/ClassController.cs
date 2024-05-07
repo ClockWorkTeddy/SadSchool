@@ -42,17 +42,26 @@ namespace SadSchool.Controllers
         public IActionResult Classes()
         {
             List<ClassViewModel> classes = new();
-
-            foreach (var theClass in this.context.Classes.Include(c => c.Teacher).ToList())
+            try
             {
-                classes.Add(new ClassViewModel
+                foreach (var theClass in this.context.Classes.Include(c => c.Teacher).ToList())
                 {
-                    Id = theClass.Id,
-                    Name = theClass.Name,
-                    TeacherId = theClass.TeacherId,
-                    TeacherName = this.GetTeacherName(theClass.TeacherId),
-                    LeaderName = this.GetLeaderName(theClass.LeaderId),
-                });
+                    classes.Add(new ClassViewModel
+                    {
+                        Id = theClass.Id,
+                        Name = theClass.Name,
+                        TeacherId = theClass.TeacherId,
+                        TeacherName = this.GetTeacherName(theClass.TeacherId),
+                        LeaderName = this.GetLeaderName(theClass.LeaderId),
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                StreamWriter sw = new StreamWriter("log.txt", true);
+                sw.WriteLine($"{DateTime.Now}: { ex.Message}");
+                sw.WriteLine($"{DateTime.Now}: { ex.InnerException?.Message}");
+                sw.Close();
             }
 
             this.navigationService.RefreshBackParams(this.RouteData);
