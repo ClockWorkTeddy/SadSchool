@@ -12,8 +12,8 @@ using SadSchool.Models;
 namespace SadSchool.Migrations
 {
     [DbContext(typeof(SadSchoolContext))]
-    [Migration("20240428065359_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20240519115516_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -184,8 +184,8 @@ namespace SadSchool.Migrations
                         .HasColumnType("int")
                         .HasColumnName("class_id");
 
-                    b.Property<string>("DateOfBirth")
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<DateOnly?>("DateOfBirth")
+                        .HasColumnType("date")
                         .HasColumnName("date_of_birth");
 
                     b.Property<string>("FirstName")
@@ -237,8 +237,8 @@ namespace SadSchool.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("Id"));
 
-                    b.Property<string>("DateOfBirth")
-                        .HasColumnType("nvarchar(max)")
+                    b.Property<DateOnly?>("DateOfBirth")
+                        .HasColumnType("date")
                         .HasColumnName("date_of_birth");
 
                     b.Property<string>("FirstName")
