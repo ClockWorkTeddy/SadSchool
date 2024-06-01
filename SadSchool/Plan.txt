@@ -1,4 +1,6 @@
-﻿1. Redis Azure
+﻿1. Redis Azure -> Redis Redis
+1.a. SQL Server
 2. Mongo
 3. SeriLog
 4. Mapperly?
+5. GraphQL
