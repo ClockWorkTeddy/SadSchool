@@ -4,12 +4,14 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
 using SadSchool.Controllers.Contracts;
 using SadSchool.Models;
 using SadSchool.Services;
 using SadSchool.Services.ApiServices;
 using SadSchool.Services.Cache;
 using SadSchool.Services.ClassBook;
+using SadSchool.Services.Secrets;
 using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -18,7 +20,6 @@ SetUpConfiguration(builder);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var connStrSad = "Data Source=.\\sad_school.db";
 var connStrAuth = "Data Source=.\\auth.db";
 
 builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlServer(builder.Configuration["sad_school_conn_str"]).UseLazyLoadingProxies());
@@ -33,9 +34,10 @@ builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
     opts.Password.RequireDigit = false;
 }).AddEntityFrameworkStores<AuthDbContext>();
 
-var redisSecretService = new RedisSecretService(builder.Configuration);
+var secretService = new SecretService(builder.Configuration);
 
-SelectCacheSource(builder, redisSecretService);
+SelectCacheSource(builder, secretService);
+SetUpMongo(builder, secretService);
 
 builder.Services.AddSingleton<INavigationService, NavigationService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
@@ -67,11 +69,11 @@ app.MapControllerRoute(
 
 app.Run();
 
-void SelectCacheSource(WebApplicationBuilder builder, RedisSecretService redisSecretService)
+void SelectCacheSource(WebApplicationBuilder builder, SecretService secretService)
 {
     try
     {
-        var redisConnStr = redisSecretService?.GetSecret();
+        var redisConnStr = secretService?.GetSecret("RedisSecretName");
 
         if (redisConnStr == null)
         {
@@ -84,6 +86,28 @@ void SelectCacheSource(WebApplicationBuilder builder, RedisSecretService redisSe
     catch
     {
         builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+    }
+}
+
+void SetUpMongo(WebApplicationBuilder builder, SecretService secretService)
+{
+    try
+    {
+        var mongoConnStr = secretService?.GetSecret("MongoConnStr");
+
+        if (mongoConnStr == null)
+        {
+            throw new Exception("Mongo connection string is null");
+        }
+
+        var client = new MongoClient(mongoConnStr);
+        var bd = MongoContext.Create(client.GetDatabase("SadSchool"));
+
+        builder.Services.AddSingleton(bd);
+    }
+    catch
+    {
+        // Nothing yet
     }
 }
 

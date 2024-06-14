@@ -101,26 +101,31 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var dateData = viewModel.DateOfBirth
+                var dateData = new List<int>();
+
+                dateData = viewModel?.DateOfBirth?
                     .Split('-')
                     .Select(d => Convert.ToInt32(d))
                     .ToList();
 
-                var student = new Student
+                if (dateData != null && dateData.Count == 3)
                 {
-                    FirstName = viewModel.FirstName,
-                    LastName = viewModel.LastName,
-                    ClassId = viewModel.ClassId,
-                    Class = this.context.Classes.Find(viewModel.ClassId),
-                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                    Sex = viewModel.Sex,
-                };
+                    var student = new Student
+                    {
+                        FirstName = viewModel?.FirstName,
+                        LastName = viewModel?.LastName,
+                        ClassId = viewModel?.ClassId,
+                        Class = this.context.Classes.Find(viewModel?.ClassId),
+                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
+                        Sex = viewModel?.Sex,
+                    };
 
-                this.context.Students.Add(student);
-                await this.context.SaveChangesAsync();
+                    this.context.Students.Add(student);
+                    await this.context.SaveChangesAsync();
+                }
             }
 
-            return this.RedirectToAction("Students");
+            return this.RedirectToAction("Add");
         }
 
         /// <summary>
@@ -164,24 +169,27 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid && viewModel != null)
             {
-                var dateData = viewModel.DateOfBirth
+                var dateData = viewModel?.DateOfBirth?
                     .Split('-')
                     .Select(d => Convert.ToInt32(d))
                     .ToList();
 
-                var student = new Student
+                if (dateData != null && dateData.Count == 3)
                 {
-                    Id = viewModel.Id,
-                    FirstName = viewModel.FirstName,
-                    LastName = viewModel.LastName,
-                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                    Sex = viewModel.Sex,
-                    ClassId = viewModel.ClassId,
-                };
+                    var student = new Student
+                    {
+                        Id = viewModel?.Id,
+                        FirstName = viewModel?.FirstName,
+                        LastName = viewModel?.LastName,
+                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
+                        Sex = viewModel?.Sex,
+                        ClassId = viewModel?.ClassId,
+                    };
 
-                this.context.Students.Update(student);
-                await this.context.SaveChangesAsync();
-                this.cacheService.RefreshObject(student);
+                    this.context.Students.Update(student);
+                    await this.context.SaveChangesAsync();
+                    this.cacheService.RefreshObject(student);
+                }
 
                 return this.RedirectToAction("Students");
             }

@@ -5,6 +5,7 @@
 namespace SadSchool.ViewModels
 {
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using MongoDB.Bson;
 
     /// <summary>
     /// Represents the mark view model.
@@ -14,7 +15,7 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets the id.
         /// </summary>
-        public int? Id { get; set; }
+        public ObjectId Id { get; set; }
 
         /// <summary>
         /// Gets or sets the mark's value.

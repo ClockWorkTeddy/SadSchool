@@ -4,7 +4,6 @@
 
 namespace SadSchool.Services.ApiServices
 {
-    using Microsoft.EntityFrameworkCore;
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
 
@@ -14,16 +13,19 @@ namespace SadSchool.Services.ApiServices
     public class MarksAnalyticsService : IMarksAnalyticsService
     {
         private readonly ICacheService cacheService;
+        private MongoContext mongoContext;
         private SadSchoolContext context;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarksAnalyticsService"/> class.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="mongoContext">DB context instance.</param>
         /// <param name="cacheService">Cache servece instance.</param>
-        public MarksAnalyticsService(SadSchoolContext context, ICacheService cacheService)
+        /// <param name="context">SadSchool context.</param>
+        public MarksAnalyticsService(MongoContext mongoContext, ICacheService cacheService, SadSchoolContext context)
         {
             this.context = context;
+            this.mongoContext = mongoContext;
             this.cacheService = cacheService;
         }
 
@@ -60,7 +62,7 @@ namespace SadSchool.Services.ApiServices
         {
             if (subjectId == null || subjectId < 1)
             {
-                return this.context.Set<Subject>().ToList<Subject?>();
+                return this.mongoContext.Set<Subject>().ToList<Subject?>();
             }
             else
             {
@@ -82,14 +84,11 @@ namespace SadSchool.Services.ApiServices
 
         private AverageMarkModel GetAveragesMark(Student student, Subject subject)
         {
-            var marks = this.context.Marks
-                .Include(m => m.Student)
-                .Include(m => m.Lesson)
-                    .ThenInclude(l => l!.ScheduledLesson)
-                        .ThenInclude(sl => sl!.Subject).ToList();
+            var marksForStudent = this.mongoContext.Marks
+                .Where(m => m.StudentId == student.Id).ToList();
 
-            var foundMarks = marks.Where(m => m?.Student?.ToString() == student.ToString()
-                && m?.Lesson?.ScheduledLesson?.Subject?.Name == subject.Name).ToList();
+            var foundMarks = marksForStudent.Where(m => m.LessonId != null
+                && this.context.Lessons.Find(m.LessonId)!.ScheduledLesson!.Subject!.Name == subject.Name).ToList();
 
             var sum = foundMarks.Sum(mdr => int.Parse(mdr.Value!));
 

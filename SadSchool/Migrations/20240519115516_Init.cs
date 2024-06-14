@@ -1,4 +1,9 @@
-﻿using System;
+﻿// <copyright file="20240519115516_Init.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+#pragma warning disable
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
@@ -260,3 +265,5 @@ namespace SadSchool.Migrations
         }
     }
 }
+
+#pragma warning restore

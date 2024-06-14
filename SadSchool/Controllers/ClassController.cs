@@ -59,8 +59,8 @@ namespace SadSchool.Controllers
             catch (Exception ex)
             {
                 StreamWriter sw = new StreamWriter("log.txt", true);
-                sw.WriteLine($"{DateTime.Now}: { ex.Message}");
-                sw.WriteLine($"{DateTime.Now}: { ex.InnerException?.Message}");
+                sw.WriteLine($"{DateTime.Now}: {ex.Message}");
+                sw.WriteLine($"{DateTime.Now}: {ex.InnerException?.Message}");
                 sw.Close();
             }
 

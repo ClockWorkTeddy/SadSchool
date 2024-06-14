@@ -5,10 +5,9 @@
 namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using MongoDB.Driver;
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
-    using SadSchool.Services;
-    using SadSchool.Services.ClassBook;
     using SadSchool.ViewModels;
 
     /// <summary>
@@ -19,6 +18,7 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IClassBookService classBookService;
+        private readonly MongoContext mongoContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassBooksController"/> class.
@@ -28,14 +28,17 @@ namespace SadSchool.Controllers
         ///     that responces for the "Back" button operating.</param>
         /// <param name="classBookService">A class books service instance,
         ///     that responses for class book data operations.</param>
+        /// <param name="mongoContext">MongoDB context.</param>
         public ClassBooksController(
             SadSchoolContext sadSchoolContext,
             INavigationService navigationService,
-            IClassBookService classBookService)
+            IClassBookService classBookService,
+            MongoContext mongoContext)
         {
             this.classBookService = classBookService;
             this.context = sadSchoolContext;
             this.navigationService = navigationService;
+            this.mongoContext = mongoContext;
         }
 
         /// <summary>
@@ -47,9 +50,9 @@ namespace SadSchool.Controllers
         {
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            var class_names = this.context.Classes.Select(cl => cl.Name).ToList();
+            var classNames = this.context.Classes.Select(cl => cl.Name).ToList();
 
-            return this.View(@"~/Views/Data/Representation/ClassBooks.cshtml", class_names);
+            return this.View(@"~/Views/Data/Representation/ClassBooks.cshtml", classNames);
         }
 
         /// <summary>
@@ -60,8 +63,6 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult ClassSelector(string className)
         {
-            var classMarks = this.context.Marks.Where(m => m.Lesson!.ScheduledLesson!.Class!.Name == className).ToList();
-
             if (className != null)
             {
                 this.navigationService.StoreClassName(className);
