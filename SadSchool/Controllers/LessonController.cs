@@ -47,13 +47,13 @@ namespace SadSchool.Controllers
             var lessons = new List<LessonViewModel>();
             var contextLessons = this.context.Lessons
                 .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl.Class)
+                    .ThenInclude(sl => sl!.Class)
                 .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl.Teacher)
+                    .ThenInclude(sl => sl!.Teacher)
                 .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl.StartTime)
+                    .ThenInclude(sl => sl!.StartTime)
                 .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl.Subject);
+                    .ThenInclude(sl => sl!.Subject);
 
             foreach (var lesson in contextLessons)
             {

@@ -63,46 +63,11 @@ public partial class SadSchoolContext : DbContext
     public virtual DbSet<Teacher> Teachers { get; set; }
 
     /// <summary>
-    /// Gets or sets the marks table.
-    /// </summary>
-    public virtual DbSet<Mark> Marks { get; set; }
-
-    /// <summary>
     /// Fluent API configuration.
     /// </summary>
     /// <param name="modelBuilder">Model builder object.</param>
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Mark>(entity =>
-        {
-            entity.ToTable("mark");
-
-            entity.HasKey(_ => _.Id);
-
-            entity.Property(_ => _.Id)
-                  .ValueGeneratedOnAdd()
-                  .HasColumnName("id");
-
-            entity.Property(_ => _.Value)
-                  .HasColumnName("value");
-
-            entity.Property(_ => _.LessonId)
-                  .HasColumnName("lesson_id");
-
-            entity.HasOne(d => d.Lesson).WithMany(p => p.Marks)
-                .HasForeignKey(d => d.LessonId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_mark_lesson");
-
-            entity.Property(_ => _.StudentId)
-                  .HasColumnName("student_id");
-
-            entity.HasOne(d => d.Student).WithMany(p => p.Marks)
-                .HasForeignKey(d => d.StudentId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_mark_student");
-        });
-
         modelBuilder.Entity<Class>(entity =>
         {
             entity.ToTable("class");
@@ -167,8 +132,7 @@ public partial class SadSchoolContext : DbContext
             entity.HasOne(d => d.ScheduledLesson)
                 .WithMany(p => p.Lessons)
                 .HasForeignKey(d => d.ScheduledLessonId)
-                .OnDelete(DeleteBehavior.SetNull)
-                .HasConstraintName("FK_mark_scheduled_lessons");
+                .OnDelete(DeleteBehavior.SetNull);
         });
 
         modelBuilder.Entity<StartTime>(entity =>
@@ -218,6 +182,13 @@ public partial class SadSchoolContext : DbContext
 
         this.OnModelCreatingPartial(modelBuilder);
     }
+
+    /// <summary>
+    /// Methos for db context configuration.
+    /// </summary>
+    /// <param name="optionsBuilder">Options builder object.</param>
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+        optionsBuilder.UseLazyLoadingProxies();
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

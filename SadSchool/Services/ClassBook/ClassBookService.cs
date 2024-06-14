@@ -15,6 +15,7 @@ namespace SadSchool.Services.ClassBook
     public class ClassBookService : IClassBookService
     {
         private SadSchoolContext context;
+        private MongoContext mongoContext;
         private List<string> dates = [];
         private List<string> students = [];
         private List<MarkCellModel> markCells = [];
@@ -27,9 +28,11 @@ namespace SadSchool.Services.ClassBook
         /// Initializes a new instance of the <see cref="ClassBookService"/> class.
         /// </summary>
         /// <param name="context">DB context.</param>
-        public ClassBookService(SadSchoolContext context)
+        /// <param name="mongoContext">MongoDB context.</param>
+        public ClassBookService(SadSchoolContext context, MongoContext mongoContext)
         {
             this.context = context;
+            this.mongoContext = mongoContext;
             this.Dates = [];
             this.Students = [];
         }
@@ -76,14 +79,24 @@ namespace SadSchool.Services.ClassBook
         {
             this.markCells = this.rawMarks.Select(mc => new MarkCellModel
             {
-                Date = $"{mc?.Lesson?.Date} {mc?.Lesson?.ScheduledLesson?.StartTime?.Value}",
+                Date = $"{this.GetLessonData(mc).Date} {this.GetLessonData(mc)?.ScheduledLesson?.StartTime?.Value}",
                 Mark = mc?.Value,
-                StudentName = $"{mc?.Student?.LastName} {mc?.Student?.FirstName}",
+                StudentName = $"{this.GetStudentData(mc!).LastName} {this.GetStudentData(mc!).FirstName}",
             }).ToList();
 
             this.GetDates();
             this.GetStudents();
         }
+
+        private Lesson GetLessonData(Mark mc) =>
+            this.context.Lessons
+                .Include(l => l.ScheduledLesson)
+                .ThenInclude(sl => sl!.StartTime)
+                .First(l => l.Id == mc.LessonId);
+
+        private Student GetStudentData(Mark mc) =>
+            this.context.Students
+                .First(s => s.Id == mc.StudentId);
 
         private void GetMarkTable()
         {
@@ -101,18 +114,17 @@ namespace SadSchool.Services.ClassBook
 
         private void GetRawMarks()
         {
-            var allMarks = this.context.Marks
-                .Include(m => m.Student)
-                .Include(m => m.Lesson!.ScheduledLesson)
-                    .ThenInclude(sl => sl!.Subject)
-                .Include(m => m.Lesson!.ScheduledLesson)
-                    .ThenInclude(sl => sl!.Class)
-                .Include(m => m.Lesson!.ScheduledLesson)
-                    .ThenInclude(sl => sl!.StartTime)
-                .ToList();
+            var allMarks = this.mongoContext.Marks.ToList();
 
-            this.rawMarks = allMarks.Where(m => m.Lesson?.ScheduledLesson?.Subject?.Name == this.subjectName
-                && m.Lesson?.ScheduledLesson?.Class?.Name == this.className).ToList();
+            foreach (var mark in this.mongoContext.Marks)
+            {
+                var scheduledLesson = this.context.Lessons.Find(mark.LessonId)?.ScheduledLesson;
+
+                if (scheduledLesson?.Subject?.Name == this.subjectName && scheduledLesson?.Class?.Name == this.className)
+                {
+                    this.rawMarks.Add(mark);
+                }
+            }
         }
 
         private void GetDates()

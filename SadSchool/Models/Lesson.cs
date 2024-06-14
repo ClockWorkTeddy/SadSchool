@@ -25,12 +25,6 @@ public partial class Lesson : BaseModel
     public virtual ScheduledLesson? ScheduledLesson { get; set; } = new ScheduledLesson();
 
     /// <summary>
-    /// Gets or sets lesson's marks list.
-    /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
-    public virtual ICollection<Mark> Marks { get; set; } = new List<Mark>();
-
-    /// <summary>
     /// Orerriden ToString().
     /// </summary>
     /// <returns>Returns a string representation of the lesson object.</returns>

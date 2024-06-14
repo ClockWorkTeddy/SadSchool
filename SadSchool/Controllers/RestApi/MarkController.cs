@@ -17,7 +17,7 @@ namespace SadSchool.Controllers.RestApi
     public class MarkController : Controller
     {
         private readonly string? apiKey = string.Empty;
-        private readonly SadSchoolContext context;
+        private readonly MongoContext context;
         private readonly IConfiguration configuration;
         private readonly IMarksAnalyticsService marksAnalyticsService;
 
@@ -27,7 +27,7 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="context">Application DB context.</param>
         /// <param name="configuration">Application configuration.</param>
         /// <param name="markAnalyticSevice">MarkAnalytic service instance.</param>
-        public MarkController(SadSchoolContext context, IConfiguration configuration, IMarksAnalyticsService markAnalyticSevice)
+        public MarkController(MongoContext context, IConfiguration configuration, IMarksAnalyticsService markAnalyticSevice)
         {
             this.context = context;
             this.configuration = configuration;
@@ -59,16 +59,17 @@ namespace SadSchool.Controllers.RestApi
         /// <summary>
         /// The method gets a particular mark by id.
         /// </summary>
-        /// <param name="id">Id of the desirable mark.</param>
+        /// <param name="lessonId">Id of the desirable lesson.</param>
+        /// <param name="studentId">Id of the desirable student.</param>
         /// <returns>The particalar <see cref="Mark"/>.</returns>
-        [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        [HttpGet("{lessonId}/{studentId}")]
+        public IActionResult Get(int lessonId, int studentId)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (apiKey == this.apiKey)
             {
-                var marks = this.context.Marks.Where(m => m.Id == id);
+                var marks = this.context.Marks.Where(m => m.LessonId == lessonId && m.StudentId == studentId);
 
                 return this.Ok(marks);
             }
@@ -81,17 +82,19 @@ namespace SadSchool.Controllers.RestApi
         /// <summary>
         /// Refreshes mark's data.
         /// </summary>
-        /// <param name="id">Refreshed mark's id.</param>
-        /// <param name="updateMark">Refreshing data.</param>
+        /// <param name="lessonId">Desirable lesson Id.</param>
+        /// <param name="studentId">Desirable student Id.</param>
+        /// <param name="updateMark">New mark data.</param>
         /// <returns>The resulting <see cref="IActionResult"/>.</returns>
-        [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Mark updateMark)
+        [HttpPut("{lessonId}/{studentId}")]
+        public IActionResult Put(int lessonId, int studentId, [FromBody] Mark updateMark)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (apiKey == this.apiKey)
             {
-                var mark = this.context.Marks.FirstOrDefault(m => m.Id == id);
+                var mark = this.context.Marks.FirstOrDefault(m => m.LessonId == lessonId
+                    && m.StudentId == studentId);
 
                 if (mark == null)
                 {
@@ -116,7 +119,7 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="studentId">Desirable student id.</param>
         /// <param name="subjectId">Desirable subject id.</param>
         /// <returns>List of <see cref="AverageMarkModel"/>.</returns>
-        [HttpGet("{studentId}/{subjectId}")]
+        [HttpGet("/ave/{studentId}/{subjectId}")]
         public IActionResult GetAverageMark(int studentId, int subjectId)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();

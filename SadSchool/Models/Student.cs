@@ -40,12 +40,6 @@ public partial class Student : BaseModel
     public virtual Class? Class { get; set; } = null!;
 
     /// <summary>
-    /// Gets or sets the marks list.
-    /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
-    public virtual ICollection<Mark> Marks { get; set; } = null!;
-
-    /// <summary>
     /// Overridden ToString().
     /// </summary>
     /// <returns>The string representation of the student object with the firstname and the last name.</returns>

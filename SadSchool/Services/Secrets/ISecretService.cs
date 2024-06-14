@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Services
+namespace SadSchool.Services.Secrets
 {
     /// <summary>
     /// Manages secrets.
@@ -12,7 +12,8 @@ namespace SadSchool.Services
         /// <summary>
         /// Gets the secret data.
         /// </summary>
+        /// <param name="keyName">Key name.</param>
         /// <returns>Secret data string.</returns>
-        string? GetSecret();
+        string? GetSecret(string keyName);
     }
 }

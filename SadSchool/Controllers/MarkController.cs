@@ -6,11 +6,10 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.Caching.Memory;
+    using MongoDB.Bson;
+    using MongoDB.Driver;
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
-    using SadSchool.Services;
     using SadSchool.Services.ApiServices;
     using SadSchool.ViewModels;
 
@@ -19,7 +18,8 @@ namespace SadSchool.Controllers
     /// </summary>
     public class MarkController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly MongoContext mongoContext;
+        private readonly SadSchoolContext sadSchoolContext;
         private readonly INavigationService navigationService;
         private readonly IMarksAnalyticsService marksAnalyticsService;
         private readonly IAuthService authService;
@@ -27,17 +27,20 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkController"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
+        /// <param name="mongoContext">Mongo DB context.</param>
+        /// <param name="sadSchoolContext">SQL Server DB context.</param>
         /// <param name="navigationService">Service instance processing Back button logic.</param>
         /// <param name="marksAnalyticsService">Service operates marks analytics.</param>
         /// <param name="authService">Authentication check service instance.</param>
         public MarkController(
-            SadSchoolContext context,
+            MongoContext mongoContext,
+            SadSchoolContext sadSchoolContext,
             INavigationService navigationService,
             IMarksAnalyticsService marksAnalyticsService,
             IAuthService authService)
         {
-            this.context = context;
+            this.mongoContext = mongoContext;
+            this.sadSchoolContext = sadSchoolContext;
             this.navigationService = navigationService;
             this.marksAnalyticsService = marksAnalyticsService;
             this.authService = authService;
@@ -52,14 +55,17 @@ namespace SadSchool.Controllers
         {
             var marks = new List<MarkViewModel>();
 
-            foreach (var mark in this.context.Marks)
+            foreach (var mark in this.mongoContext.Marks)
             {
+                var student = this.sadSchoolContext.Set<Student>().Find(mark.StudentId);
+                var lesson = this.sadSchoolContext.Set<Lesson>().Find(mark.LessonId);
+
                 marks.Add(new MarkViewModel
                 {
                     Id = mark.Id,
                     Value = mark.Value,
-                    Student = $"{mark.Student?.FirstName} {mark.Student?.LastName}",
-                    Lesson = $"{mark.Lesson}",
+                    Student = $"{student?.LastName} {student?.FirstName}",
+                    Lesson = $"{lesson}",
                 });
             }
 
@@ -110,8 +116,8 @@ namespace SadSchool.Controllers
                     LessonId = viewModel.LessonId,
                 };
 
-                this.context.Marks.Add(mark);
-                await this.context.SaveChangesAsync();
+                this.mongoContext.Marks.Add(mark);
+                await this.mongoContext.SaveChangesAsync();
 
                 return this.RedirectToAction("Marks");
             }
@@ -128,11 +134,11 @@ namespace SadSchool.Controllers
         /// <returns><see cref="ViewResult"/> for "Add" form or
         ///     <see cref="RedirectToActionResult"/> for action "Marks" in case of failure.</returns>
         [HttpGet]
-        public IActionResult Edit(int id)
+        public IActionResult Edit(ObjectId id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedMark = this.context.Marks.Find(id);
+                var editedMark = this.mongoContext.Marks.Find(id);
 
                 MarkViewModel viewModel = new()
                 {
@@ -160,16 +166,16 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var mark = new Mark
-                {
-                    Id = viewModel.Id,
-                    Value = viewModel.Value,
-                    LessonId = viewModel.LessonId,
-                    StudentId = viewModel.StudentId,
-                };
+                var mark = await this.mongoContext.Marks.FindAsync(viewModel.Id);
 
-                this.context.Marks.Update(mark);
-                await this.context.SaveChangesAsync();
+                if (mark != null)
+                {
+                    mark.LessonId = viewModel.LessonId;
+                    mark.StudentId = viewModel.StudentId;
+                    mark.Value = viewModel.Value;
+                }
+
+                await this.mongoContext.SaveChangesAsync();
 
                 return this.RedirectToAction("Marks");
             }
@@ -185,16 +191,16 @@ namespace SadSchool.Controllers
         /// <param name="id">Desiarable <see cref="Mark"/> id.</param>
         /// <returns><see cref="RedirectToActionResult"/> to action "Marks".</returns>
         [HttpPost]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(ObjectId id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var mark = await this.context.Marks.FindAsync(id);
+                var mark = await this.mongoContext.Marks.FindAsync(id);
 
                 if (mark != null)
                 {
-                    this.context.Marks.Remove(mark);
-                    await this.context.SaveChangesAsync();
+                    this.mongoContext.Marks.Remove(mark);
+                    await this.mongoContext.SaveChangesAsync();
                 }
             }
 
@@ -256,7 +262,7 @@ namespace SadSchool.Controllers
 
         private List<SelectListItem> GetLessonsList(int? lessonId)
         {
-            var lessons = this.context.Lessons.ToList();
+            var lessons = this.sadSchoolContext.Lessons.ToList();
 
             return lessons.Select(lesson => new SelectListItem
             {
@@ -268,7 +274,7 @@ namespace SadSchool.Controllers
 
         private List<SelectListItem> GetStudentsList(int? studentId)
         {
-            var students = this.context.Students.ToList();
+            var students = this.sadSchoolContext.Students.ToList();
 
             return students.Select(student => new SelectListItem
             {
@@ -280,7 +286,7 @@ namespace SadSchool.Controllers
 
         private List<SelectListItem> GetStudents()
         {
-            var students = this.context.Students.ToList();
+            var students = this.sadSchoolContext.Students.ToList();
             var studentsItemList = new List<SelectListItem>()
             {
                 new SelectListItem
@@ -303,7 +309,7 @@ namespace SadSchool.Controllers
 
         private List<SelectListItem> GetSubjects()
         {
-            var subjects = this.context.Subjects.ToList();
+            var subjects = this.sadSchoolContext.Subjects.ToList();
             var subjectsList = new List<SelectListItem>()
             {
                 new SelectListItem { Value = 0.ToString(), Text = string.Empty, Selected = true },

@@ -89,21 +89,24 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var dateData = model.DateOfBirth
+                var dateData = model?.DateOfBirth?
                     .Split('-')
                     .Select(d => Convert.ToInt32(d))
                     .ToList();
 
-                var teacher = new Teacher
+                if (dateData != null && dateData.Count == 3)
                 {
-                    FirstName = model.FirstName,
-                    LastName = model.LastName,
-                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                    Grade = model.Grade,
-                };
+                    var teacher = new Teacher
+                    {
+                        FirstName = model?.FirstName,
+                        LastName = model?.LastName,
+                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
+                        Grade = model?.Grade,
+                    };
 
-                this.context.Teachers.Add(teacher);
-                this.context.SaveChanges();
+                    this.context.Teachers.Add(teacher);
+                    this.context.SaveChanges();
+                }
             }
 
             return this.RedirectToAction("Teachers");
@@ -151,22 +154,25 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid && viewModel != null)
             {
-                var dateData = viewModel.DateOfBirth
+                var dateData = viewModel?.DateOfBirth?
                     .Split('-')
                     .Select(d => Convert.ToInt32(d))
                     .ToList();
 
-                var teacher = new Teacher
+                if (dateData != null && dateData.Count == 3)
                 {
-                    Id = viewModel.Id,
-                    FirstName = viewModel.FirstName,
-                    LastName = viewModel.LastName,
-                    DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                    Grade = viewModel.Grade,
-                };
+                    var teacher = new Teacher
+                    {
+                        Id = viewModel?.Id,
+                        FirstName = viewModel?.FirstName,
+                        LastName = viewModel?.LastName,
+                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
+                        Grade = viewModel?.Grade,
+                    };
 
-                this.context.Teachers.Update(teacher);
-                await this.context.SaveChangesAsync();
+                    this.context.Teachers.Update(teacher);
+                    await this.context.SaveChangesAsync();
+                }
 
                 return this.RedirectToAction("Teachers");
             }

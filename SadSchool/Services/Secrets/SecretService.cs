@@ -1,8 +1,8 @@
-﻿// <copyright file="RedisSecretService.cs" company="ClockWorkTeddy">
+﻿// <copyright file="SecretService.cs" company="ClockWorkTeddy">
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Services
+namespace SadSchool.Services.Secrets
 {
     using Azure.Identity;
     using Azure.Security.KeyVault.Secrets;
@@ -10,18 +10,16 @@ namespace SadSchool.Services
     /// <summary>
     /// Manages redis secrets.
     /// </summary>
-    public class RedisSecretService : ISecretService
+    public class SecretService : ISecretService
     {
         private readonly string destVariableName = "EnvVarKeys";
-        private readonly string keyName = "RedisSecretName";
-
         private readonly ConfigurationManager confManager;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RedisSecretService"/> class.
+        /// Initializes a new instance of the <see cref="SecretService"/> class.
         /// </summary>
-        /// <param name="configurationManager">configuration manager</param>
-        public RedisSecretService(ConfigurationManager configurationManager)
+        /// <param name="configurationManager">configuration manager.</param>
+        public SecretService(ConfigurationManager configurationManager)
         {
             this.confManager = configurationManager;
         }
@@ -29,10 +27,11 @@ namespace SadSchool.Services
         /// <summary>
         /// Gets the secret data.
         /// </summary>
+        /// <param name="keyName">Key name.</param>
         /// <returns>String with redis conn string.</returns>
-        public string? GetSecret()
+        public string? GetSecret(string keyName)
         {
-            var varKeyVault = confManager[this.destVariableName];
+            var varKeyVault = this.confManager[this.destVariableName];
 
             if (string.IsNullOrEmpty(varKeyVault))
             {
@@ -40,7 +39,7 @@ namespace SadSchool.Services
             }
 
             var keyVaultDest = Environment.GetEnvironmentVariable(varKeyVault);
-            var redisSecretName = confManager[this.keyName];
+            var redisSecretName = this.confManager[keyName];
 
             if (string.IsNullOrEmpty(keyVaultDest) || string.IsNullOrEmpty(redisSecretName))
             {
