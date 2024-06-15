@@ -22,7 +22,7 @@ namespace SadSchool.Services.ClassBook
         private string className = string.Empty;
         private string subjectName = string.Empty;
         private List<Mark> rawMarks = [];
-        private MarkCellModel[,] markCellsTable = new MarkCellModel[0, 0];
+        private MarkCellModel[,]? markCellsTable = new MarkCellModel[0, 0];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassBookService"/> class.
@@ -107,7 +107,7 @@ namespace SadSchool.Services.ClassBook
                 for (int j = 0; j < this.dates.Count; j++)
                 {
                     this.markCellsTable[i, j] = this.markCells
-                        .First(mc => mc.Date == this.dates[j] && mc.StudentName == this.students[i]);
+                        .FirstOrDefault(mc => mc.Date == this.dates[j] && mc.StudentName == this.students[i]);
                 }
             }
         }

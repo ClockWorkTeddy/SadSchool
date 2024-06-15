@@ -62,7 +62,7 @@ namespace SadSchool.Services.ApiServices
         {
             if (subjectId == null || subjectId < 1)
             {
-                return this.mongoContext.Set<Subject>().ToList<Subject?>();
+                return this.context.Set<Subject>().ToList<Subject?>();
             }
             else
             {
