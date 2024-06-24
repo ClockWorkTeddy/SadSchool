@@ -95,10 +95,14 @@ void SelectCacheSource(WebApplicationBuilder builder, SecretService secretServic
 
         builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnStr));
         builder.Services.AddScoped<ICacheService, RedisCacheService>();
+
+        Log.Information("Redis cache service selected.");
     }
     catch
     {
         builder.Services.AddScoped<ICacheService, MemoryCacheService>();
+
+        Log.Information("Memory cache service selected.");
     }
 }
 
