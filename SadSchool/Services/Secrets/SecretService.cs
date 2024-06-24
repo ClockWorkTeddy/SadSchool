@@ -6,6 +6,8 @@ namespace SadSchool.Services.Secrets
 {
     using Azure.Identity;
     using Azure.Security.KeyVault.Secrets;
+    using SadSchool.Controllers.Contracts;
+    using Serilog;
 
     /// <summary>
     /// Manages redis secrets.
@@ -31,6 +33,8 @@ namespace SadSchool.Services.Secrets
         /// <returns>String with redis conn string.</returns>
         public string? GetSecret(string keyName)
         {
+            Log.Information("SecretService.GetSecret(): method called with parameters: keyName = {keyName}", keyName);
+
             var varKeyVault = this.confManager[this.destVariableName];
 
             if (string.IsNullOrEmpty(varKeyVault))

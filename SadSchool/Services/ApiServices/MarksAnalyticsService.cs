@@ -6,6 +6,7 @@ namespace SadSchool.Services.ApiServices
 {
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
+    using Serilog;
 
     /// <summary>
     /// Marks analytics service.
@@ -38,6 +39,8 @@ namespace SadSchool.Services.ApiServices
         ///     (for all students\subject if none selected).</returns>
         public List<AverageMarkModel> GetAverageMarks(int studentId, int subjectId)
         {
+            Log.Information("MarksAnalyticsService.GetAverageMarks(): method called with parameters: studentId = {studentId}, subjectId = {subjectId}", studentId, subjectId);
+
             List<AverageMarkModel> averageMarks = [];
             var students = this.GetStudents(studentId);
             var subjects = this.GetSubjects(subjectId);
@@ -60,6 +63,8 @@ namespace SadSchool.Services.ApiServices
 
         private List<Subject?> GetSubjects(int? subjectId)
         {
+            Log.Information("MarksAnalyticsService.GetSubjects(): method called with parameter: subjectId = {subjectId}", subjectId);
+
             if (subjectId == null || subjectId < 1)
             {
                 return this.context.Set<Subject>().ToList<Subject?>();
@@ -72,6 +77,8 @@ namespace SadSchool.Services.ApiServices
 
         private List<Student> GetStudents(int? studentId)
         {
+            Log.Information("MarksAnalyticsService.GetStudents(): method called with parameter: studentId = {studentId}", studentId);
+
             if (studentId == null || studentId < 1)
             {
                 return this.context.Students.ToList();
@@ -84,6 +91,8 @@ namespace SadSchool.Services.ApiServices
 
         private AverageMarkModel GetAveragesMark(Student student, Subject subject)
         {
+            Log.Information("MarksAnalyticsService.GetAveragesMark(): method called with parameters: student = {student}, subject = {subject}", student, subject);
+
             var marksForStudent = this.mongoContext.Marks
                 .Where(m => m.StudentId == student.Id).ToList();
 

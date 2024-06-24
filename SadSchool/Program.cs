@@ -12,7 +12,12 @@ using SadSchool.Services.ApiServices;
 using SadSchool.Services.Cache;
 using SadSchool.Services.ClassBook;
 using SadSchool.Services.Secrets;
+using Serilog;
 using StackExchange.Redis;
+
+SetupLogger();
+
+Log.Information("Welcome to Hell.");
 
 var builder = WebApplication.CreateBuilder(args);
 SetUpConfiguration(builder);
@@ -68,6 +73,14 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
 app.Run();
+
+void SetupLogger()
+{
+    Log.Logger = new LoggerConfiguration()
+        .WriteTo.Console()
+        .WriteTo.File("logs\\log.txt", rollingInterval: RollingInterval.Day)
+        .CreateLogger();
+}
 
 void SelectCacheSource(WebApplicationBuilder builder, SecretService secretService)
 {

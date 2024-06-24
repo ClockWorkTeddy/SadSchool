@@ -5,6 +5,7 @@
 namespace SadSchool.Services.Schedule
 {
     using SadSchool.Models;
+    using Serilog;
 
     /// <summary>
     /// Service for schedule.
@@ -35,6 +36,8 @@ namespace SadSchool.Services.Schedule
         /// <returns>Schedule cells table.</returns>
         public ScheduleCell[,] GetScheduleCells()
         {
+            Log.Information("ScheduleService.GetScheduleCells(): method called.");
+
             this.GetOverallCells();
 
             return this.SortCells()!;
@@ -42,6 +45,8 @@ namespace SadSchool.Services.Schedule
 
         private void GetOverallCells()
         {
+            Log.Debug("ScheduleService.GetOverallCells(): method called.");
+
             List<ScheduleCell> cells = new();
 
             foreach (var scheduledLesson in this.scheduledLessons)
@@ -83,6 +88,8 @@ namespace SadSchool.Services.Schedule
 
         private ScheduleCell?[,] SortCells()
         {
+            Log.Debug("ScheduleService.SortCells(): method called.");
+
             this.GetClasses();
             var days = Enum.GetNames(typeof(Days));
             ScheduleCell?[,] table = new ScheduleCell[days.Length, this.classes.Count];
@@ -98,11 +105,17 @@ namespace SadSchool.Services.Schedule
             return table;
         }
 
-        private bool Check(ScheduleCell cell, string day, int classIndex) =>
-            cell.Day == day && cell.ClassName == this.classes[classIndex];
+        private bool Check(ScheduleCell cell, string day, int classIndex)
+        {
+            Log.Debug($"ScheduleService.Check(): method called for day = {day}, classIndex = {classIndex}");
+
+            return cell.Day == day && cell.ClassName == this.classes[classIndex];
+        }
 
         private void GetClasses()
         {
+            Log.Debug("ScheduleService.GetClasses(): method called.");
+
             this.classes = this.unsortedCells.Select(cell => cell.ClassName).Distinct().ToList();
             this.classes.OrderBy(s => s, new MixedNumericStringComparer()).ToList();
         }

@@ -5,6 +5,7 @@
 namespace SadSchool.Services
 {
     using SadSchool.Controllers.Contracts;
+    using Serilog;
 
     /// <summary>
     /// Navigation service, pcoresses the "Back" button functions.
@@ -76,8 +77,12 @@ namespace SadSchool.Services
         /// Stores the class name.
         /// </summary>
         /// <param name="className">Class name.</param>
-        public void StoreClassName(string className) =>
+        public void StoreClassName(string className)
+        {
+            Log.Information($"NavigationService.StoreClassName(): method called for className = {className}");
+
             this.ClassName = className;
+        }
 
         /// <summary>
         /// Refreshes the "Back" button parameters.
@@ -85,6 +90,8 @@ namespace SadSchool.Services
         /// <param name="routeData">Controller and action names of the route.</param>
         public void RefreshBackParams(RouteData routeData)
         {
+            Log.Information("NavigationService.RefreshBackParams(): method called.");
+
             string adress = this.GetAdress(routeData);
 
             this.Controller = this.map[adress].Controller;

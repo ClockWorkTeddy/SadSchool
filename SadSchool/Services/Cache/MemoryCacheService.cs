@@ -7,6 +7,7 @@ namespace SadSchool.Services.Cache
     using Microsoft.Extensions.Caching.Memory;
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
+    using Serilog;
 
     /// <summary>
     /// Memory cache service.
@@ -36,6 +37,11 @@ namespace SadSchool.Services.Cache
         public List<T?> GetObject<T>(int id)
             where T : class
         {
+            Log.Information(
+                "MemoryCacheService.GetObject(): method called with parameters: id = {id} and for type = {type}",
+                id,
+                typeof(T));
+
             var cacheKey = $"{typeof(T)}:{id}";
 
             if (!this.memoryCache.TryGetValue(cacheKey, out object? cachedObject))
@@ -55,6 +61,11 @@ namespace SadSchool.Services.Cache
         public void RefreshObject<T>(T obj)
             where T : class
         {
+            Log.Information(
+                "MemoryCacheService.RefreshObject(): method called with parameters: obj = {obj} and for type = {type}",
+                obj,
+                typeof(T));
+
             var cacheKey = $"{typeof(T)}:{(obj as BaseModel)?.Id}";
 
             if (this.memoryCache.TryGetValue(cacheKey, out object? cachedObject))

@@ -8,6 +8,7 @@ namespace SadSchool.Services.ClassBook
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
     using SadSchool.ViewModels;
+    using Serilog;
 
     /// <summary>
     /// Service for class book data.
@@ -68,7 +69,7 @@ namespace SadSchool.Services.ClassBook
                 SubjectName = subjectName,
                 Dates = this.dates,
                 Students = this.students,
-                MarkCells = this.markCellsTable,
+                MarkCells = this.markCellsTable!,
             };
         }
 
@@ -77,6 +78,8 @@ namespace SadSchool.Services.ClassBook
         /// </summary>
         public void GetMarkData()
         {
+            Log.Information("ClassBookService.GetMarkData(): method called.");
+
             this.markCells = this.rawMarks.Select(mc => new MarkCellModel
             {
                 Date = $"{this.GetLessonData(mc).Date} {this.GetLessonData(mc)?.ScheduledLesson?.StartTime?.Value}",
@@ -88,39 +91,60 @@ namespace SadSchool.Services.ClassBook
             this.GetStudents();
         }
 
-        private Lesson GetLessonData(Mark mc) =>
-            this.context.Lessons
+        private Lesson GetLessonData(Mark mc)
+        {
+            Log.Debug($"ClassBookService.GetLessonData(): method called with Mark.LessonId = {mc.LessonId}");
+
+            return this.context.Lessons
                 .Include(l => l.ScheduledLesson)
                 .ThenInclude(sl => sl!.StartTime)
                 .First(l => l.Id == mc.LessonId);
+        }
 
-        private Student GetStudentData(Mark mc) =>
-            this.context.Students
+        private Student GetStudentData(Mark mc)
+        {
+            Log.Debug($"ClassBookService.GetStudentData(): method called with Mark.StudentId = {mc.StudentId}");
+
+            return this.context.Students
                 .First(s => s.Id == mc.StudentId);
+        }
 
         private void GetMarkTable()
         {
+            Log.Debug("ClassBookService.GetMarkTable(): method called.");
+
             this.markCellsTable = new MarkCellModel[this.students.Count, this.dates.Count];
 
             for (int i = 0; i < this.students.Count; i++)
             {
                 for (int j = 0; j < this.dates.Count; j++)
                 {
-                    this.markCellsTable[i, j] = this.markCells
-                        .FirstOrDefault(mc => mc.Date == this.dates[j] && mc.StudentName == this.students[i]);
+                    if (this.dates[j] != null && this.students[i] != null)
+                    {
+                        var markCell = this.markCells
+                            .FirstOrDefault(mc => mc.Date == this.dates[j] && mc.StudentName == this.students[i]);
+
+                        if (markCell != null)
+                        {
+                            this.markCellsTable[i, j] = markCell;
+                        }
+                    }
                 }
             }
         }
 
         private void GetRawMarks()
         {
+            Log.Debug("ClassBookService.GetRawMarks(): method called.");
+
             var allMarks = this.mongoContext.Marks.ToList();
 
             foreach (var mark in this.mongoContext.Marks)
             {
                 var scheduledLesson = this.context.Lessons.Find(mark.LessonId)?.ScheduledLesson;
 
-                if (scheduledLesson?.Subject?.Name == this.subjectName && scheduledLesson?.Class?.Name == this.className)
+                if (scheduledLesson?.Subject?.Name == this.subjectName 
+                    && scheduledLesson?.Class?.Name == this.className)
                 {
                     this.rawMarks.Add(mark);
                 }
@@ -129,11 +153,17 @@ namespace SadSchool.Services.ClassBook
 
         private void GetDates()
         {
+            Log.Debug("ClassBookService.GetDates(): method called.");
+
             this.dates = this.markCells.Select(cell => cell.Date).Distinct().ToList();
             this.dates = this.dates.Order().ToList();
         }
 
-        private void GetStudents() =>
+        private void GetStudents()
+        {
+            Log.Debug("ClassBookService.GetStudents(): method called.");
+
             this.students = this.markCells.Select(cell => cell.StudentName).Distinct().Order().ToList();
+        }
     }
 }

@@ -4,6 +4,8 @@
 
 namespace SadSchool.Services
 {
+    using Serilog;
+
     /// <summary>
     /// Compares strings that contain a mix of numeric and non-numeric characters.
     /// </summary>
@@ -17,6 +19,9 @@ namespace SadSchool.Services
         /// <returns>Comparation result: -1, 0 or 1.</returns>
         public int Compare(string? x, string? y)
         {
+            Log.Information($"MixedNumericStringComparer.Compare(): " +
+                $"method called with parameters: x = {x} and y = {y}");
+
             int numX, numY;
             string alphaX, alphaY;
 
@@ -37,6 +42,9 @@ namespace SadSchool.Services
 
         private void SplitNumericAndAlpha(string? input, out int numericPart, out string alphaPart)
         {
+            Log.Debug($"MixedNumericStringComparer.SplitNumericAndAlpha(): " +
+                $"method called with parameter: input = {input}");
+
             alphaPart = string.Empty;
             numericPart = 0;
 

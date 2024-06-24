@@ -7,6 +7,7 @@ namespace SadSchool.Services.Cache
     using Newtonsoft.Json;
     using SadSchool.Controllers.Contracts;
     using SadSchool.Models;
+    using Serilog;
     using StackExchange.Redis;
 
     /// <summary>
@@ -37,6 +38,11 @@ namespace SadSchool.Services.Cache
         public List<T?> GetObject<T>(int id)
             where T : class
         {
+            Log.Information(
+                "RedisCacheService.GetObject(): method called with parameters: id = {id} and for type = {type}",
+                id,
+                typeof(T));
+
             var rKey = new RedisKey($"{typeof(T)}:{id}");
             var value = this.redis.StringGet(rKey);
 
@@ -68,6 +74,11 @@ namespace SadSchool.Services.Cache
         public void RefreshObject<T>(T obj)
             where T : class
         {
+            Log.Information(
+                "RedisCacheService.RefreshObject(): method called with parameters: obj = {obj} and for type = {type}",
+                obj,
+                typeof(T));
+
             var redisKey = new RedisKey($"{typeof(T)}:{(obj as BaseModel)?.Id}");
             var redisValue = this.redis.StringGet(redisKey);
 

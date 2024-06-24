@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Services.Secrets
+namespace SadSchool.Controllers.Contracts
 {
     /// <summary>
     /// Manages secrets.
