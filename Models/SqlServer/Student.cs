@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models;
+namespace Models.SqlServer;
 
 /// <summary>
 /// Student model.
@@ -45,6 +45,6 @@ public partial class Student : BaseModel
     /// <returns>The string representation of the student object with the firstname and the last name.</returns>
     public override string ToString()
     {
-        return $"{this.FirstName} {this.LastName}";
+        return $"{FirstName} {LastName}";
     }
 }

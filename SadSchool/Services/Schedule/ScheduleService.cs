@@ -4,7 +4,7 @@
 
 namespace SadSchool.Services.Schedule
 {
-    using SadSchool.Models;
+    using Models.SqlServer;
     using Serilog;
 
     /// <summary>

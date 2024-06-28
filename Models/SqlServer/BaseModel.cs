@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models
+namespace Models.SqlServer
 {
     /// <summary>
     /// Base model for all models.

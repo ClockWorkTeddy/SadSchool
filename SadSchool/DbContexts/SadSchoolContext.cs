@@ -2,9 +2,10 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models;
+namespace SadSchool.DbContexts;
 
 using Microsoft.EntityFrameworkCore;
+using Models.SqlServer;
 
 /// <summary>
 /// SadSchool database context.

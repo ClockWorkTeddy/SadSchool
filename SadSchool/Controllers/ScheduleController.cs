@@ -6,7 +6,7 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Controllers.Contracts;
-    using SadSchool.Models;
+    using SadSchool.DbContexts;
     using SadSchool.Services.Schedule;
     using SadSchool.ViewModels;
 

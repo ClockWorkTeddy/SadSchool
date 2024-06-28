@@ -2,9 +2,10 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models
+namespace SadSchool.DbContexts
 {
     using Microsoft.EntityFrameworkCore;
+    using Models.Mongo;
     using MongoDB.Driver;
     using MongoDB.EntityFrameworkCore.Extensions;
 

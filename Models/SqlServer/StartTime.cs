@@ -1,22 +1,21 @@
-﻿// <copyright file="Subject.cs" company="ClockWorkTeddy">
+﻿// <copyright file="StartTime.cs" company="ClockWorkTeddy">
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models;
+namespace Models.SqlServer;
 
 /// <summary>
-/// Subject model.
+/// Start time (schedule position) model.
 /// </summary>
-public partial class Subject : BaseModel
+public partial class StartTime : BaseModel
 {
     /// <summary>
-    /// Gets or sets the name of the subject.
+    /// Gets or sets the value of the start time.
     /// </summary>
-    public string? Name { get; set; } = null!;
+    public string? Value { get; set; }
 
     /// <summary>
     /// Gets or sets the scheduled lessons list.
     /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
     public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 }

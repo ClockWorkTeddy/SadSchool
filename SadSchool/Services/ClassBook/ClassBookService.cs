@@ -5,8 +5,10 @@
 namespace SadSchool.Services.ClassBook
 {
     using Microsoft.EntityFrameworkCore;
+    using Models.Mongo;
+    using Models.SqlServer;
     using SadSchool.Controllers.Contracts;
-    using SadSchool.Models;
+    using SadSchool.DbContexts;
     using SadSchool.ViewModels;
     using Serilog;
 
@@ -143,7 +145,7 @@ namespace SadSchool.Services.ClassBook
             {
                 var scheduledLesson = this.context.Lessons.Find(mark.LessonId)?.ScheduledLesson;
 
-                if (scheduledLesson?.Subject?.Name == this.subjectName 
+                if (scheduledLesson?.Subject?.Name == this.subjectName
                     && scheduledLesson?.Class?.Name == this.className)
                 {
                     this.rawMarks.Add(mark);

@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models;
+namespace Models.SqlServer;
 
 /// <summary>
 /// Lesson (like a real event that is being held some time) model.
@@ -28,5 +28,5 @@ public partial class Lesson : BaseModel
     /// Orerriden ToString().
     /// </summary>
     /// <returns>Returns a string representation of the lesson object.</returns>
-    public override string ToString() => $"{this.Date} {this.ScheduledLesson}";
+    public override string ToString() => $"{Date} {ScheduledLesson}";
 }

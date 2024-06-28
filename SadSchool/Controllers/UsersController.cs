@@ -7,10 +7,8 @@ namespace SadSchool.Controllers
     using System.Data;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
     using SadSchool.Controllers.Contracts;
-    using SadSchool.Models;
-    using SadSchool.Services;
+    using SadSchool.DbContexts;
     using SadSchool.ViewModels;
 
     /// <summary>

@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models;
+namespace Models.SqlServer;
 
 /// <summary>
 /// Teacher model.
@@ -46,5 +46,5 @@ public partial class Teacher : BaseModel
     /// </summary>
     /// <returns>The string representation of the theacher object with the full name.</returns>
     public override string ToString() =>
-         $"{this.FirstName} {this.LastName}";
+         $"{FirstName} {LastName}";
 }

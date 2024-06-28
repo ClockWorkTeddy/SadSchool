@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models
+namespace SadSchool.ViewModels
 {
     /// <summary>
     /// Error view model.

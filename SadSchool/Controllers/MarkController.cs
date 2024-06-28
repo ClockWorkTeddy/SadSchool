@@ -6,10 +6,12 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
+    using Models.Mongo;
+    using Models.SqlServer;
     using MongoDB.Bson;
     using MongoDB.Driver;
     using SadSchool.Controllers.Contracts;
-    using SadSchool.Models;
+    using SadSchool.DbContexts;
     using SadSchool.Services.ApiServices;
     using SadSchool.ViewModels;
 

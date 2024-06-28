@@ -4,8 +4,9 @@
 
 namespace SadSchool.Services.ApiServices
 {
+    using Models.SqlServer;
     using SadSchool.Controllers.Contracts;
-    using SadSchool.Models;
+    using SadSchool.DbContexts;
     using Serilog;
 
     /// <summary>

@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Models;
+namespace Models.SqlServer;
 
 /// <summary>
 /// A scheduled lesson model. Scheduled lesson is the repeated entity of the planned lesson with partucular
@@ -66,5 +66,5 @@ public partial class ScheduledLesson : BaseModel
     /// <returns>A string representation of scheduled lesson object with the data about a day, a class, a teacher,
     ///     a subject and a start time.</returns>
     public override string ToString() =>
-        $"{this.Day} {this.Class?.Name} {this.StartTime?.Value} {this.Subject?.Name} {this.Teacher}";
+        $"{Day} {Class?.Name} {StartTime?.Value} {Subject?.Name} {Teacher}";
 }

@@ -7,8 +7,9 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using Microsoft.EntityFrameworkCore;
+    using Models.SqlServer;
     using SadSchool.Controllers.Contracts;
-    using SadSchool.Models;
+    using SadSchool.DbContexts;
     using SadSchool.Services;
     using SadSchool.ViewModels;
 
