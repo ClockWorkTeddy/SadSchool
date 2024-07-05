@@ -6,13 +6,13 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Models.Mongo;
-    using Models.SqlServer;
     using MongoDB.Bson;
     using MongoDB.Driver;
     using SadSchool.Controllers.Contracts;
     using SadSchool.DbContexts;
-    using SadSchool.Services.ApiServices;
+    using SadSchool.Dtos;
+    using SadSchool.Models.Mongo;
+    using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
 
     /// <summary>
@@ -242,7 +242,7 @@ namespace SadSchool.Controllers
             var students = marks.Select(m => m.StudentName).Distinct().Order().ToList();
             var subjects = marks.Select(m => m.SubjectName).Distinct().Order().ToList();
 
-            var aveMarksTable = new AverageMarkModel?[students.Count, subjects.Count];
+            var aveMarksTable = new AverageMarkDto?[students.Count, subjects.Count];
 
             for (int i = 0; i < students.Count; i++)
             {

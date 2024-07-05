@@ -5,10 +5,9 @@
 namespace SadSchool.Controllers.RestApi
 {
     using Microsoft.AspNetCore.Mvc;
-    using Models.Mongo;
     using SadSchool.Controllers.Contracts;
     using SadSchool.DbContexts;
-    using SadSchool.Services.ApiServices;
+    using SadSchool.Models.Mongo;
 
     /// <summary>
     /// The controller serves marks processing.
@@ -119,7 +118,7 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="studentId">Desirable student id.</param>
         /// <param name="subjectId">Desirable subject id.</param>
-        /// <returns>List of <see cref="AverageMarkModel"/>.</returns>
+        /// <returns>List of <see cref="Dtos.AverageMarkDto"/>.</returns>
         [HttpGet("/ave/{studentId}/{subjectId}")]
         public IActionResult GetAverageMark(int studentId, int subjectId)
         {

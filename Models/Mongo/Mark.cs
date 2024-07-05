@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace Models.Mongo
+namespace SadSchool.Models.Mongo
 {
     using MongoDB.Bson;
 

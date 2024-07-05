@@ -5,9 +5,9 @@
 namespace SadSchool.DbContexts
 {
     using Microsoft.EntityFrameworkCore;
-    using Models.Mongo;
     using MongoDB.Driver;
     using MongoDB.EntityFrameworkCore.Extensions;
+    using SadSchool.Models.Mongo;
 
     /// <summary>
     /// Mongo context.

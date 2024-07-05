@@ -2,12 +2,12 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Services.Schedule
+namespace SadSchool.Dtos
 {
     /// <summary>
     /// The class represents the lesson info.
     /// </summary>
-    public class LessonInfo
+    public class LessonInfoDto
     {
         /// <summary>
         /// Gets or sets the lesson start time.

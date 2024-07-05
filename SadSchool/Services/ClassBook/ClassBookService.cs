@@ -5,10 +5,10 @@
 namespace SadSchool.Services.ClassBook
 {
     using Microsoft.EntityFrameworkCore;
-    using Models.Mongo;
-    using Models.SqlServer;
     using SadSchool.Controllers.Contracts;
     using SadSchool.DbContexts;
+    using SadSchool.Models.Mongo;
+    using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
     using Serilog;
 
@@ -21,11 +21,11 @@ namespace SadSchool.Services.ClassBook
         private MongoContext mongoContext;
         private List<string> dates = [];
         private List<string> students = [];
-        private List<MarkCellModel> markCells = [];
+        private List<MarkCellDto> markCells = [];
         private string className = string.Empty;
         private string subjectName = string.Empty;
         private List<Mark> rawMarks = [];
-        private MarkCellModel[,]? markCellsTable = new MarkCellModel[0, 0];
+        private MarkCellDto[,]? markCellsTable = new MarkCellDto[0, 0];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassBookService"/> class.
@@ -82,7 +82,7 @@ namespace SadSchool.Services.ClassBook
         {
             Log.Information("ClassBookService.GetMarkData(): method called.");
 
-            this.markCells = this.rawMarks.Select(mc => new MarkCellModel
+            this.markCells = this.rawMarks.Select(mc => new MarkCellDto
             {
                 Date = $"{this.GetLessonData(mc).Date} {this.GetLessonData(mc)?.ScheduledLesson?.StartTime?.Value}",
                 Mark = mc?.Value,
@@ -115,7 +115,7 @@ namespace SadSchool.Services.ClassBook
         {
             Log.Debug("ClassBookService.GetMarkTable(): method called.");
 
-            this.markCellsTable = new MarkCellModel[this.students.Count, this.dates.Count];
+            this.markCellsTable = new MarkCellDto[this.students.Count, this.dates.Count];
 
             for (int i = 0; i < this.students.Count; i++)
             {

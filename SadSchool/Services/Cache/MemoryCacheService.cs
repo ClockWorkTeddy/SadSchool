@@ -5,9 +5,9 @@
 namespace SadSchool.Services.Cache
 {
     using Microsoft.Extensions.Caching.Memory;
-    using Models.SqlServer;
     using SadSchool.Controllers.Contracts;
     using SadSchool.DbContexts;
+    using SadSchool.Models.SqlServer;
     using Serilog;
 
     /// <summary>

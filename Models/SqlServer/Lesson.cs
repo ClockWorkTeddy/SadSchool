@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace Models.SqlServer;
+namespace SadSchool.Models.SqlServer;
 
 /// <summary>
 /// Lesson (like a real event that is being held some time) model.

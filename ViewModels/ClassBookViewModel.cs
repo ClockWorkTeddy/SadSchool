@@ -34,6 +34,6 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets the mark cells.
         /// </summary>
-        public MarkCellModel[,] MarkCells { get; set; } = new MarkCellModel[0, 0];
+        public MarkCellDto[,] MarkCells { get; set; } = new MarkCellDto[0, 0];
     }
 }

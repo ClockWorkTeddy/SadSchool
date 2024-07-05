@@ -4,7 +4,7 @@
 
 namespace SadSchool.ViewModels
 {
-    using SadSchool.Services.ApiServices;
+    using SadSchool.Dtos;
 
     /// <summary>
     /// Represents the average marks view model.
@@ -14,7 +14,7 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets table for average marks.
         /// </summary>
-        public AverageMarkModel?[,] AverageMarksTable { get; set; } = new AverageMarkModel[0, 0];
+        public AverageMarkDto?[,] AverageMarksTable { get; set; } = new AverageMarkDto[0, 0];
 
         /// <summary>
         /// Gets or sets the list of students.

@@ -7,7 +7,7 @@ namespace SadSchool.Services.ClassBook
     /// <summary>
     /// Model for mark cell object.
     /// </summary>
-    public class MarkCellModel
+    public class MarkCellDto
     {
         /// <summary>
         /// Gets or sets the mark value.

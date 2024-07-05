@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace Models.SqlServer;
+namespace SadSchool.Models.SqlServer;
 
 /// <summary>
 /// A scheduled lesson model. Scheduled lesson is the repeated entity of the planned lesson with partucular

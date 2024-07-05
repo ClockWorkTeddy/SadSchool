@@ -4,7 +4,7 @@
 
 namespace SadSchool.Controllers.Contracts
 {
-    using SadSchool.Services.ApiServices;
+    using SadSchool.Dtos;
 
     /// <summary>
     /// Represents the marks analytics service.
@@ -17,6 +17,6 @@ namespace SadSchool.Controllers.Contracts
         /// <param name="studentName">Desirable student's name.</param>
         /// <param name="subjectName">Desirable subject's name.</param>
         /// <returns>List of average marks.</returns>
-        List<AverageMarkModel> GetAverageMarks(int studentName, int subjectName);
+        List<AverageMarkDto> GetAverageMarks(int studentName, int subjectName);
     }
 }

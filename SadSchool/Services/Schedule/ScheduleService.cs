@@ -4,7 +4,8 @@
 
 namespace SadSchool.Services.Schedule
 {
-    using Models.SqlServer;
+    using SadSchool.Dtos;
+    using SadSchool.Models.SqlServer;
     using Serilog;
 
     /// <summary>
@@ -13,7 +14,7 @@ namespace SadSchool.Services.Schedule
     public class ScheduleService
     {
         private List<ScheduledLesson> scheduledLessons = new();
-        private List<ScheduleCell> unsortedCells = new();
+        private List<ScheduleCellDto> unsortedCells = new();
         private List<string?> classes = new();
 
         /// <summary>
@@ -34,7 +35,7 @@ namespace SadSchool.Services.Schedule
         /// Gets the schedule cells.
         /// </summary>
         /// <returns>Schedule cells table.</returns>
-        public ScheduleCell[,] GetScheduleCells()
+        public ScheduleCellDto[,] GetScheduleCells()
         {
             Log.Information("ScheduleService.GetScheduleCells(): method called.");
 
@@ -47,7 +48,7 @@ namespace SadSchool.Services.Schedule
         {
             Log.Debug("ScheduleService.GetOverallCells(): method called.");
 
-            List<ScheduleCell> cells = new();
+            List<ScheduleCellDto> cells = new();
 
             foreach (var scheduledLesson in this.scheduledLessons)
             {
@@ -57,13 +58,13 @@ namespace SadSchool.Services.Schedule
 
                 if (cell == null)
                 {
-                    cell = new ScheduleCell
+                    cell = new ScheduleCellDto
                     {
                         Day = scheduledLesson?.Day,
                         ClassName = scheduledLesson?.Class?.Name,
-                        LessonInfos = new List<LessonInfo>
+                        LessonInfos = new List<LessonInfoDto>
                         {
-                            new LessonInfo
+                            new LessonInfoDto
                             {
                                 Teacher = $"{scheduledLesson?.Teacher?.FirstName} {scheduledLesson?.Teacher?.LastName}",
                                 StartTime = scheduledLesson?.StartTime?.Value,
@@ -76,7 +77,7 @@ namespace SadSchool.Services.Schedule
                 }
                 else
                 {
-                    cell?.LessonInfos?.Add(new LessonInfo
+                    cell?.LessonInfos?.Add(new LessonInfoDto
                     {
                         Teacher = $"{scheduledLesson?.Teacher?.FirstName} {scheduledLesson?.Teacher?.LastName}",
                         StartTime = scheduledLesson?.StartTime?.Value,
@@ -86,13 +87,13 @@ namespace SadSchool.Services.Schedule
             }
         }
 
-        private ScheduleCell?[,] SortCells()
+        private ScheduleCellDto?[,] SortCells()
         {
             Log.Debug("ScheduleService.SortCells(): method called.");
 
             this.GetClasses();
             var days = Enum.GetNames(typeof(Days));
-            ScheduleCell?[,] table = new ScheduleCell[days.Length, this.classes.Count];
+            ScheduleCellDto?[,] table = new ScheduleCellDto[days.Length, this.classes.Count];
 
             for (int i = 0; i < days.Length; i++)
             {
@@ -105,7 +106,7 @@ namespace SadSchool.Services.Schedule
             return table;
         }
 
-        private bool Check(ScheduleCell cell, string day, int classIndex)
+        private bool Check(ScheduleCellDto cell, string day, int classIndex)
         {
             Log.Debug($"ScheduleService.Check(): method called for day = {day}, classIndex = {classIndex}");
 

@@ -6,9 +6,9 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Models.SqlServer;
     using SadSchool.Controllers.Contracts;
     using SadSchool.DbContexts;
+    using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
 
     /// <summary>

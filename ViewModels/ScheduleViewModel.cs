@@ -4,7 +4,7 @@
 
 namespace SadSchool.ViewModels
 {
-    using SadSchool.Services.Schedule;
+    using SadSchool.Dtos;
 
     /// <summary>
     /// Represents the schedule view model.
@@ -24,6 +24,6 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets the list of SheduleCells.
         /// </summary>
-        public ScheduleCell[,] Cells { get; set; } = new ScheduleCell[,] { };
+        public ScheduleCellDto[,] Cells { get; set; } = new ScheduleCellDto[,] { };
     }
 }

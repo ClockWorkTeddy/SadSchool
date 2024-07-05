@@ -4,9 +4,10 @@
 
 namespace SadSchool.Services.ApiServices
 {
-    using Models.SqlServer;
     using SadSchool.Controllers.Contracts;
     using SadSchool.DbContexts;
+    using SadSchool.Dtos;
+    using SadSchool.Models.SqlServer;
     using Serilog;
 
     /// <summary>
@@ -38,11 +39,11 @@ namespace SadSchool.Services.ApiServices
         /// <param name="subjectId">The id of the desirable subject.</param>
         /// <returns>Average marks collection for selected student and subject
         ///     (for all students\subject if none selected).</returns>
-        public List<AverageMarkModel> GetAverageMarks(int studentId, int subjectId)
+        public List<AverageMarkDto> GetAverageMarks(int studentId, int subjectId)
         {
             Log.Information("MarksAnalyticsService.GetAverageMarks(): method called with parameters: studentId = {studentId}, subjectId = {subjectId}", studentId, subjectId);
 
-            List<AverageMarkModel> averageMarks = [];
+            List<AverageMarkDto> averageMarks = [];
             var students = this.GetStudents(studentId);
             var subjects = this.GetSubjects(subjectId);
 
@@ -90,7 +91,7 @@ namespace SadSchool.Services.ApiServices
             }
         }
 
-        private AverageMarkModel GetAveragesMark(Student student, Subject subject)
+        private AverageMarkDto GetAveragesMark(Student student, Subject subject)
         {
             Log.Information("MarksAnalyticsService.GetAveragesMark(): method called with parameters: student = {student}, subject = {subject}", student, subject);
 
@@ -102,7 +103,7 @@ namespace SadSchool.Services.ApiServices
 
             var sum = foundMarks.Sum(mdr => int.Parse(mdr.Value!));
 
-            return new AverageMarkModel
+            return new AverageMarkDto
             {
                 StudentName = student.ToString(),
                 SubjectName = subject.Name,

@@ -2,12 +2,12 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Services.ApiServices
+namespace SadSchool.Dtos
 {
     /// <summary>
     /// Average mark model.
     /// </summary>
-    public class AverageMarkModel
+    public class AverageMarkDto
     {
         /// <summary>
         /// Gets or sets the student name.

@@ -5,7 +5,7 @@
 namespace SadSchool.DbContexts;
 
 using Microsoft.EntityFrameworkCore;
-using Models.SqlServer;
+using SadSchool.Models.SqlServer;
 
 /// <summary>
 /// SadSchool database context.

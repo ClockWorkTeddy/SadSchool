@@ -4,10 +4,10 @@
 
 namespace SadSchool.Services.Cache
 {
-    using Models.SqlServer;
     using Newtonsoft.Json;
     using SadSchool.Controllers.Contracts;
     using SadSchool.DbContexts;
+    using SadSchool.Models.SqlServer;
     using Serilog;
     using StackExchange.Redis;
 

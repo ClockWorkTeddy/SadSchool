@@ -46,6 +46,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Mappers\Mappers.csproj" />
     <ProjectReference Include="..\Models\Models.csproj" />
+    <ProjectReference Include="..\ViewModels\ViewModels.csproj" />
   </ItemGroup>
 
   <ItemGroup>

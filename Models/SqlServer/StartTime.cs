@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace Models.SqlServer;
+namespace SadSchool.Models.SqlServer;
 
 /// <summary>
 /// Start time (schedule position) model.

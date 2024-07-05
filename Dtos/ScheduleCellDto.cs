@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Services.Schedule
+namespace SadSchool.Dtos
 {
     /// <summary>
     /// Enum for days of the week.
@@ -38,7 +38,7 @@ namespace SadSchool.Services.Schedule
     /// <summary>
     /// Class for schedule cell.
     /// </summary>
-    public class ScheduleCell
+    public class ScheduleCellDto
     {
         /// <summary>
         /// Gets or sets the day.
@@ -53,6 +53,6 @@ namespace SadSchool.Services.Schedule
         /// <summary>
         /// Gets or sets the lesson infos.
         /// </summary>
-        public List<LessonInfo>? LessonInfos { get; set; } = new List<LessonInfo>();
+        public List<LessonInfoDto>? LessonInfos { get; set; } = new ();
     }
 }
