@@ -1,12 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Mappers
+﻿namespace SadSchool.Mappers
 {
-    internal class TeachersMapper
+    using Riok.Mapperly.Abstractions;
+    using SadSchool.Models.SqlServer;
+    using SadSchool.ViewModels;
+
+    [Mapper]
+    public partial class TeacherMapper
     {
+        public partial TeacherViewModel Map(Teacher teacher);
     }
 }

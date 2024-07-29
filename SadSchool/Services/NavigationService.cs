@@ -4,7 +4,7 @@
 
 namespace SadSchool.Services
 {
-    using SadSchool.Controllers.Contracts;
+    using SadSchool.Contracts;
     using Serilog;
 
     /// <summary>

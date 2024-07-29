@@ -5,7 +5,7 @@
 namespace SadSchool.Services.ClassBook
 {
     using Microsoft.EntityFrameworkCore;
-    using SadSchool.Controllers.Contracts;
+    using SadSchool.Contracts;
     using SadSchool.DbContexts;
     using SadSchool.Models.Mongo;
     using SadSchool.Models.SqlServer;

@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Controllers.Contracts
+namespace SadSchool.Contracts
 {
     /// <summary>
     /// Interface for cache services those are used in controlles.

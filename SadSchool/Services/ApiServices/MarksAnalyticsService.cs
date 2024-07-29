@@ -4,7 +4,7 @@
 
 namespace SadSchool.Services.ApiServices
 {
-    using SadSchool.Controllers.Contracts;
+    using SadSchool.Contracts;
     using SadSchool.DbContexts;
     using SadSchool.Dtos;
     using SadSchool.Models.SqlServer;

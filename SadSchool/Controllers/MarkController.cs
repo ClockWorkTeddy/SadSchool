@@ -8,7 +8,7 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc.Rendering;
     using MongoDB.Bson;
     using MongoDB.Driver;
-    using SadSchool.Controllers.Contracts;
+    using SadSchool.Contracts;
     using SadSchool.DbContexts;
     using SadSchool.Dtos;
     using SadSchool.Models.Mongo;

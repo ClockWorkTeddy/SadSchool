@@ -5,7 +5,7 @@
 namespace SadSchool.Controllers.RestApi
 {
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Controllers.Contracts;
+    using SadSchool.Contracts;
     using SadSchool.DbContexts;
     using SadSchool.Models.Mongo;
 

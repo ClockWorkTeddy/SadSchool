@@ -6,7 +6,7 @@ namespace SadSchool.Services.Secrets
 {
     using Azure.Identity;
     using Azure.Security.KeyVault.Secrets;
-    using SadSchool.Controllers.Contracts;
+    using SadSchool.Contracts;
     using Serilog;
 
     /// <summary>

@@ -5,7 +5,7 @@
 namespace SadSchool.Services
 {
     using System.Security.Claims;
-    using SadSchool.Controllers.Contracts;
+    using SadSchool.Contracts;
     using Serilog;
 
     /// <summary>

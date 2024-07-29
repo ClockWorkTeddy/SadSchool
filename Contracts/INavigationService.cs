@@ -2,8 +2,10 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Controllers.Contracts
+namespace SadSchool.Contracts
 {
+    using Microsoft.AspNetCore.Routing;
+
     /// <summary>
     /// Navigation service interface.
     /// </summary>

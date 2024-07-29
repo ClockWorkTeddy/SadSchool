@@ -2,7 +2,7 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-namespace SadSchool.Controllers.Contracts
+namespace SadSchool.Contracts
 {
     using SadSchool.ViewModels;
 

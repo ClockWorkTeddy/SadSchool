@@ -5,7 +5,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
-using SadSchool.Controllers.Contracts;
+using SadSchool.Contracts;
 using SadSchool.DbContexts;
 using SadSchool.Services;
 using SadSchool.Services.ApiServices;

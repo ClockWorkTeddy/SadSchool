@@ -7,11 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SadSchool", "SadSchool\SadS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Mappers", "Mappers\Mappers.csproj", "{3E381295-1777-435E-A7F4-21BE2AEF4FA6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Models", "Models\Models.csproj", "{09E32B31-F8D0-489B-9B37-A74611E2B858}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Models", "Models\Models.csproj", "{09E32B31-F8D0-489B-9B37-A74611E2B858}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ViewModels", "ViewModels\ViewModels.csproj", "{818A3C06-2574-4943-A0D7-B9A1E7D362E5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModels", "ViewModels\ViewModels.csproj", "{818A3C06-2574-4943-A0D7-B9A1E7D362E5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Dtos", "Dtos\Dtos.csproj", "{B7C82CC3-D3BD-42A1-9A5A-4B7D18FF688E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtos", "Dtos\Dtos.csproj", "{B7C82CC3-D3BD-42A1-9A5A-4B7D18FF688E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{2693DC44-EE89-41C0-AA0E-531CBC9B9486}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{B7C82CC3-D3BD-42A1-9A5A-4B7D18FF688E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B7C82CC3-D3BD-42A1-9A5A-4B7D18FF688E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B7C82CC3-D3BD-42A1-9A5A-4B7D18FF688E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2693DC44-EE89-41C0-AA0E-531CBC9B9486}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2693DC44-EE89-41C0-AA0E-531CBC9B9486}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2693DC44-EE89-41C0-AA0E-531CBC9B9486}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2693DC44-EE89-41C0-AA0E-531CBC9B9486}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
