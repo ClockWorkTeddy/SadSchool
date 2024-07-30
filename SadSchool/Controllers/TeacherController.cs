@@ -7,8 +7,10 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
     using SadSchool.DbContexts;
+    using SadSchool.Mappers;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
+    using System.Diagnostics;
 
     /// <summary>
     /// Processes requests for teacher data.
@@ -18,6 +20,7 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
+        private readonly ITeacherMapper teacherMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TeacherController"/> class.
@@ -28,11 +31,13 @@ namespace SadSchool.Controllers
         public TeacherController(
             SadSchoolContext context,
             INavigationService navigationService,
-            IAuthService authService)
+            IAuthService authService,
+            ITeacherMapper teacherMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
+            this.teacherMapper = teacherMapper;
         }
 
         /// <summary>
@@ -42,23 +47,13 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Teachers()
         {
-            List<TeacherViewModel> teachers = new();
-
-            foreach (var t in this.context.Teachers)
-            {
-                teachers.Add(new TeacherViewModel
-                {
-                    Id = t.Id,
-                    FirstName = t.FirstName,
-                    LastName = t.LastName,
-                    DateOfBirth = t.DateOfBirth?.ToString(),
-                    Grade = t.Grade,
-                });
-            }
+            List<TeacherViewModel> teacherViewModels = this.context.Teachers
+                .Select(t => this.teacherMapper.ToViewModel(t))
+                .ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/Teachers.cshtml", teachers);
+            return this.View(@"~/Views/Data/Teachers.cshtml", teacherViewModels);
         }
 
         /// <summary>
@@ -82,31 +77,15 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Receives the data from the form and adds a new teacher to the database.
         /// </summary>
-        /// <param name="model">ViewModel with data.</param>
+        /// <param name="viewModel">ViewModel with data.</param>
         /// <returns><see cref="IActionResult"/> reditrect to the "Teachers" action.</returns>
         [HttpPost]
-        public IActionResult Add(TeacherViewModel model)
+        public IActionResult Add(TeacherViewModel viewModel)
         {
             if (this.ModelState.IsValid)
             {
-                var dateData = model?.DateOfBirth?
-                    .Split('-')
-                    .Select(d => Convert.ToInt32(d))
-                    .ToList();
-
-                if (dateData != null && dateData.Count == 3)
-                {
-                    var teacher = new Teacher
-                    {
-                        FirstName = model?.FirstName,
-                        LastName = model?.LastName,
-                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                        Grade = model?.Grade,
-                    };
-
-                    this.context.Teachers.Add(teacher);
-                    this.context.SaveChanges();
-                }
+                this.context.Teachers.Add(this.teacherMapper.ToModel(viewodel));
+                this.context.SaveChanges();
             }
 
             return this.RedirectToAction("Teachers");
@@ -126,17 +105,11 @@ namespace SadSchool.Controllers
 
                 if (editedTeacher != null)
                 {
-                    var model = new TeacherViewModel
-                    {
-                        FirstName = editedTeacher.FirstName,
-                        LastName = editedTeacher.LastName,
-                        DateOfBirth = editedTeacher.DateOfBirth?.ToString(),
-                        Grade = editedTeacher.Grade,
-                    };
+                    var viewModel = this.teacherMapper.ToViewModel(editedTeacher);
 
                     this.navigationService.RefreshBackParams(this.RouteData);
 
-                    return this.View(@"~/Views/Data/TeacherEdit.cshtml", model);
+                    return this.View(@"~/Views/Data/TeacherEdit.cshtml", viewModel);
                 }
             }
 
@@ -152,27 +125,19 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(TeacherViewModel viewModel)
         {
-            if (this.ModelState.IsValid && viewModel != null)
+            if (this.ModelState.IsValid)
             {
-                var dateData = viewModel?.DateOfBirth?
-                    .Split('-')
-                    .Select(d => Convert.ToInt32(d))
-                    .ToList();
-
-                if (dateData != null && dateData.Count == 3)
+                var teacher = new Teacher
                 {
-                    var teacher = new Teacher
-                    {
-                        Id = viewModel?.Id,
-                        FirstName = viewModel?.FirstName,
-                        LastName = viewModel?.LastName,
-                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                        Grade = viewModel?.Grade,
-                    };
+                    Id = viewModel?.Id,
+                    FirstName = viewModel?.FirstName,
+                    LastName = viewModel?.LastName,
+                    DateOfBirth = viewModel?.DateOfBirth,
+                    Grade = viewModel?.Grade,
+                };
 
-                    this.context.Teachers.Update(teacher);
-                    await this.context.SaveChangesAsync();
-                }
+                this.context.Teachers.Update(teacher);
+                await this.context.SaveChangesAsync();
 
                 return this.RedirectToAction("Teachers");
             }

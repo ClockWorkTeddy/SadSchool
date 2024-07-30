@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using SadSchool.Contracts;
 using SadSchool.DbContexts;
+using SadSchool.Mappers;
 using SadSchool.Services;
 using SadSchool.Services.ApiServices;
 using SadSchool.Services.Cache;
@@ -48,6 +49,7 @@ builder.Services.AddSingleton<INavigationService, NavigationService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
+builder.Services.AddSingleton<ITeacherMapper, TeacherMapper>();
 
 var app = builder.Build();
 

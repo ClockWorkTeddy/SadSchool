@@ -27,7 +27,7 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets the date of birth.
         /// </summary>
-        public string? DateOfBirth { get; set; }
+        public DateOnly? DateOfBirth { get; set; }
 
         /// <summary>
         /// Gets or sets teacher's grade.
