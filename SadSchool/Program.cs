@@ -49,7 +49,7 @@ builder.Services.AddSingleton<INavigationService, NavigationService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
-builder.Services.AddSingleton<ITeacherMapper, TeacherMapper>();
+builder.Services.AddSingleton<ICommonMapper, CommonMapper>();
 
 var app = builder.Build();
 

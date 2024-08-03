@@ -20,7 +20,8 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
-        private readonly ITeacherMapper teacherMapper;
+        private readonly ICommonMapper commonMapper;
+        private readonly ICacheService cacheService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TeacherController"/> class.
@@ -32,12 +33,14 @@ namespace SadSchool.Controllers
             SadSchoolContext context,
             INavigationService navigationService,
             IAuthService authService,
-            ITeacherMapper teacherMapper)
+            ICommonMapper commonMapper,
+            ICacheService cacheService)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
-            this.teacherMapper = teacherMapper;
+            this.commonMapper = commonMapper;
+            this.cacheService = cacheService;
         }
 
         /// <summary>
@@ -47,9 +50,8 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Teachers()
         {
-            List<TeacherViewModel> teacherViewModels = this.context.Teachers
-                .Select(t => this.teacherMapper.ToViewModel(t))
-                .ToList();
+            List<TeacherViewModel> teacherViewModels =
+                [.. this.context.Teachers.Select(t => this.commonMapper.TeacherToVm(t))];
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
@@ -84,8 +86,12 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                this.context.Teachers.Add(this.teacherMapper.ToModel(viewodel));
+                var teacher = this.commonMapper.TeacherToModel(viewModel);
+
+                this.context.Teachers.Add(teacher);
                 this.context.SaveChanges();
+
+                this.cacheService.RefreshObject<Teacher>(teacher);
             }
 
             return this.RedirectToAction("Teachers");
@@ -105,9 +111,9 @@ namespace SadSchool.Controllers
 
                 if (editedTeacher != null)
                 {
-                    var viewModel = this.teacherMapper.ToViewModel(editedTeacher);
-
                     this.navigationService.RefreshBackParams(this.RouteData);
+
+                    var viewModel = this.commonMapper.TeacherToVm(editedTeacher);
 
                     return this.View(@"~/Views/Data/TeacherEdit.cshtml", viewModel);
                 }
@@ -127,14 +133,7 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var teacher = new Teacher
-                {
-                    Id = viewModel?.Id,
-                    FirstName = viewModel?.FirstName,
-                    LastName = viewModel?.LastName,
-                    DateOfBirth = viewModel?.DateOfBirth,
-                    Grade = viewModel?.Grade,
-                };
+                var teacher = this.commonMapper.TeacherToModel(viewModel);
 
                 this.context.Teachers.Update(teacher);
                 await this.context.SaveChangesAsync();

@@ -20,6 +20,7 @@ namespace SadSchool.Controllers
         private readonly INavigationService navigationService;
         private readonly ICacheService cacheService;
         private readonly IAuthService authService;
+        private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StudentController"/> class.
@@ -32,12 +33,14 @@ namespace SadSchool.Controllers
             SadSchoolContext context,
             INavigationService navigationService,
             ICacheService cacheService,
-            IAuthService authService)
+            IAuthService authService,
+            ICommonMapper commonMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.cacheService = cacheService;
             this.authService = authService;
+            this.commonMapper = commonMapper;
         }
 
         /// <summary>
@@ -51,15 +54,7 @@ namespace SadSchool.Controllers
 
             foreach (var student in this.context.Students.ToList())
             {
-                students.Add(new StudentViewModel
-                {
-                    Id = student.Id,
-                    FirstName = student.FirstName,
-                    LastName = student.LastName,
-                    DateOfBirth = student.DateOfBirth.ToString(),
-                    Sex = student.Sex,
-                    ClassName = student.Class?.Name,
-                });
+                students.Add(this.commonMapper.StudentToVm(student));
             }
 
             this.navigationService.RefreshBackParams(this.RouteData);
@@ -77,7 +72,8 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                StudentViewModel viewModel = new StudentViewModel()
+
+                var viewModel = new StudentViewModel
                 {
                     Classes = this.GetClassesList(null),
                     Sexes = this.GetSexes(null),
@@ -101,31 +97,16 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var dateData = new List<int>();
-
-                dateData = viewModel?.DateOfBirth?
-                    .Split('-')
-                    .Select(d => Convert.ToInt32(d))
-                    .ToList();
-
-                if (dateData != null && dateData.Count == 3)
+                if (viewModel != null)
                 {
-                    var student = new Student
-                    {
-                        FirstName = viewModel?.FirstName,
-                        LastName = viewModel?.LastName,
-                        ClassId = viewModel?.ClassId,
-                        Class = this.context.Classes.Find(viewModel?.ClassId),
-                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                        Sex = viewModel?.Sex,
-                    };
+                    var student = this.commonMapper.StudentToModel(viewModel);
 
                     this.context.Students.Add(student);
                     await this.context.SaveChangesAsync();
                 }
             }
 
-            return this.RedirectToAction("Add");
+            return this.RedirectToAction("Students");
         }
 
         /// <summary>
@@ -141,18 +122,16 @@ namespace SadSchool.Controllers
             {
                 var editedStudent = this.context.Students.Find(id);
 
-                StudentViewModel viewModel = new()
+                if (editedStudent != null)
                 {
-                    FirstName = editedStudent?.FirstName,
-                    LastName = editedStudent?.LastName,
-                    DateOfBirth = editedStudent?.DateOfBirth.ToString(),
-                    Sexes = this.GetSexes(editedStudent?.Sex),
-                    Classes = this.GetClassesList(editedStudent?.ClassId),
-                };
+                    StudentViewModel viewModel = this.commonMapper.StudentToVm(editedStudent);
+                    viewModel.Sexes = this.GetSexes(editedStudent?.Sex);
+                    viewModel.Classes = this.GetClassesList(editedStudent?.ClassId);
 
-                this.navigationService.RefreshBackParams(this.RouteData);
+                    this.navigationService.RefreshBackParams(this.RouteData);
 
-                return this.View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+                    return this.View(@"~/Views/Data/StudentEdit.cshtml", viewModel);
+                }
             }
 
             return this.RedirectToAction("Students");
@@ -167,29 +146,14 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(StudentViewModel viewModel)
         {
-            if (this.ModelState.IsValid && viewModel != null)
+            if (this.ModelState.IsValid)
             {
-                var dateData = viewModel?.DateOfBirth?
-                    .Split('-')
-                    .Select(d => Convert.ToInt32(d))
-                    .ToList();
+                var student = this.commonMapper.StudentToModel(viewModel);
 
-                if (dateData != null && dateData.Count == 3)
-                {
-                    var student = new Student
-                    {
-                        Id = viewModel?.Id,
-                        FirstName = viewModel?.FirstName,
-                        LastName = viewModel?.LastName,
-                        DateOfBirth = new DateOnly(dateData[0], dateData[1], dateData[2]),
-                        Sex = viewModel?.Sex,
-                        ClassId = viewModel?.ClassId,
-                    };
+                this.context.Students.Update(student);
+                await this.context.SaveChangesAsync();
 
-                    this.context.Students.Update(student);
-                    await this.context.SaveChangesAsync();
-                    this.cacheService.RefreshObject(student);
-                }
+                this.cacheService.RefreshObject(student);
 
                 return this.RedirectToAction("Students");
             }

@@ -19,6 +19,7 @@ namespace SadSchool.Controllers
         private readonly INavigationService navigationService;
         private readonly ICacheService cacheService;
         private readonly IAuthService authService;
+        private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SubjectController"/> class.
@@ -31,12 +32,14 @@ namespace SadSchool.Controllers
             SadSchoolContext context,
             INavigationService navigationService,
             ICacheService cacheService,
-            IAuthService authService)
+            IAuthService authService,
+            ICommonMapper commonMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.cacheService = cacheService;
             this.authService = authService;
+            this.commonMapper = commonMapper;
         }
 
         /// <summary>
@@ -46,18 +49,9 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult Subjects()
         {
-            List<SubjectViewModel> subjects = new();
-
-            foreach (var s in this.context.Subjects)
-            {
-                subjects.Add(new SubjectViewModel
-                {
-                    Id = s.Id,
-                    Name = s.Name,
-                });
-            }
-
             this.navigationService.RefreshBackParams(this.RouteData);
+
+            List<SubjectViewModel> subjects = [.. this.context.Subjects.Select(s => this.commonMapper.SubjectToVm(s))];
 
             return this.View(@"~/Views/Data/Subjects.cshtml", subjects);
         }
@@ -83,17 +77,14 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Adds a new subject.
         /// </summary>
-        /// <param name="model">View model with data.</param>
+        /// <param name="viewModel">View model with data.</param>
         /// <returns><see cref="RedirectToActionResult"/> for the "Subjects".</returns>
         [HttpPost]
-        public IActionResult Add(SubjectViewModel model)
+        public IActionResult Add(SubjectViewModel viewModel)
         {
             if (this.ModelState.IsValid)
             {
-                var subject = new Subject
-                {
-                    Name = model?.Name,
-                };
+                var subject = this.commonMapper.SubjectToModel(viewModel);
 
                 this.context.Subjects.Add(subject);
                 this.context.SaveChanges();
@@ -114,14 +105,14 @@ namespace SadSchool.Controllers
             {
                 var editedSubject = this.context.Subjects.Find(id);
 
-                var model = new SubjectViewModel
+                if (editedSubject != null)
                 {
-                    Name = editedSubject?.Name,
-                };
+                    this.navigationService.RefreshBackParams(this.RouteData);
 
-                this.navigationService.RefreshBackParams(this.RouteData);
+                    var model = this.commonMapper.SubjectToVm(editedSubject);
 
-                return this.View(@"~/Views/Data/SubjectEdit.cshtml", model);
+                    return this.View(@"~/Views/Data/SubjectEdit.cshtml", model);
+                }
             }
 
             return this.RedirectToAction("Subjects");
@@ -130,18 +121,14 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Edits a subject.
         /// </summary>
-        /// <param name="model">View model with data.</param>
+        /// <param name="viewModel">View model with data.</param>
         /// <returns><see cref="IActionResult"/> for the "Subjects" action or for the "SubjectEdit" view.</returns>
         [HttpPost]
-        public IActionResult Edit(SubjectViewModel model)
+        public IActionResult Edit(SubjectViewModel viewModel)
         {
-            if (this.ModelState.IsValid && model != null)
+            if (this.ModelState.IsValid && viewModel != null)
             {
-                var subject = new Subject
-                {
-                    Id = model.Id,
-                    Name = model.Name,
-                };
+                var subject = this.commonMapper.SubjectToModel(viewModel);
 
                 this.context.Subjects.Update(subject);
                 this.context.SaveChanges();
@@ -150,7 +137,7 @@ namespace SadSchool.Controllers
                 return this.RedirectToAction("Subjects");
             }
 
-            return this.View(@"~/Views/Data/SubjectEdit.cshtml", model);
+            return this.View(@"~/Views/Data/SubjectEdit.cshtml", viewModel);
         }
 
         /// <summary>
