@@ -21,6 +21,7 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
+        private readonly ICacheService cacheService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LessonController"/> class.
@@ -31,11 +32,13 @@ namespace SadSchool.Controllers
         public LessonController(
             SadSchoolContext context,
             INavigationService navigationService,
-            IAuthService authService)
+            IAuthService authService,
+            ICacheService cacheService)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
+            this.cacheService = cacheService;
         }
 
         /// <summary>
@@ -46,15 +49,7 @@ namespace SadSchool.Controllers
         public IActionResult Lessons()
         {
             var lessons = new List<LessonViewModel>();
-            var contextLessons = this.context.Lessons
-                .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl!.Class)
-                .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl!.Teacher)
-                .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl!.StartTime)
-                .Include(l => l.ScheduledLesson)
-                    .ThenInclude(sl => sl!.Subject);
+            var contextLessons = this.context.Lessons.ToList();
 
             foreach (var lesson in contextLessons)
             {
@@ -111,6 +106,8 @@ namespace SadSchool.Controllers
 
                 this.context.Lessons.Add(lesson);
                 this.context.SaveChanges();
+
+                this.cacheService.GetObject<Lesson>(lesson.Id!.Value);
             }
 
             return this.RedirectToAction("Lessons");
@@ -164,6 +161,8 @@ namespace SadSchool.Controllers
                 this.context.Lessons.Update(lesson);
                 this.context.SaveChanges();
 
+                this.cacheService.RefreshObject(lesson);
+
                 return this.RedirectToAction("Lessons");
             }
 
@@ -186,6 +185,8 @@ namespace SadSchool.Controllers
                 {
                     this.context.Lessons.Remove(lesson);
                     this.context.SaveChanges();
+
+                    this.cacheService.RemoveObject(lesson);
                 }
             }
 

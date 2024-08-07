@@ -91,7 +91,7 @@ namespace SadSchool.Controllers
                 this.context.Teachers.Add(teacher);
                 this.context.SaveChanges();
 
-                this.cacheService.RefreshObject<Teacher>(teacher);
+                this.cacheService.GetObject<Teacher>(teacher.Id!.Value);
             }
 
             return this.RedirectToAction("Teachers");
@@ -138,6 +138,8 @@ namespace SadSchool.Controllers
                 this.context.Teachers.Update(teacher);
                 await this.context.SaveChangesAsync();
 
+                this.cacheService.RefreshObject(teacher);
+
                 return this.RedirectToAction("Teachers");
             }
             else
@@ -162,6 +164,8 @@ namespace SadSchool.Controllers
                 {
                     this.context.Teachers.Remove(teacher);
                     this.context.SaveChanges();
+
+                    this.cacheService.RemoveObject(teacher);
                 }
             }
 

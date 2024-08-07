@@ -50,14 +50,7 @@ namespace SadSchool.Services.Cache
             if (value == RedisValue.Null)
             {
                 T? dbValue = this.context.Set<T>().Find(id);
-                string serializedValue = JsonConvert.SerializeObject(
-                    dbValue,
-                    Formatting.Indented,
-                    new JsonSerializerSettings()
-                    {
-                        ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                    });
-                value = new RedisValue(serializedValue);
+                value = new RedisValue(this.JsonSerialize(dbValue));
 
                 this.redis.StringSet(rKey, value);
             }
@@ -81,12 +74,36 @@ namespace SadSchool.Services.Cache
                 typeof(T));
 
             var redisKey = new RedisKey($"{typeof(T)}:{(obj as BaseModel)?.Id}");
-            var redisValue = this.redis.StringGet(redisKey);
+            var redisValue = new RedisValue(this.JsonSerialize(obj));
 
             if (redisValue != RedisValue.Null)
             {
                 this.redis.StringSet(redisKey, redisValue);
             }
+        }
+
+        public void RemoveObject<T>(T obj)
+            where T : class
+        {
+            Log.Information(
+                "RedisCacheService.RemoveObject(): method called with parameters: id = {id} and for type = {type}",
+                obj,
+                typeof(T));
+
+            var redisKey = new RedisKey($"{typeof(T)}:{(obj as BaseModel)?.Id}");
+
+            this.redis.KeyDelete(redisKey);
+        }
+
+        private string JsonSerialize<T>(T obj)
+        {
+            return JsonConvert.SerializeObject(
+                obj,
+                Formatting.Indented,
+                new JsonSerializerSettings()
+                {
+                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
+                });
         }
     }
 }

@@ -19,6 +19,7 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
+        private readonly ICacheService cacheService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledLessonController"/> class.
@@ -29,11 +30,13 @@ namespace SadSchool.Controllers
         public ScheduledLessonController(
             SadSchoolContext context,
             INavigationService navigationService,
-            IAuthService authService)
+            IAuthService authService,
+            ICacheService cacheService)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
+            this.cacheService = cacheService;
         }
 
         /// <summary>
@@ -110,6 +113,8 @@ namespace SadSchool.Controllers
 
                 this.context.ScheduledLessons.Add(lesson);
                 await this.context.SaveChangesAsync();
+
+                this.cacheService.GetObject<ScheduledLesson>(lesson.Id!.Value);
             }
 
             return this.RedirectToAction("ScheduledLessons");
@@ -156,7 +161,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var lesson = new ScheduledLesson
+                var scheduledLesson = new ScheduledLesson
                 {
                     Id = viewModel.Id,
                     Day = viewModel.Day,
@@ -166,8 +171,10 @@ namespace SadSchool.Controllers
                     StartTimeId = viewModel.StartTimeId,
                 };
 
-                this.context.ScheduledLessons.Update(lesson);
+                this.context.ScheduledLessons.Update(scheduledLesson);
                 await this.context.SaveChangesAsync();
+
+                this.cacheService.RefreshObject(scheduledLesson);
 
                 return this.RedirectToAction("ScheduledLessons");
             }
@@ -191,6 +198,8 @@ namespace SadSchool.Controllers
                 {
                     this.context.ScheduledLessons.Remove(lesson);
                     await this.context.SaveChangesAsync();
+
+                    this.cacheService.RemoveObject(lesson);
                 }
             }
 

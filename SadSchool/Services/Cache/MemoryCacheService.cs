@@ -74,5 +74,18 @@ namespace SadSchool.Services.Cache
                 this.memoryCache.Set(cacheKey, obj as T);
             }
         }
+
+        public void RemoveObject<T>(T obj)
+            where T : class
+        {
+            Log.Information(
+                "MemoryCacheService.RemoveObject(): method called with parameters: obj = {obj} and for type = {type}",
+                obj,
+                typeof(T));
+
+            var cacheKey = $"{typeof(T)}:{(obj as BaseModel)?.Id}";
+
+            this.memoryCache.Remove(cacheKey);
+        }
     }
 }

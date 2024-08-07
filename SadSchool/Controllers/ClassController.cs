@@ -20,6 +20,7 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
+        private readonly ICacheService cacheService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassController"/> class.
@@ -27,11 +28,16 @@ namespace SadSchool.Controllers
         /// <param name="context">DB context.</param>
         /// <param name="navigationService">The service responses for "Back" button operations.</param>
         /// <param name="authService">The service responses for user authorization.</param>
-        public ClassController(SadSchoolContext context, INavigationService navigationService, IAuthService authService)
+        public ClassController(
+            SadSchoolContext context,
+            INavigationService navigationService,
+            IAuthService authService,
+            ICacheService cacheService)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
+            this.cacheService = cacheService;
         }
 
         /// <summary>
@@ -44,7 +50,7 @@ namespace SadSchool.Controllers
             List<ClassViewModel> classes = new();
             try
             {
-                foreach (var theClass in this.context.Classes.Include(c => c.Teacher).ToList())
+                foreach (var theClass in this.context.Classes.ToList())
                 {
                     classes.Add(new ClassViewModel
                     {
@@ -107,6 +113,8 @@ namespace SadSchool.Controllers
                 this.context.Classes.Add(@class);
                 await this.context.SaveChangesAsync();
 
+                this.cacheService.GetObject<Class>(@class.Id!.Value);
+
                 return this.RedirectToAction("Classes");
             }
             else
@@ -160,6 +168,9 @@ namespace SadSchool.Controllers
 
                 this.context.Classes.Update(@class);
                 await this.context.SaveChangesAsync();
+
+                this.cacheService.RefreshObject(@class);
+
                 return this.RedirectToAction("Classes");
             }
             else
@@ -184,6 +195,8 @@ namespace SadSchool.Controllers
                 {
                     this.context.Classes.Remove(@class);
                     await this.context.SaveChangesAsync();
+
+                    this.cacheService.RemoveObject(@class);
                 }
 
                 return this.RedirectToAction("Classes");

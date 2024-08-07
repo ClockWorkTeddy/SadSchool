@@ -103,6 +103,8 @@ namespace SadSchool.Controllers
 
                     this.context.Students.Add(student);
                     await this.context.SaveChangesAsync();
+
+                    this.cacheService.GetObject<Student>(student.Id!.Value);
                 }
             }
 
@@ -177,6 +179,8 @@ namespace SadSchool.Controllers
                 {
                     this.context.Students.Remove(student);
                     await this.context.SaveChangesAsync();
+
+                    this.cacheService.RemoveObject(student);
                 }
             }
 

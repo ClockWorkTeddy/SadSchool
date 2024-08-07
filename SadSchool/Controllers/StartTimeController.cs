@@ -18,6 +18,7 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
+        private readonly ICacheService cacheService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StartTimeController"/> class.
@@ -28,11 +29,13 @@ namespace SadSchool.Controllers
         public StartTimeController(
             SadSchoolContext context,
             INavigationService navigationService,
-            IAuthService authService)
+            IAuthService authService,
+            ICacheService cacheService)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
+            this.cacheService = cacheService;
         }
 
         /// <summary>
@@ -93,6 +96,8 @@ namespace SadSchool.Controllers
 
                 this.context.StartTimes.Add(schedule);
                 this.context.SaveChanges();
+
+                this.cacheService.GetObject<StartTime>(schedule.Id!.Value);
             }
 
             return this.RedirectToAction("StartTimes");
@@ -143,6 +148,9 @@ namespace SadSchool.Controllers
 
                 this.context.StartTimes.Update(startTime);
                 await this.context.SaveChangesAsync();
+
+                this.cacheService.RefreshObject(startTime);
+
                 return this.RedirectToAction("StartTimes");
             }
             else
@@ -167,6 +175,8 @@ namespace SadSchool.Controllers
                 {
                     this.context.StartTimes.Remove(schedule);
                     this.context.SaveChanges();
+
+                    this.cacheService.RemoveObject(schedule);
                 }
             }
 

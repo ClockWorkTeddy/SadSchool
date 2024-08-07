@@ -88,6 +88,8 @@ namespace SadSchool.Controllers
 
                 this.context.Subjects.Add(subject);
                 this.context.SaveChanges();
+
+                this.cacheService.GetObject<Subject>(subject.Id!.Value);
             }
 
             return this.RedirectToAction("Subjects");
@@ -126,15 +128,19 @@ namespace SadSchool.Controllers
         [HttpPost]
         public IActionResult Edit(SubjectViewModel viewModel)
         {
-            if (this.ModelState.IsValid && viewModel != null)
+            if (this.authService.IsAutorized(this.User))
             {
-                var subject = this.commonMapper.SubjectToModel(viewModel);
+                if (this.ModelState.IsValid && viewModel != null)
+                {
+                    var subject = this.commonMapper.SubjectToModel(viewModel);
 
-                this.context.Subjects.Update(subject);
-                this.context.SaveChanges();
-                this.cacheService.RefreshObject(subject);
+                    this.context.Subjects.Update(subject);
+                    this.context.SaveChanges();
 
-                return this.RedirectToAction("Subjects");
+                    this.cacheService.RefreshObject(subject);
+
+                    return this.RedirectToAction("Subjects");
+                }
             }
 
             return this.View(@"~/Views/Data/SubjectEdit.cshtml", viewModel);
@@ -156,6 +162,8 @@ namespace SadSchool.Controllers
                 {
                     this.context.Subjects.Remove(subject);
                     this.context.SaveChanges();
+
+                    this.cacheService.RemoveObject(subject);
                 }
             }
 

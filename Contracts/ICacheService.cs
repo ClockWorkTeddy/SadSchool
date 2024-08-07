@@ -25,5 +25,8 @@ namespace SadSchool.Contracts
         /// <param name="obj">Refreshing object.</param>
         void RefreshObject<T>(T obj)
             where T : class;
+
+        void RemoveObject<T>(T obj)
+            where T : class;
     }
 }
