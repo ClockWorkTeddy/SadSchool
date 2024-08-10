@@ -21,6 +21,7 @@ namespace SadSchool.Controllers
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICacheService cacheService;
+        private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassController"/> class.
@@ -28,16 +29,20 @@ namespace SadSchool.Controllers
         /// <param name="context">DB context.</param>
         /// <param name="navigationService">The service responses for "Back" button operations.</param>
         /// <param name="authService">The service responses for user authorization.</param>
+        /// <param name="cacheService">The service responses for cache operations.</param>
+        /// <param name="commonMapper">The service responses for mapping operations.</param>
         public ClassController(
             SadSchoolContext context,
             INavigationService navigationService,
             IAuthService authService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ICommonMapper commonMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
             this.cacheService = cacheService;
+            this.commonMapper = commonMapper;
         }
 
         /// <summary>
@@ -57,8 +62,7 @@ namespace SadSchool.Controllers
                         Id = theClass.Id,
                         Name = theClass.Name,
                         TeacherId = theClass.TeacherId,
-                        TeacherName = this.GetTeacherName(theClass.TeacherId),
-                        LeaderName = this.GetLeaderName(theClass.LeaderId),
+                        TeacherName = $"{theClass?.Teacher?.FirstName} {theClass?.Teacher?.LastName}",
                     });
                 }
             }
@@ -104,11 +108,7 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var @class = new Class
-                {
-                    Name = viewModel.Name ?? string.Empty,
-                    TeacherId = viewModel.TeacherId,
-                };
+                var @class = this.commonMapper.ClassToModel(viewModel);
 
                 this.context.Classes.Add(@class);
                 await this.context.SaveChangesAsync();
@@ -159,12 +159,7 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid && viewModel != null)
             {
-                var @class = new Class
-                {
-                    Id = viewModel.Id,
-                    Name = viewModel?.Name,
-                    TeacherId = viewModel?.TeacherId,
-                };
+                var @class = this.commonMapper.ClassToModel(viewModel);
 
                 this.context.Classes.Update(@class);
                 await this.context.SaveChangesAsync();
@@ -215,20 +210,6 @@ namespace SadSchool.Controllers
                 Text = $"{teacher.FirstName} {teacher.LastName}",
                 Selected = teacher.Id == teacherId,
             }).ToList();
-        }
-
-        private string GetLeaderName(int? leaderId)
-        {
-            var leader = this.context.Students.Find(leaderId);
-
-            return $"{leader?.FirstName} {leader?.LastName}";
-        }
-
-        private string GetTeacherName(int? teacherId)
-        {
-            var teacher = this.context.Teachers.Find(teacherId);
-
-            return $"{teacher?.FirstName} {teacher?.LastName}";
         }
     }
 }

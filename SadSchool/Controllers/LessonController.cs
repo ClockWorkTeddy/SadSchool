@@ -22,6 +22,7 @@ namespace SadSchool.Controllers
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICacheService cacheService;
+        private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LessonController"/> class.
@@ -29,16 +30,20 @@ namespace SadSchool.Controllers
         /// <param name="context">DB context.</param>
         /// <param name="navigationService">Service that operates "Back" button.</param>
         /// <param name="authService">Service that checks user authentication.</param>
+        /// <param name="cacheService">Service that operates cache.</param>
+        /// <param name="commonMapper">Service that maps entities.</param>
         public LessonController(
             SadSchoolContext context,
             INavigationService navigationService,
             IAuthService authService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ICommonMapper commonMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
             this.cacheService = cacheService;
+            this.commonMapper = commonMapper;
         }
 
         /// <summary>
@@ -49,15 +54,14 @@ namespace SadSchool.Controllers
         public IActionResult Lessons()
         {
             var lessons = new List<LessonViewModel>();
-            var contextLessons = this.context.Lessons.ToList();
 
-            foreach (var lesson in contextLessons)
+            foreach (var lesson in this.context.Lessons.ToList())
             {
                 lessons.Add(new LessonViewModel
                 {
                     Id = lesson.Id,
                     Date = lesson?.Date,
-                    LessonData = $"{lesson?.ScheduledLesson} ",
+                    LessonData = $"{lesson?.ScheduledLesson}",
                 });
             }
 
@@ -98,11 +102,7 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var lesson = new Lesson
-                {
-                    Date = viewModel.Date,
-                    ScheduledLesson = this.context.ScheduledLessons.Find(viewModel.ScheduledLessonId),
-                };
+                var lesson = this.commonMapper.LessonToModel(viewModel);
 
                 this.context.Lessons.Add(lesson);
                 this.context.SaveChanges();
@@ -125,16 +125,15 @@ namespace SadSchool.Controllers
             {
                 var editedLesson = this.context.Lessons.Find(id);
 
-                LessonViewModel viewModel = new()
+                if (editedLesson != null)
                 {
-                    Id = editedLesson?.Id,
-                    Date = editedLesson?.Date,
-                    ScheduledLessons = this.GetScheduledLessonsList(editedLesson?.ScheduledLessonId),
-                };
+                    LessonViewModel viewModel = this.commonMapper.LessonToVm(editedLesson);
+                    viewModel.ScheduledLessons = this.GetScheduledLessonsList(viewModel.ScheduledLessonId);
 
-                this.navigationService.RefreshBackParams(this.RouteData);
+                    this.navigationService.RefreshBackParams(this.RouteData);
 
-                return this.View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
+                    return this.View(@"~/Views/Data/LessonEdit.cshtml", viewModel);
+                }
             }
 
             return this.RedirectToAction("Lessons");
@@ -150,13 +149,7 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid && viewModel != null)
             {
-                var lesson = new Lesson
-                {
-                    Id = viewModel.Id,
-                    Date = viewModel.Date,
-                    ScheduledLessonId = viewModel.ScheduledLessonId,
-                    ScheduledLesson = this.context.ScheduledLessons.Find(viewModel.ScheduledLessonId),
-                };
+                var lesson = this.commonMapper.LessonToModel(viewModel);
 
                 this.context.Lessons.Update(lesson);
                 this.context.SaveChanges();

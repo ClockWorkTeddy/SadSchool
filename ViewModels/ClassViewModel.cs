@@ -37,11 +37,6 @@ namespace SadSchool.ViewModels
         public string? TeacherName { get; set; }
 
         /// <summary>
-        /// Gets or sets the leader name.
-        /// </summary>
-        public string? LeaderName { get; set; }
-
-        /// <summary>
         /// Gets or sets the list of teachers.
         /// </summary>
         public List<SelectListItem> Teachers { get; set; } = new();

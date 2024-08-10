@@ -28,6 +28,7 @@ namespace SadSchool.Controllers
         /// <param name="navigationService">Service processes the "Back" button.</param>
         /// <param name="cacheService">Cahce instance.</param>
         /// <param name="authService">Service processes user authorization check.</param>
+        /// <param name="commonMapper">Service processes mapping operations.</param>
         public SubjectController(
             SadSchoolContext context,
             INavigationService navigationService,

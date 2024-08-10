@@ -75,6 +75,11 @@ namespace SadSchool.Services.Cache
             }
         }
 
+        /// <summary>
+        /// Removes the object from the cache.
+        /// </summary>
+        /// <typeparam name="T">Desirable object type.</typeparam>
+        /// <param name="obj">Object that being removed.</param>
         public void RemoveObject<T>(T obj)
             where T : class
         {

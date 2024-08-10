@@ -29,6 +29,7 @@ namespace SadSchool.Controllers
         /// <param name="navigationService">Service processes the "Back" button.</param>
         /// <param name="cacheService">Cache instance.</param>
         /// <param name="authService">Service processes user authorization check.</param>"
+        /// <param name="commonMapper">Service processes mapping operations.</param>
         public StudentController(
             SadSchoolContext context,
             INavigationService navigationService,
@@ -72,7 +73,6 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-
                 var viewModel = new StudentViewModel
                 {
                     Classes = this.GetClassesList(null),

@@ -13,5 +13,17 @@ namespace SadSchool.Contracts
 
         public StudentViewModel StudentToVm(Student student);
         public Student StudentToModel(StudentViewModel studentViewModel);
+
+        public StartTimeViewModel StartTimeToVm(StartTime startTime);
+        public StartTime StartTimeToModel(StartTimeViewModel startTimeViewModel);
+
+        public ScheduledLessonViewModel ScheduledLessonToVm(ScheduledLesson scheduledLesson);
+        public ScheduledLesson ScheduledLessonToModel(ScheduledLessonViewModel scheduledLessonViewModel);
+
+        public LessonViewModel LessonToVm(Lesson lesson);
+        public Lesson LessonToModel(LessonViewModel lessonViewModel);
+
+        public ClassViewModel ClassToVm(Class @class);
+        public Class ClassToModel(ClassViewModel classViewModel);
     }
 }

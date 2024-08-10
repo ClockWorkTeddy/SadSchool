@@ -7,10 +7,8 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
     using SadSchool.DbContexts;
-    using SadSchool.Mappers;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
-    using System.Diagnostics;
 
     /// <summary>
     /// Processes requests for teacher data.
@@ -29,6 +27,8 @@ namespace SadSchool.Controllers
         /// <param name="context">DB context.</param>
         /// <param name="navigationService">Services processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
+        /// <param name="cacheService">Service processes cache operations.</param>
+        /// <param name="commonMapper">Service processes mapping operations.</param>
         public TeacherController(
             SadSchoolContext context,
             INavigationService navigationService,

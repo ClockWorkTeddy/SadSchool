@@ -16,5 +16,17 @@
 
         public partial StudentViewModel StudentToVm(Student student);
         public partial Student StudentToModel(StudentViewModel studentViewModel);
+
+        public partial StartTimeViewModel StartTimeToVm(StartTime startTime);
+        public partial StartTime StartTimeToModel(StartTimeViewModel startTimeViewModel);
+
+        public partial ScheduledLessonViewModel ScheduledLessonToVm(ScheduledLesson scheduledLesson);
+        public partial ScheduledLesson ScheduledLessonToModel(ScheduledLessonViewModel scheduledLessonViewModel);
+
+        public partial LessonViewModel LessonToVm(Lesson lesson);
+        public partial Lesson LessonToModel(LessonViewModel lessonViewModel);
+
+        public partial ClassViewModel ClassToVm(Class @class);
+        public partial Class ClassToModel(ClassViewModel classViewModel);
     }
 }

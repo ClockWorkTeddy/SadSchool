@@ -19,6 +19,7 @@ namespace SadSchool.Controllers
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICacheService cacheService;
+        private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StartTimeController"/> class.
@@ -26,16 +27,20 @@ namespace SadSchool.Controllers
         /// <param name="context">DB context.</param>
         /// <param name="navigationService">Service processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
+        /// <param name="cacheService">Service processes cache operations.</param>
+        /// <param name="commonMapper">Service processes mapping operations.</param>
         public StartTimeController(
             SadSchoolContext context,
             INavigationService navigationService,
             IAuthService authService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ICommonMapper commonMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
             this.cacheService = cacheService;
+            this.commonMapper = commonMapper;
         }
 
         /// <summary>
@@ -45,20 +50,13 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult StartTimes()
         {
-            List<StartTimeViewModel> schedules = new List<StartTimeViewModel>();
-
-            foreach (var schedule in this.context.StartTimes)
-            {
-                schedules.Add(new StartTimeViewModel
-                {
-                    Id = schedule.Id,
-                    StartTime = schedule.Value,
-                });
-            }
+            List<StartTimeViewModel> startTimes = this.context.StartTimes
+                .Select(startTime => this.commonMapper.StartTimeToVm(startTime))
+                .ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/StartTimes.cshtml", schedules);
+            return this.View(@"~/Views/Data/StartTimes.cshtml", startTimes);
         }
 
         /// <summary>
@@ -89,10 +87,7 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var schedule = new StartTime
-                {
-                    Value = model.StartTime,
-                };
+                var schedule = this.commonMapper.StartTimeToModel(model);
 
                 this.context.StartTimes.Add(schedule);
                 this.context.SaveChanges();
@@ -116,14 +111,14 @@ namespace SadSchool.Controllers
             {
                 var editedStartTime = this.context.StartTimes.Find(id);
 
-                StartTimeViewModel viewModel = new()
+                if (editedStartTime != null)
                 {
-                    StartTime = editedStartTime?.Value,
-                };
+                    var viewModel = this.commonMapper.StartTimeToVm(editedStartTime);
 
-                this.navigationService.RefreshBackParams(this.RouteData);
+                    this.navigationService.RefreshBackParams(this.RouteData);
 
-                return this.View(@"~/Views/Data/StartTimeEdit.cshtml", viewModel);
+                    return this.View(@"~/Views/Data/StartTimeEdit.cshtml", viewModel);
+                }
             }
 
             return this.RedirectToAction("StartTimes");
@@ -140,11 +135,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var startTime = new StartTime
-                {
-                    Id = viewModel.Id,
-                    Value = viewModel.StartTime,
-                };
+                var startTime = this.commonMapper.StartTimeToModel(viewModel);
 
                 this.context.StartTimes.Update(startTime);
                 await this.context.SaveChangesAsync();
@@ -169,14 +160,14 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var schedule = this.context.StartTimes.Find(id);
+                var startTime = this.context.StartTimes.Find(id);
 
-                if (schedule != null)
+                if (startTime != null)
                 {
-                    this.context.StartTimes.Remove(schedule);
+                    this.context.StartTimes.Remove(startTime);
                     this.context.SaveChanges();
 
-                    this.cacheService.RemoveObject(schedule);
+                    this.cacheService.RemoveObject(startTime);
                 }
             }
 

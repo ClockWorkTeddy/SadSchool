@@ -32,7 +32,6 @@
                                 <th scope="col" class="h3-sad blinker-sad border-dark" style="width:100px">#</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Name</th>
                                 <th scope="col" class="h3-sad blinker-sad border-dark">Teacher Name</th>
-                                <th scope="col" class="h3-sad blinker-sad border-dark">Leader Name</th>
                                 @if (!User.IsInRole("user"))
                                 {
                                     <th scope="col" class="h3-sad blinker-sad border-dark" style="width: 100px"></th>
@@ -53,9 +52,6 @@
                                 </td>
                                 <td class="td-sad">
                                     <div class="blinker-sad">@classModel.TeacherName</div>
-                                </td>
-                                <td class="td-sad">
-                                    <div class="blinker-sad">@classModel.LeaderName</div>
                                 </td>
                                 @if (!User.IsInRole("user"))
                                 {

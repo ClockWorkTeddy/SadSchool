@@ -20,6 +20,7 @@ namespace SadSchool.Controllers
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICacheService cacheService;
+        private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledLessonController"/> class.
@@ -27,16 +28,20 @@ namespace SadSchool.Controllers
         /// <param name="context">DB context instance.</param>
         /// <param name="navigationService">Service processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
+        /// <param name="cacheService">Service processes cache operations.</param>
+        /// <param name="commonMapper">Service processes mapping operations.</param>
         public ScheduledLessonController(
             SadSchoolContext context,
             INavigationService navigationService,
             IAuthService authService,
-            ICacheService cacheService)
+            ICacheService cacheService,
+            ICommonMapper commonMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
             this.cacheService = cacheService;
+            this.commonMapper = commonMapper;
         }
 
         /// <summary>
@@ -46,24 +51,13 @@ namespace SadSchool.Controllers
         [HttpGet]
         public IActionResult ScheduledLessons()
         {
-            var lessons = new List<ScheduledLessonViewModel>();
-
-            foreach (var lesson in this.context.ScheduledLessons.ToList())
-            {
-                lessons.Add(new ScheduledLessonViewModel
-                {
-                    Id = lesson.Id,
-                    StartTimeValue = lesson?.StartTime?.Value,
-                    SubjectName = lesson?.Subject?.Name,
-                    ClassName = lesson?.Class?.Name,
-                    TeacherName = $"{lesson?.Teacher?.FirstName} {lesson?.Teacher?.LastName}",
-                    Day = lesson?.Day,
-                });
-            }
+            var scheduledLessons = this.context.ScheduledLessons
+                .Select(scheduledLesson => this.commonMapper.ScheduledLessonToVm(scheduledLesson))
+                .ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/ScheduledLessons.cshtml", lessons);
+            return this.View(@"~/Views/Data/ScheduledLessons.cshtml", scheduledLessons);
         }
 
         /// <summary>
@@ -102,19 +96,12 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var lesson = new ScheduledLesson
-                {
-                    ClassId = viewModel.ClassId,
-                    SubjectId = viewModel.SubjectId,
-                    TeacherId = viewModel.TeacherId,
-                    StartTimeId = viewModel.StartTimeId,
-                    Day = viewModel.Day,
-                };
+                var scheduledLesson = this.commonMapper.ScheduledLessonToModel(viewModel);
 
-                this.context.ScheduledLessons.Add(lesson);
+                this.context.ScheduledLessons.Add(scheduledLesson);
                 await this.context.SaveChangesAsync();
 
-                this.cacheService.GetObject<ScheduledLesson>(lesson.Id!.Value);
+                this.cacheService.GetObject<ScheduledLesson>(scheduledLesson.Id!.Value);
             }
 
             return this.RedirectToAction("ScheduledLessons");
@@ -161,15 +148,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var scheduledLesson = new ScheduledLesson
-                {
-                    Id = viewModel.Id,
-                    Day = viewModel.Day,
-                    ClassId = viewModel.ClassId,
-                    SubjectId = viewModel.SubjectId,
-                    TeacherId = viewModel.TeacherId,
-                    StartTimeId = viewModel.StartTimeId,
-                };
+                var scheduledLesson = this.commonMapper.ScheduledLessonToModel(viewModel);
 
                 this.context.ScheduledLessons.Update(scheduledLesson);
                 await this.context.SaveChangesAsync();
