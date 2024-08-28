@@ -1,10 +1,11 @@
-﻿// <copyright file="MarkController.cs" company="ClockWorkTeddy">
+﻿// <copyright file="RestControllerMarks.cs" company="ClockWorkTeddy">
 // Written by ClockWorkTeddy.
 // </copyright>
 
 namespace SadSchool.Controllers.RestApi
 {
     using Microsoft.AspNetCore.Mvc;
+    using MongoDB.Bson;
     using SadSchool.Contracts;
     using SadSchool.DbContexts;
     using SadSchool.Models.Mongo;
@@ -13,8 +14,8 @@ namespace SadSchool.Controllers.RestApi
     /// The controller serves marks processing.
     /// </summary>
     [ApiController]
-    [Route("api/MarkController")]
-    public class MarkController : Controller
+    [Route("api/rest/marks")]
+    public class MarksRestController : Controller
     {
         private readonly string? apiKey = string.Empty;
         private readonly MongoContext context;
@@ -22,12 +23,15 @@ namespace SadSchool.Controllers.RestApi
         private readonly IMarksAnalyticsService marksAnalyticsService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="MarkController"/> class.
+        /// Initializes a new instance of the <see cref="MarksRestController"/> class.
         /// </summary>
         /// <param name="context">Application DB context.</param>
         /// <param name="configuration">Application configuration.</param>
         /// <param name="markAnalyticSevice">MarkAnalytic service instance.</param>
-        public MarkController(MongoContext context, IConfiguration configuration, IMarksAnalyticsService markAnalyticSevice)
+        public MarksRestController(
+            MongoContext context,
+            IConfiguration configuration,
+            IMarksAnalyticsService markAnalyticSevice)
         {
             this.context = context;
             this.configuration = configuration;
@@ -72,6 +76,28 @@ namespace SadSchool.Controllers.RestApi
                 var marks = this.context.Marks.Where(m => m.LessonId == lessonId && m.StudentId == studentId);
 
                 return this.Ok(marks);
+            }
+            else
+            {
+                return this.Unauthorized();
+            }
+        }
+
+        /// <summary>
+        /// The method gets a particular mark by id.
+        /// </summary>
+        /// <param name="markId">Id of the desirable mark.</param>
+        /// <returns>The particalar <see cref="Mark"/>.</returns>
+        [HttpGet("{markId}")]
+        public IActionResult Get(string markId)
+        {
+            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
+
+            if (apiKey == this.apiKey)
+            {
+                var mark = this.context.Marks.Find(ObjectId.Parse(markId));
+
+                return this.Ok(mark);
             }
             else
             {
@@ -129,6 +155,29 @@ namespace SadSchool.Controllers.RestApi
                 var marks = this.marksAnalyticsService.GetAverageMarks(studentId, subjectId);
 
                 return this.Ok(marks);
+            }
+            else
+            {
+                return this.Unauthorized();
+            }
+        }
+
+        /// <summary>
+        /// Adds new mark to the DB.
+        /// </summary>
+        /// <param name="mark">New mark data.</param>
+        /// <returns>The resulting <see cref="IActionResult"/>.</returns></returns>
+        [HttpPost]
+        public IActionResult Post([FromBody] Mark mark)
+        {
+            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
+
+            if (apiKey == this.apiKey)
+            {
+                this.context.Marks.Add(mark);
+                this.context.SaveChanges();
+
+                return this.Ok();
             }
             else
             {

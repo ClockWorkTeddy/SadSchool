@@ -4,7 +4,7 @@
 
 namespace SadSchool.Services.Cache
 {
-    using Newtonsoft.Json;
+    using System.Text.Json;
     using SadSchool.Contracts;
     using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
@@ -18,6 +18,7 @@ namespace SadSchool.Services.Cache
     {
         private readonly IDatabase redis;
         private readonly SadSchoolContext context;
+        private readonly JsonSerializerOptions options = new JsonSerializerOptions() { WriteIndented = true };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RedisCacheService"/> class.
@@ -36,7 +37,7 @@ namespace SadSchool.Services.Cache
         /// <typeparam name="T">Type of desirable object.</typeparam>
         /// <param name="id">Id of desirable object.</param>
         /// <returns>Desirable object of type T.</returns>
-        public List<T?> GetObject<T>(int id)
+        public T? GetObject<T>(int id)
             where T : class
         {
             Log.Information(
@@ -50,14 +51,21 @@ namespace SadSchool.Services.Cache
             if (value == RedisValue.Null)
             {
                 T? dbValue = this.context.Set<T>().Find(id);
-                value = new RedisValue(this.JsonSerialize(dbValue));
 
-                this.redis.StringSet(rKey, value);
+                if (dbValue != null)
+                {
+                    value = new RedisValue(this.JsonSerialize(dbValue));
+                    this.redis.StringSet(rKey, value);
+                }
+                else
+                {
+                    return null;
+                }
             }
 
-            var returnValue = JsonConvert.DeserializeObject<T>(value.ToString());
+            var returnValue = JsonSerializer.Deserialize<T>(value.ToString());
 
-            return new List<T?> { returnValue };
+            return returnValue;
         }
 
         /// <summary>
@@ -100,15 +108,7 @@ namespace SadSchool.Services.Cache
             this.redis.KeyDelete(redisKey);
         }
 
-        private string JsonSerialize<T>(T obj)
-        {
-            return JsonConvert.SerializeObject(
-                obj,
-                Formatting.Indented,
-                new JsonSerializerSettings()
-                {
-                    ReferenceLoopHandling = ReferenceLoopHandling.Ignore,
-                });
-        }
+        private string JsonSerialize<T>(T obj) =>
+            JsonSerializer.Serialize(obj, this.options);
     }
 }

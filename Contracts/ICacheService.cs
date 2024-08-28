@@ -15,7 +15,7 @@ namespace SadSchool.Contracts
         /// <typeparam name="T">Type of returned object.</typeparam>
         /// <param name="id">Id of returned object.</param>
         /// <returns>Return List of objects of type T with specified id. In case of one object List.Count === 1.</returns>
-        List<T?> GetObject<T>(int id)
+        T? GetObject<T>(int id)
             where T : class;
 
         /// <summary>

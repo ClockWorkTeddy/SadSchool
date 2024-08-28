@@ -35,7 +35,7 @@ namespace SadSchool.Services.Cache
         /// <typeparam name="T">Desirable object type.</typeparam>
         /// <param name="id">Desirable object id.</param>
         /// <returns>List with the found object.</returns>
-        public List<T?> GetObject<T>(int id)
+        public T? GetObject<T>(int id)
             where T : class
         {
             Log.Information(
@@ -51,7 +51,7 @@ namespace SadSchool.Services.Cache
                 this.memoryCache.Set(cacheKey, cachedObject);
             }
 
-            return new List<T?> { cachedObject as T };
+            return cachedObject as T;
         }
 
         /// <summary>

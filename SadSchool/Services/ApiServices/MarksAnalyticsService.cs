@@ -73,7 +73,7 @@ namespace SadSchool.Services.ApiServices
             }
             else
             {
-                return this.cacheService.GetObject<Subject>(subjectId.Value);
+                return [this.cacheService.GetObject<Subject>(subjectId.Value)];
             }
         }
 
@@ -87,7 +87,7 @@ namespace SadSchool.Services.ApiServices
             }
             else
             {
-                return this.cacheService.GetObject<Student>(studentId.Value)!;
+                return [this.cacheService.GetObject<Student>(studentId.Value)]!;
             }
         }
 

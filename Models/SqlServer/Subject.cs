@@ -4,6 +4,7 @@
 
 namespace SadSchool.Models.SqlServer;
 
+using System.Text.Json.Serialization;
 /// <summary>
 /// Subject model.
 /// </summary>
@@ -17,6 +18,6 @@ public partial class Subject : BaseModel
     /// <summary>
     /// Gets or sets the scheduled lessons list.
     /// </summary>
-    [Newtonsoft.Json.JsonIgnore]
+    [JsonIgnore]
     public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 }
