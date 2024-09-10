@@ -1,4 +1,8 @@
-﻿namespace SadSchool.Controllers.RestApi
+﻿// <copyright file="SubjectRestController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
     using Microsoft.AspNetCore.Mvc;
@@ -6,6 +10,9 @@
     using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
 
+    /// <summary>
+    /// The controller serves subject processing.
+    /// </summary>
     [ApiController]
     [Route("api/rest/subjects")]
     public class SubjectRestController : Controller
@@ -15,6 +22,12 @@
         private readonly ICacheService cacheService;
         private readonly SadSchoolContext context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SubjectRestController"/> class.
+        /// </summary>
+        /// <param name="context">DB context instance.</param>
+        /// <param name="configuration">Configuration object instance.</param>
+        /// <param name="cacheService">Cache service instance.</param>
         public SubjectRestController(
             SadSchoolContext context,
             IConfiguration configuration,
@@ -26,6 +39,10 @@
             this.cacheService = cacheService;
         }
 
+        /// <summary>
+        /// The method gets collection of subjects from DB.
+        /// </summary>
+        /// <returns>Action result.</returns>
         [HttpGet]
         public IActionResult Get()
         {
@@ -43,6 +60,11 @@
             }
         }
 
+        /// <summary>
+        /// The method gets subject by id.
+        /// </summary>
+        /// <param name="id">Desirable subject id.</param>
+        /// <returns>Action result.</returns>
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
@@ -60,6 +82,11 @@
             }
         }
 
+        /// <summary>
+        /// The method adds a new subject to DB.
+        /// </summary>
+        /// <param name="subject">Created subject data.</param>
+        /// <returns>Action result.</returns>
         [HttpPost]
         public IActionResult Post([FromBody] Subject subject)
         {
@@ -78,6 +105,12 @@
             }
         }
 
+        /// <summary>
+        /// The method updates subject data.
+        /// </summary>
+        /// <param name="subjectId">Edited subject id.</param>
+        /// <param name="subject">Edited subject data.</param>
+        /// <returns>Action result.</returns>
         [HttpPut("{subjectId}")]
         public IActionResult Put(int subjectId, [FromBody] Subject subject)
         {

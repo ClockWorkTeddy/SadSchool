@@ -1,4 +1,8 @@
-﻿namespace SadSchool.Controllers.RestApi
+﻿// <copyright file="StudentRestController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
     using Microsoft.AspNetCore.Mvc;
@@ -6,6 +10,9 @@
     using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
 
+    /// <summary>
+    /// The controller serves student processing.
+    /// </summary>
     [ApiController]
     [Route("api/rest/students")]
     public class StudentRestController : Controller
@@ -15,6 +22,12 @@
         private readonly ICacheService cacheService;
         private readonly SadSchoolContext context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StudentRestController"/> class.
+        /// </summary>
+        /// <param name="context">DB context instance.</param>
+        /// <param name="configuration">Configuration object instance.</param>
+        /// <param name="cacheService">Cache service instance.</param>
         public StudentRestController(
             SadSchoolContext context,
             IConfiguration configuration,
@@ -26,6 +39,10 @@
             this.cacheService = cacheService;
         }
 
+        /// <summary>
+        /// The method gets collection of students from DB.
+        /// </summary>
+        /// <returns>Action result.</returns>
         [HttpGet]
         public IActionResult Get()
         {
@@ -43,6 +60,11 @@
             }
         }
 
+        /// <summary>
+        /// The method gets student by id from DB.
+        /// </summary>
+        /// <param name="id">Target student's id.</param>
+        /// <returns>Action result.</returns>
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
@@ -60,6 +82,11 @@
             }
         }
 
+        /// <summary>
+        /// The method adds a new student to DB.
+        /// </summary>
+        /// <param name="student">Created student's name.</param>
+        /// <returns>Action result.</returns>
         [HttpPost]
         public IActionResult Post([FromBody] Student student)
         {
@@ -78,6 +105,12 @@
             }
         }
 
+        /// <summary>
+        /// The method updates student in DB.
+        /// </summary>
+        /// <param name="id">Updated student's id.</param>
+        /// <param name="student">Updated student's data.</param>
+        /// <returns>Action result.</returns>
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] Student student)
         {

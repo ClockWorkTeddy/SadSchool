@@ -1,4 +1,7 @@
-﻿
+﻿// <copyright file="StartTimeRestController.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
 namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
@@ -7,6 +10,9 @@ namespace SadSchool.Controllers.RestApi
     using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
 
+    /// <summary>
+    /// The controller serves start time processing.
+    /// </summary>
     [ApiController]
     [Route("api/rest/starttimes")]
     public class StartTimeRestController : Controller
@@ -16,6 +22,12 @@ namespace SadSchool.Controllers.RestApi
         private readonly ICacheService cacheService;
         private readonly SadSchoolContext context;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StartTimeRestController"/> class.
+        /// </summary>
+        /// <param name="context">DB context.</param>
+        /// <param name="configuration">Configuration object.</param>
+        /// <param name="cacheService">Cache service instance.</param>
         public StartTimeRestController(
             SadSchoolContext context,
             IConfiguration configuration,
@@ -27,6 +39,10 @@ namespace SadSchool.Controllers.RestApi
             this.cacheService = cacheService;
         }
 
+        /// <summary>
+        /// The method gets collection of start times from DB.
+        /// </summary>
+        /// <returns>Action result.</returns>
         [HttpGet]
         public IActionResult Get()
         {
@@ -44,6 +60,11 @@ namespace SadSchool.Controllers.RestApi
             }
         }
 
+        /// <summary>
+        /// The method gets start time by id.
+        /// </summary>
+        /// <param name="id">Target instanse's id.</param>
+        /// <returns>Action result.</returns>
         [HttpGet("{id}")]
         public IActionResult Get(int id)
         {
@@ -61,6 +82,11 @@ namespace SadSchool.Controllers.RestApi
             }
         }
 
+        /// <summary>
+        /// The method adds a new start time to DB.
+        /// </summary>
+        /// <param name="startTime">Start time object's data for the creation.</param>
+        /// <returns>Action result.</returns>
         [HttpPost]
         public IActionResult Post([FromBody] StartTime startTime)
         {
@@ -79,6 +105,12 @@ namespace SadSchool.Controllers.RestApi
             }
         }
 
+        /// <summary>
+        /// The method updates start time data.
+        /// </summary>
+        /// <param name="id">Target start time's id.</param>
+        /// <param name="startTime">Start time object's date for update.</param>
+        /// <returns>Action result.</returns>
         [HttpPut("{id}")]
         public IActionResult Put(int id, [FromBody] StartTime startTime)
         {

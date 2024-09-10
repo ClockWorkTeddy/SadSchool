@@ -1,4 +1,4 @@
-﻿// <copyright file="RestControllerMarks.cs" company="ClockWorkTeddy">
+﻿// <copyright file="MarksRestController.cs" company="ClockWorkTeddy">
 // Written by ClockWorkTeddy.
 // </copyright>
 
@@ -166,7 +166,7 @@ namespace SadSchool.Controllers.RestApi
         /// Adds new mark to the DB.
         /// </summary>
         /// <param name="mark">New mark data.</param>
-        /// <returns>The resulting <see cref="IActionResult"/>.</returns></returns>
+        /// <returns>The resulting <see cref="IActionResult"/>.</returns>
         [HttpPost]
         public IActionResult Post([FromBody] Mark mark)
         {

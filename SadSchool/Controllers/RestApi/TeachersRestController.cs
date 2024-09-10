@@ -1,4 +1,4 @@
-﻿// <copyright file="RestControllerTerachers.cs" company="ClockWorkTeddy">
+﻿// <copyright file="TeachersRestController.cs" company="ClockWorkTeddy">
 // Written by ClockWorkTeddy.
 // </copyright>
 
@@ -112,7 +112,7 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="updateTeacher">New teacher data.</param>
         /// <returns>The result of the operation.</returns>
         [HttpPut("{teacherId}")]
-        public IActionResult Put(int teacherId , [FromBody] Teacher updateTeacher)
+        public IActionResult Put(int teacherId, [FromBody] Teacher updateTeacher)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
