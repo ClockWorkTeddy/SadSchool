@@ -17,6 +17,6 @@ namespace SadSchool.ViewModels
         /// <summary>
         /// Gets or sets the start time.
         /// </summary>
-        public string? StartTime { get; set; } = null!;
+        public string? Value { get; set; } = null!;
     }
 }

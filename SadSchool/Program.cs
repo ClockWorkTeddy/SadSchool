@@ -50,6 +50,7 @@ builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 builder.Services.AddSingleton<ICommonMapper, CommonMapper>();
+builder.Services.AddSingleton<IScheduledLessonMapper, ScheduleLessonMapper>();
 
 var app = builder.Build();
 

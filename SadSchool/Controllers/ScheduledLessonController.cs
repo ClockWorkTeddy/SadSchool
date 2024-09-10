@@ -20,7 +20,7 @@ namespace SadSchool.Controllers
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICacheService cacheService;
-        private readonly ICommonMapper commonMapper;
+        private readonly IScheduledLessonMapper scheduledLessonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledLessonController"/> class.
@@ -29,19 +29,19 @@ namespace SadSchool.Controllers
         /// <param name="navigationService">Service processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
         /// <param name="cacheService">Service processes cache operations.</param>
-        /// <param name="commonMapper">Service processes mapping operations.</param>
+        /// <param name="scheduledLessonMapper">Service processes mapping operations.</param>
         public ScheduledLessonController(
             SadSchoolContext context,
             INavigationService navigationService,
             IAuthService authService,
             ICacheService cacheService,
-            ICommonMapper commonMapper)
+            IScheduledLessonMapper scheduledLessonMapper)
         {
             this.context = context;
             this.navigationService = navigationService;
             this.authService = authService;
             this.cacheService = cacheService;
-            this.commonMapper = commonMapper;
+            this.scheduledLessonMapper = scheduledLessonMapper;
         }
 
         /// <summary>
@@ -52,7 +52,8 @@ namespace SadSchool.Controllers
         public IActionResult ScheduledLessons()
         {
             var scheduledLessons = this.context.ScheduledLessons
-                .Select(scheduledLesson => this.commonMapper.ScheduledLessonToVm(scheduledLesson))
+                .ToList()
+                .Select(scheduledLesson => this.scheduledLessonMapper.ScheduledLessonToVm(scheduledLesson))
                 .ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
@@ -96,7 +97,7 @@ namespace SadSchool.Controllers
         {
             if (this.ModelState.IsValid)
             {
-                var scheduledLesson = this.commonMapper.ScheduledLessonToModel(viewModel);
+                var scheduledLesson = this.scheduledLessonMapper.ScheduledLessonToModel(viewModel);
 
                 this.context.ScheduledLessons.Add(scheduledLesson);
                 await this.context.SaveChangesAsync();
@@ -148,7 +149,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var scheduledLesson = this.commonMapper.ScheduledLessonToModel(viewModel);
+                var scheduledLesson = this.scheduledLessonMapper.ScheduledLessonToModel(viewModel);
 
                 this.context.ScheduledLessons.Update(scheduledLesson);
                 await this.context.SaveChangesAsync();

@@ -2,6 +2,8 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
+using System.Text.Json.Serialization;
+
 namespace SadSchool.Models.SqlServer;
 
 /// <summary>
@@ -17,5 +19,6 @@ public partial class StartTime : BaseModel
     /// <summary>
     /// Gets or sets the scheduled lessons list.
     /// </summary>
+    [JsonIgnore]
     public virtual ICollection<ScheduledLesson> Lessons { get; set; } = new List<ScheduledLesson>();
 }

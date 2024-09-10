@@ -2,6 +2,8 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
+using System.Text.Json.Serialization;
+
 namespace SadSchool.Models.SqlServer;
 
 /// <summary>
@@ -58,6 +60,7 @@ public partial class ScheduledLesson : BaseModel
     /// <summary>
     /// Gets or sets the lessons list.
     /// </summary>
+    [JsonIgnore]
     public virtual ICollection<Lesson> Lessons { get; set; } = new List<Lesson>();
 
     /// <summary>
