@@ -22,7 +22,7 @@ public partial class Lesson : BaseModel
     /// <summary>
     /// Gets or sets lesson's scheduled lesson object.
     /// </summary>
-    public virtual ScheduledLesson? ScheduledLesson { get; set; } = new ScheduledLesson();
+    public virtual ScheduledLesson? ScheduledLesson { get; set; } = null!;
 
     /// <summary>
     /// Orerriden ToString().
