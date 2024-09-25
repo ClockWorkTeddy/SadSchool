@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using SadSchool.Contracts;
+using SadSchool.Controllers.GraphQl;
 using SadSchool.DbContexts;
 using SadSchool.Mappers;
 using SadSchool.Services;
@@ -30,6 +31,13 @@ var connStrAuth = "Data Source=.\\auth.db";
 
 builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlServer(builder.Configuration["sad_school_conn_str"]).UseLazyLoadingProxies());
 builder.Services.AddDbContext<AuthDbContext>(_ => _.UseSqlite(connStrAuth));
+
+builder.Services
+    .AddGraphQLServer()
+    .RegisterDbContext<SadSchoolContext>()
+    .AddQueryType<Query>() // Register Query class
+    .AddSorting()
+    .AddFiltering();
 
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
 {
@@ -74,6 +82,8 @@ app.UseAuthentication();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.MapGraphQL("/graphql");
 
 app.Run();
 
