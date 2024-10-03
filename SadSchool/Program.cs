@@ -32,13 +32,6 @@ var connStrAuth = "Data Source=.\\auth.db";
 builder.Services.AddDbContext<SadSchoolContext>(_ => _.UseSqlServer(builder.Configuration["sad_school_conn_str"]).UseLazyLoadingProxies());
 builder.Services.AddDbContext<AuthDbContext>(_ => _.UseSqlite(connStrAuth));
 
-builder.Services
-    .AddGraphQLServer()
-    .RegisterDbContext<SadSchoolContext>()
-    .AddQueryType<Query>() // Register Query class
-    .AddSorting()
-    .AddFiltering();
-
 builder.Services.AddIdentity<IdentityUser, IdentityRole>(opts =>
 {
     opts.Password.RequiredLength = 1;
@@ -53,12 +46,22 @@ var secretService = new SecretService(builder.Configuration);
 SelectCacheSource(builder, secretService);
 SetUpMongo(builder, secretService);
 
+builder.Services
+    .AddGraphQLServer()
+    .RegisterDbContext<SadSchoolContext>()
+    .AddQueryType<Query>() // Register Query class
+    .AddMutationType<Mutation>()
+    .AddSorting()
+    .AddFiltering();
+
 builder.Services.AddSingleton<INavigationService, NavigationService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 builder.Services.AddSingleton<ICommonMapper, CommonMapper>();
 builder.Services.AddSingleton<IScheduledLessonMapper, ScheduleLessonMapper>();
+
+var graphQlKey = builder.Configuration["graphql-key"];
 
 var app = builder.Build();
 
@@ -82,6 +85,23 @@ app.UseAuthentication();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+app.UseWhen(context => context.Request.Path.StartsWithSegments("/graphql"), appBuilder =>
+{
+    appBuilder.Use(async (context, next) =>
+    {
+        var requestGraphQlKey = context.Request.Headers["graphql-key"].FirstOrDefault();
+
+        if (!context.User.Identity.IsAuthenticated && requestGraphQlKey != graphQlKey)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("Unauthorized");
+            return;
+        }
+
+        await next.Invoke();
+    });
+});
 
 app.MapGraphQL("/graphql");
 
