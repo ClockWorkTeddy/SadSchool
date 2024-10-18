@@ -92,7 +92,7 @@ app.UseWhen(context => context.Request.Path.StartsWithSegments("/graphql"), appB
     {
         var requestGraphQlKey = context.Request.Headers["graphql-key"].FirstOrDefault();
 
-        if (!context.User.Identity.IsAuthenticated && requestGraphQlKey != graphQlKey)
+        if (!context!.User!.Identity!.IsAuthenticated && requestGraphQlKey != graphQlKey)
         {
             context.Response.StatusCode = StatusCodes.Status401Unauthorized;
             await context.Response.WriteAsync("Unauthorized");
