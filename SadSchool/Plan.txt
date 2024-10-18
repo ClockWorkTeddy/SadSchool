@@ -4,5 +4,11 @@
 3. SeriLog
 4. Mapperly?
 5. Rest API
+6. GraphQL
 === U r here ===
-5. GraphQL
+7. gRPC
+8. SignalR
+9. Hangfire
+10. xUnit + Moq + FluentAssertions + AutoFixture
+11. Verify
+12. Specflow
