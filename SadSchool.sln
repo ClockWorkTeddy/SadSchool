@@ -13,7 +13,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ViewModels", "ViewModels\Vi
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Dtos", "Dtos\Dtos.csproj", "{B7C82CC3-D3BD-42A1-9A5A-4B7D18FF688E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Contracts", "Contracts\Contracts.csproj", "{2693DC44-EE89-41C0-AA0E-531CBC9B9486}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Contracts", "Contracts\Contracts.csproj", "{2693DC44-EE89-41C0-AA0E-531CBC9B9486}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
