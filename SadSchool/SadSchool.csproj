@@ -34,7 +34,7 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="8.0.0" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.4" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.7" />
     <PackageReference Include="MongoDB.Driver" Version="2.26.0" />
     <PackageReference Include="MongoDB.Driver.Core" Version="2.26.0" />
     <PackageReference Include="MongoDB.EntityFrameworkCore" Version="8.0.1" />
@@ -80,6 +80,10 @@
     <None Update="sad_school.db-wal">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="wwwroot\js\signalr\" />
   </ItemGroup>
 
 </Project>

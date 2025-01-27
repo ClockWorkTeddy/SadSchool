@@ -14,28 +14,31 @@
             <div class="row justify-content-center" style="margin-top:30px">
                 <div class="col-4 d-flex justify-content-center">
                     <a class="btn btn-sad btn-main-sad blinker-sad"
-                       href="/Home/About"
-                       role="button"
-                       style="display: flex; align-items: center; justify-content: center;">
+                    href="/Home/About"
+                    role="button"
+                    style="display: flex; align-items: center; justify-content: center;">
                         So why?
                     </a>
                 </div>
                 <div class="col-4 d-flex justify-content-center">
                     <a class="btn btn-sad btn-main-sad blinker-sad"
-                       role="button"
-                       style="display: flex; align-items: center; justify-content: center;"
-                       asp-controller="Data" asp-action="DataIndex">
+                    role="button"
+                    style="display: flex; align-items: center; justify-content: center;"
+                    asp-controller="Data" asp-action="DataIndex">
                         Data
                     </a>
                 </div>
-                <div class="col-4 d-flex justify-content-center">
-                    <a class="btn btn-sad btn-main-sad blinker-sad"
-                       href=""
-                       role="button"
-                       style="display: flex; align-items: center; justify-content: center;">
-                        So why?
-                    </a>
-                </div>
+                @if (@User.Identity != null && User.Identity.IsAuthenticated)
+                {
+                    <div class="col-4 d-flex justify-content-center">
+                            <a class="btn btn-sad btn-main-sad blinker-sad"
+                            href="/Home/Chat"
+                            role="button"
+                            style="display: flex; align-items: center; justify-content: center;">
+                            Need to talk
+                            </a>
+                    </div>
+                }
             </div>
             @if(User.IsInRole("admin"))
             {

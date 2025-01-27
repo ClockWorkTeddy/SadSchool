@@ -62,6 +62,24 @@ namespace SadSchool.Controllers
         }
 
         /// <summary>
+        /// Gets Chat view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for about view.</returns>
+        public IActionResult Chat()
+        {
+            try
+            {
+                this.navigationService.RefreshBackParams(this.RouteData);
+                return this.View();
+            }
+            catch (Exception ex)
+            {
+                return this.View(ex.Message);
+            }
+        }
+
+
+        /// <summary>
         /// Processes error cases.
         /// </summary>
         /// <returns><see cref="ViewResult"/>View for errors.</returns>

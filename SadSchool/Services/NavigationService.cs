@@ -21,6 +21,7 @@ namespace SadSchool.Services
         {
             this.map["Home:About"] = new UrlParams { Controller = "Home", Action = "Index" };
             this.map["Data:DataIndex"] = new UrlParams { Controller = "Home", Action = "Index" };
+            this.map["Home:Chat"] = new UrlParams { Controller = "Home", Action = "Index" };
             this.map["Class:Classes"] = new UrlParams { Controller = "Data", Action = "DataIndex" };
             this.map["Class:Add"] = new UrlParams { Controller = "Class", Action = "Classes" };
             this.map["Class:Edit"] = new UrlParams { Controller = "Class", Action = "Classes" };

@@ -54,6 +54,9 @@ builder.Services
     .AddSorting()
     .AddFiltering();
 
+builder.Services.AddRazorPages();
+builder.Services.AddSignalR();
+
 builder.Services.AddSingleton<INavigationService, NavigationService>();
 builder.Services.AddTransient<IAuthService, AuthService>();
 builder.Services.AddTransient<IClassBookService, ClassBookService>();
@@ -104,6 +107,8 @@ app.UseWhen(context => context.Request.Path.StartsWithSegments("/graphql"), appB
 });
 
 app.MapGraphQL("/graphql");
+app.MapRazorPages();
+app.MapHub<SignalRChatHub>("/chatHub");
 
 app.Run();
 
