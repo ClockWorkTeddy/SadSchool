@@ -1,0 +1,17 @@
+﻿@page
+<div class="container">
+    <div class="row">
+        <div class="col-12 d-flex" style="justify-content: center">
+            <canvas class="border-sad" id="drawingCanvas" width="800" height="600"></canvas>
+        </div>
+    </div>
+    <div class="row" style="margin-top: 15px">
+        <div class="col-12 d-flex" style="justify-content: center">
+            <button class="btn btn-sad btn-main-sad blinker-sad" id="clearButton">Clear Board</button>
+        </div>
+    </div>
+</div>
+
+<!-- Include SignalR client -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.12/signalr.min.js"></script>
+<script src="/js/blackboard.js"></script>

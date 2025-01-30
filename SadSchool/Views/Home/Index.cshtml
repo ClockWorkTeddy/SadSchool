@@ -10,9 +10,9 @@
 </head>
 <body>
     <div class="container-fluid">
-        <div class="container" style="max-width: 800px;">
+        <div class="container" style="max-width: 1000px;">
             <div class="row justify-content-center" style="margin-top:30px">
-                <div class="col-4 d-flex justify-content-center">
+                <div class="col-3 d-flex justify-content-center">
                     <a class="btn btn-sad btn-main-sad blinker-sad"
                     href="/Home/About"
                     role="button"
@@ -20,7 +20,7 @@
                         So why?
                     </a>
                 </div>
-                <div class="col-4 d-flex justify-content-center">
+                <div class="col-3 d-flex justify-content-center">
                     <a class="btn btn-sad btn-main-sad blinker-sad"
                     role="button"
                     style="display: flex; align-items: center; justify-content: center;"
@@ -30,13 +30,21 @@
                 </div>
                 @if (@User.Identity != null && User.Identity.IsAuthenticated)
                 {
-                    <div class="col-4 d-flex justify-content-center">
+                    <div class="col-3 d-flex justify-content-center">
                             <a class="btn btn-sad btn-main-sad blinker-sad"
                             href="/Home/Chat"
                             role="button"
                             style="display: flex; align-items: center; justify-content: center;">
                             Need to talk
                             </a>
+                    </div>
+                    <div class="col-3 d-flex justify-content-center">
+                        <a class="btn btn-sad btn-main-sad blinker-sad"
+                           href="/Home/Blackboard"
+                           role="button"
+                           style="display: flex; align-items: center; justify-content: center;">
+                            Blackboard
+                        </a>
                     </div>
                 }
             </div>

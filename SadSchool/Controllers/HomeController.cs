@@ -78,6 +78,18 @@ namespace SadSchool.Controllers
             }
         }
 
+        public IActionResult Blackboard()
+        {
+            try
+            {
+                this.navigationService.RefreshBackParams(this.RouteData);
+                return this.View();
+            }
+            catch (Exception ex)
+            {
+                return this.View(ex.Message);
+            }
+        }
 
         /// <summary>
         /// Processes error cases.

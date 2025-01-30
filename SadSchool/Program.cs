@@ -14,6 +14,7 @@ using SadSchool.Services.ApiServices;
 using SadSchool.Services.Cache;
 using SadSchool.Services.ClassBook;
 using SadSchool.Services.Secrets;
+using SadSchool.Services.SignalR;
 using Serilog;
 using StackExchange.Redis;
 
@@ -109,6 +110,7 @@ app.UseWhen(context => context.Request.Path.StartsWithSegments("/graphql"), appB
 app.MapGraphQL("/graphql");
 app.MapRazorPages();
 app.MapHub<SignalRChatHub>("/chatHub");
+app.MapHub<BlackboardHub>("/blackboardHub");
 
 app.Run();
 

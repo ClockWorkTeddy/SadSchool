@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using SadSchool.Contracts;
 
-namespace SadSchool.Services
+namespace SadSchool.Services.SignalR
 {
     public class SignalRChatHub : Hub, ISignalRChatHub
     {
