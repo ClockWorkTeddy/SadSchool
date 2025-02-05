@@ -5,18 +5,18 @@ var connection = new signalR.HubConnectionBuilder().withUrl("/chatHub").build();
 //Disable the send button until connection is established.
 document.getElementById("sendButton").disabled = true;
 
-connection.on("ReceiveMessage", function (user, message) {
+connection.on("ReceiveMessage", function (user, message, timeStamp) {
     var li = document.createElement("li");
 
     // Create span for the timestamp
     var timestampSpan = document.createElement("span");
+    timestampSpan.style.fontSize = "11px";
     timestampSpan.style.color = "gray"; // Set timestamp color to red
-    timestampSpan.textContent = `[${new Date().toLocaleTimeString()}]: `;
+    timestampSpan.textContent = `${timeStamp}: `;
 
     // Create span for the user
     var userSpan = document.createElement("span");
     userSpan.style.color = "#5dd15d";
-    timestampSpan.style.fontWeight = "bold";
     userSpan.textContent = `${user}: `;
 
     // Create span for the message
