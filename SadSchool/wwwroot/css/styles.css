@@ -130,8 +130,8 @@ footer {
     font-weight: 100;
 }
 
-.hr-sad {
-  height: 2px;
+hr {
+  height: 1px;
   background: var(--color2);
   margin-top: 0px;
 }

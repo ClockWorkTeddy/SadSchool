@@ -1,10 +1,20 @@
 ﻿@page
 <div class="container" style="border:solid; border-radius: 15px; border-width: 1px">
-    <div class="row">
+    <div class="row" style="margin-top: 15px; margin-bottom: 15px">
         <div class="col-9">
             <div class="row p-1">
                 <div class="col-2 h4-sad" style="max-width: 120px">User</div>
-                <div class="col-10"><input class="input-sad blinker-sad" type="text" id="userInput" /></div>
+                @if (!User.IsInRole("admin"))
+                {
+                    <div class="col-10"><input class="input-sad blinker-sad" type="text" id="userInput" /></div>
+                }
+                else
+                {
+                    <div class="col-8"><input class="input-sad blinker-sad" type="text" id="userInput" /></div>
+                    <div class="col-2">
+                        <input class="btn btn-sad btn-service-sad blinker-sad" style="margin-top: 10px; margin-left: 15px" type="button" id="clearButton" value="Clear History" />
+                    </div>
+                }
             </div>
             <div class="row p-1">
                 <div class="col-2 h4-sad" style="max-width: 120px">Message</div>
@@ -12,17 +22,16 @@
             </div>
         </div>
         <div class="col-3">
-            <input class="btn btn-sad btn-main-sad blinker-sad" style="margin-top: 15px; margin-left: 15px" type="button" id="sendButton" value="Send Message" />
+            <input class="btn btn-sad btn-main-sad blinker-sad" style="margin-top: 10px; margin-left: 15px" type="button" id="sendButton" value="Send Message" />
         </div>
-
     </div>
     <div class="row p-1">
-        <div class="col-6">
+        <div class="col-12">
             <hr />
         </div>
     </div>
     <div class="row p-1">
-        <div class="col-6">
+        <div class="col-12 scroll-sad" style="max-height: 40vh; height: auto; word-wrap:normal">
             <ul id="messagesList"></ul>
         </div>
     </div>
