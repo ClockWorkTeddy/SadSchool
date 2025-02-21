@@ -15,6 +15,8 @@ connection.on("LoadChatHistory", (messages) => {
 
 connection.on("ReceiveMessage", (message) => {
     appendMessage(message);
+    clearMessageInput();
+    scrollMessageList();
 });
 
 function appendMessage(message) {
@@ -45,6 +47,21 @@ function appendMessage(message) {
     document.getElementById("messagesList").appendChild(li);
 }
 
+function clearMessageInput() {
+    const messageInput = document.getElementById("messageInput");
+    messageInput.value = "";
+    messageInput.focus();
+}
+
+function scrollMessageList() {
+    var messageListContainer = document.getElementById("messageListContainer");
+    messageListContainer.scrollTop = messageListContainer.scrollHeight;
+}
+
+function isNullOrEmpty(str) {
+    return !str || str.trim() === "";
+}
+
 connection.start().then(function () {
     document.getElementById("sendButton").disabled = false;
 }).catch(function (err) {
@@ -54,11 +71,14 @@ connection.start().then(function () {
 document.getElementById("sendButton").addEventListener("click", function (event) {
     var user = document.getElementById("userInput").value;
     var message = document.getElementById("messageInput").value;
-    connection.invoke("SendMessage", user, message).catch(function (err) {
-        return console.error(err.toString());
-    });
+    if (!isNullOrEmpty(user)) {
+        connection.invoke("SendMessage", user, message).catch(function (err) {
+            return console.error(err.toString());
+        });
+    }
     event.preventDefault();
 });
+
 
 document.getElementById("clearButton").addEventListener("click", function (event) {
     document.getElementById("messagesList").replaceChildren();
@@ -66,4 +86,10 @@ document.getElementById("clearButton").addEventListener("click", function (event
         return console.error(err.toString());
     });
     event.preventDefault();
+});
+
+document.addEventListener("keyup", function (event) {
+    if (event.key === "Enter" || event.key === "NumpadEnter") {
+        document.getElementById("sendButton").click();
+    }
 });

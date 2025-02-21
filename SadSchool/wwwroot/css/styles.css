@@ -160,7 +160,8 @@ hr {
 }
 
 .scroll-sad {
-    overflow:auto; /* Safari and Chrome */
+    overflow: auto; /* Safari and Chrome */
+    overflow-y: auto;
 }
 
 .scroll-sad::-webkit-scrollbar {
