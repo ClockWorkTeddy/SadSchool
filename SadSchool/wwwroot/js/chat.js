@@ -79,17 +79,31 @@ document.getElementById("sendButton").addEventListener("click", function (event)
     event.preventDefault();
 });
 
+document.addEventListener("DOMContentLoaded", function () {
+    const clearButton = document.getElementById("clearButton");
 
-document.getElementById("clearButton").addEventListener("click", function (event) {
-    document.getElementById("messagesList").replaceChildren();
-    connection.invoke("ClearChat").catch(function (err) {
-        return console.error(err.toString());
-    });
-    event.preventDefault();
+    if (clearButton) {
+        clearButton.addEventListener("click", function (event) {
+            document.getElementById("messagesList").replaceChildren();
+            connection.invoke("ClearChat").catch(function (err) {
+                console.error(err.toString());
+            });
+            event.preventDefault();
+        });
+    } else {
+        console.warn("clearButton not found – this might be because the user doesn't have permission.");
+    }
 });
 
-document.addEventListener("keyup", function (event) {
-    if (event.key === "Enter" || event.key === "NumpadEnter") {
-        document.getElementById("sendButton").click();
-    }
+document.addEventListener("DOMContentLoaded", function () {
+    document.addEventListener("keyup", function (event) {
+        if (event.key === "Enter" || event.key === "NumpadEnter") {
+            const sendButton = document.getElementById("sendButton");
+            if (sendButton) {
+                sendButton.click();
+            } else {
+                console.error("sendButton not found in the DOM.");
+            }
+        }
+    });
 });
