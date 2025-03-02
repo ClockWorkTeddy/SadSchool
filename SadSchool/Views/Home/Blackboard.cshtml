@@ -6,8 +6,18 @@
         </div>
     </div>
     <div class="row" style="margin-top: 15px">
-        <div class="col-12 d-flex" style="justify-content: center">
+        <div class="col-4"></div>
+        <div class="col-4 d-flex" style="justify-content: center">
             <button class="btn btn-sad btn-main-sad blinker-sad" id="clearButton">Clear Board</button>
+        </div>
+        <div class="col-4" style="justify-content: start">
+            <select asp-items="@(new List<SelectListItem>
+            {
+                new SelectListItem { Value = "#ff0000", Text = "Red" },
+                new SelectListItem { Value = "#5dd15d", Text = "SadGreen" },
+                new SelectListItem { Value = "#ffaa00", Text = "Orange" }
+            })" class="input-sad blinker-sad" id="colorSelector" onchange="updateComboBoxColor()">
+            </select>
         </div>
     </div>
 </div>

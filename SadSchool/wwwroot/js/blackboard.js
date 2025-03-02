@@ -52,7 +52,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const currentX = e.offsetX;
         const currentY = e.offsetY;
-        const color = '#5dd15d'; // Default color
+        const colorSelector = document.getElementById("colorSelector");
+        const color = colorSelector.value; // Default color
         const lineWidth = 3;
 
         // Draw locally
@@ -77,4 +78,31 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.stroke();
         ctx.closePath();
     }
+
+    const selectElement = document.getElementById("colorSelector");
+
+    // Function to change the background color based on selected value
+    function changeColor() {
+        const count = selectElement.options.length;
+        for (i = 0; i < count; i++) {
+            selectElement.options[i].style.color = selectElement.options[i].value;
+        }
+
+        selectElement.style.color = selectElement.options[selectElement.selectedIndex].value;
+
+        selectElement.addEventListener('mouseover', function () {
+            selectElement.style.borderColor = selectElement.style.color; // Change color on hover
+        });
+
+        selectElement.addEventListener('mouseout', function () {
+            selectElement.style.borderColor = '#70717d'; // Change color on hover
+        });
+
+    }
+
+    // Set initial color based on default selection
+    changeColor();
+
+    // Add event listener for change event
+    selectElement.addEventListener("change", changeColor);
 });
