@@ -2,6 +2,9 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
+using Hangfire;
+using Hangfire.AspNetCore;
+using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
@@ -47,6 +50,12 @@ var secretService = new SecretService(builder.Configuration);
 SelectCacheSource(builder, secretService);
 SetUpMongo(builder, secretService);
 
+builder.Services.AddHangfire(configuration => configuration
+        .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+        .UseSimpleAssemblyNameTypeSerializer()
+        .UseRecommendedSerializerSettings()
+        .UseSqlServerStorage(builder.Configuration["hangfire_conn_str"]));
+
 builder.Services
     .AddGraphQLServer()
     .RegisterDbContext<SadSchoolContext>()
@@ -64,6 +73,7 @@ builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 builder.Services.AddSingleton<ICommonMapper, CommonMapper>();
 builder.Services.AddSingleton<IScheduledLessonMapper, ScheduleLessonMapper>();
+builder.Services.AddHangfireServer();
 
 var graphQlKey = builder.Configuration["graphql-key"];
 
@@ -77,6 +87,13 @@ if (!app.Environment.IsDevelopment())
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
+
+app.UseHangfireDashboard();
+
+RecurringJob.AddOrUpdate<SadSchool.Services.HangFire.LoggerJobService>(
+    "LoggerJobService",
+    x => x.LogJob(),
+    Cron.Minutely);
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
