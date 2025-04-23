@@ -64,7 +64,7 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Gets Chat view.
         /// </summary>
-        /// <returns><see cref="ViewResult"/> for about view.</returns>
+        /// <returns><see cref="ViewResult"/> for About view.</returns>
         public IActionResult Chat()
         {
             try
@@ -78,6 +78,10 @@ namespace SadSchool.Controllers
             }
         }
 
+        /// <summary>
+        /// Gets the Blackboard view.
+        /// </summary>
+        /// <returns><see cref="ViewResult"/> for the BlackBoard view.</returns>
         public IActionResult Blackboard()
         {
             try

@@ -1,37 +1,40 @@
-﻿namespace SadSchool.Services.SignalR
+﻿// <copyright file="ChatHistory.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+namespace SadSchool.Services.SignalR
 {
+    /// <summary>
+    /// Class for managing chat history.
+    /// </summary>
     public class ChatHistory
     {
-        private readonly int _maxMessages = 50;
-        private readonly Queue<Message> _messages = new();
+        private readonly int maxMessages = 50;
+        private readonly Queue<Message> messages = new();
 
+        /// <summary>
+        /// Adds a message to the chat history.
+        /// </summary>
+        /// <param name="message">A message to add.</param>
         public void AddMessage(Message message)
         {
-            if (_messages.Count >= _maxMessages)
+            if (this.messages.Count >= this.maxMessages)
             {
-                _messages.Dequeue(); // Remove oldest message
+                this.messages.Dequeue(); // Remove oldest message
             }
-            _messages.Enqueue(message);
+
+            this.messages.Enqueue(message);
         }
 
-        public void Clear() => _messages.Clear();
+        /// <summary>
+        /// Clears the chat history.
+        /// </summary>
+        public void Clear() => this.messages.Clear();
 
-        public List<Message> GetMessages() => _messages.ToList();
-    }
-
-    public class Message
-    {
-        public Message(string timeStamp, string user, string message)
-        {
-            TimeStamp = timeStamp;
-            User = user;
-            MessageText = message;
-        }
-
-        public string TimeStamp { get; set; }
-
-        public string User { get; set; }
-        
-        public string MessageText { get; set; }
+        /// <summary>
+        /// Gets the chat history messages.
+        /// </summary>
+        /// <returns>Retrieves all chat history messages.</returns>
+        public List<Message> GetMessages() => this.messages.ToList();
     }
 }

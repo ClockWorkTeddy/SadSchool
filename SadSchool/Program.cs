@@ -91,7 +91,7 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHangfireDashboard();
 
-RecurringJob.AddOrUpdate<LoggerJobService>( "LoggerJobService", x => x.LogJob(), Cron.Minutely );
+RecurringJob.AddOrUpdate<LoggerJobService>("LoggerJobService", x => x.LogJob(), Cron.Minutely);
 RecurringJob.AddOrUpdate<LessonCheckService>("LessonCheckService", x => x.DeleteLessonWithoutDate(), Cron.Minutely);
 
 app.UseHttpsRedirection();

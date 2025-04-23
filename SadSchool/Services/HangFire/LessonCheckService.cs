@@ -1,17 +1,31 @@
-﻿using SadSchool.DbContexts;
-using Serilog;
+﻿// <copyright file="LessonCheckService.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Services.HangFire
 {
+    using SadSchool.DbContexts;
+    using Serilog;
+
+    /// <summary>
+    /// Service that checks for lessons without a date and deletes them.
+    /// </summary>
     public class LessonCheckService
     {
         private readonly SadSchoolContext sadSchoolContext;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LessonCheckService"/> class.
+        /// </summary>
+        /// <param name="sadSchoolContext">DB context.</param>
         public LessonCheckService(SadSchoolContext sadSchoolContext)
         {
             this.sadSchoolContext = sadSchoolContext;
         }
 
+        /// <summary>
+        /// Checks for lessons without a date and deletes them.
+        /// </summary>
         public void DeleteLessonWithoutDate()
         {
             var lessonsWithoutDate = this.sadSchoolContext.Lessons
