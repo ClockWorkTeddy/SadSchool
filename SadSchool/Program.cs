@@ -16,6 +16,7 @@ using SadSchool.Services;
 using SadSchool.Services.ApiServices;
 using SadSchool.Services.Cache;
 using SadSchool.Services.ClassBook;
+using SadSchool.Services.HangFire;
 using SadSchool.Services.Secrets;
 using SadSchool.Services.SignalR;
 using Serilog;
@@ -90,10 +91,8 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHangfireDashboard();
 
-RecurringJob.AddOrUpdate<SadSchool.Services.HangFire.LoggerJobService>(
-    "LoggerJobService",
-    x => x.LogJob(),
-    Cron.Minutely);
+RecurringJob.AddOrUpdate<LoggerJobService>( "LoggerJobService", x => x.LogJob(), Cron.Minutely );
+RecurringJob.AddOrUpdate<LessonCheckService>("LessonCheckService", x => x.DeleteLessonWithoutDate(), Cron.Minutely);
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
