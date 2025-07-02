@@ -7,8 +7,10 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using SadSchool.Contracts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
+    using SadSchool.Repositories;
     using SadSchool.ViewModels;
 
     /// <summary>
@@ -16,31 +18,31 @@ namespace SadSchool.Controllers
     /// </summary>
     public class ClassController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly IClassRepository classRepository;
+        private readonly ITeacherRepository teacherRepository;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
-        private readonly ICacheService cacheService;
         private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassController"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
+        /// <param name="classRepository">Class repo instance.</param>
+        /// <param name="teacherRepository">Teacher repo instance.</param>
         /// <param name="navigationService">The service responses for "Back" button operations.</param>
         /// <param name="authService">The service responses for user authorization.</param>
-        /// <param name="cacheService">The service responses for cache operations.</param>
         /// <param name="commonMapper">The service responses for mapping operations.</param>
         public ClassController(
-            SadSchoolContext context,
+            IClassRepository classRepository,
+            ITeacherRepository teacherRepository,
             INavigationService navigationService,
             IAuthService authService,
-            ICacheService cacheService,
             ICommonMapper commonMapper)
         {
-            this.context = context;
+            this.classRepository = classRepository;
+            this.teacherRepository = teacherRepository;
             this.navigationService = navigationService;
             this.authService = authService;
-            this.cacheService = cacheService;
             this.commonMapper = commonMapper;
         }
 
@@ -49,33 +51,21 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for a classes view.</returns>
         [HttpGet]
-        public IActionResult Classes()
+        public async Task<IActionResult> Classes()
         {
-            List<ClassViewModel> classes = new();
-            try
+            var classes = await this.classRepository.GetAllClassesAsync();
+
+            var classViewModels = classes.Select(c => new ClassViewModel
             {
-                foreach (var theClass in this.context.Classes.ToList())
-                {
-                    classes.Add(new ClassViewModel
-                    {
-                        Id = theClass.Id,
-                        Name = theClass.Name,
-                        TeacherId = theClass.TeacherId,
-                        TeacherName = $"{theClass?.Teacher?.FirstName} {theClass?.Teacher?.LastName}",
-                    });
-                }
-            }
-            catch (Exception ex)
-            {
-                StreamWriter sw = new StreamWriter("log.txt", true);
-                sw.WriteLine($"{DateTime.Now}: {ex.Message}");
-                sw.WriteLine($"{DateTime.Now}: {ex.InnerException?.Message}");
-                sw.Close();
-            }
+                Id = c.Id,
+                Name = c.Name,
+                TeacherId = c.TeacherId,
+                TeacherName = $"{c?.Teacher?.FirstName} {c?.Teacher?.LastName}",
+            }).ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/Classes.cshtml", classes);
+            return this.View(@"~/Views/Data/Classes.cshtml", classViewModels);
         }
 
         /// <summary>
@@ -83,11 +73,11 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for class add view.</returns>
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
             if (this.authService.IsAutorized(this.User))
             {
-                ClassViewModel viewModel = new() { Teachers = this.GetTeachersList(null) };
+                ClassViewModel viewModel = new() { Teachers = await this.GetTeachersList(null) };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
 
@@ -109,10 +99,7 @@ namespace SadSchool.Controllers
             {
                 var @class = this.commonMapper.ClassToModel(viewModel);
 
-                this.context.Classes.Add(@class);
-                await this.context.SaveChangesAsync();
-
-                this.cacheService.GetObject<Class>(@class.Id!.Value);
+                await this.classRepository.AddClassAsync(@class);
 
                 return this.RedirectToAction("Classes");
             }
@@ -128,16 +115,16 @@ namespace SadSchool.Controllers
         /// <param name="id">Desirable <see cref="Class"/> id.</param>
         /// <returns><see cref="ViewResult"/> of redirect to "Classes" action.</returns>
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedClass = this.context.Classes.Find(id);
+                var editedClass = await this.classRepository.GetClassByIdAsync(id);
 
                 ClassViewModel viewModel = new()
                 {
                     Name = editedClass?.Name,
-                    Teachers = this.GetTeachersList(editedClass?.TeacherId),
+                    Teachers = await this.GetTeachersList(editedClass?.TeacherId),
                 };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
@@ -160,10 +147,7 @@ namespace SadSchool.Controllers
             {
                 var @class = this.commonMapper.ClassToModel(viewModel);
 
-                this.context.Classes.Update(@class);
-                await this.context.SaveChangesAsync();
-
-                this.cacheService.RefreshObject(@class);
+                await this.classRepository.UpdateClassAsync(@class);
 
                 return this.RedirectToAction("Classes");
             }
@@ -183,15 +167,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var @class = await this.context.Classes.FindAsync(id);
-
-                if (@class != null)
-                {
-                    this.context.Classes.Remove(@class);
-                    await this.context.SaveChangesAsync();
-
-                    this.cacheService.RemoveObject(@class);
-                }
+                await this.classRepository.DeleteClassByIdAsync(id);
 
                 return this.RedirectToAction("Classes");
             }
@@ -199,9 +175,9 @@ namespace SadSchool.Controllers
             return this.RedirectToAction("Classes");
         }
 
-        private List<SelectListItem> GetTeachersList(int? teacherId)
+        private async Task<List<SelectListItem>> GetTeachersList(int? teacherId)
         {
-            var teachers = this.context.Teachers.ToList();
+            var teachers = await this.teacherRepository.GetAllTeachersAsync();
 
             return teachers.Select(teacher => new SelectListItem
             {

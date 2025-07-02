@@ -4,15 +4,21 @@
 
 namespace Tests.Services
 {
-    using System.Collections.Generic;
     using AutoFixture;
     using AutoFixture.AutoMoq;
     using Moq;
     using SadSchool.Contracts;
     using SadSchool.DbContexts;
-    using SadSchool.Models.SqlServer;
     using SadSchool.Services.ApiServices;
 
+    /// <summary>
+    /// Provides unit tests for the <see cref="MarksAnalyticsService"/> class,  verifying its behavior and functionality
+    /// under various conditions.
+    /// </summary>
+    /// <remarks>This test class uses mocks for dependencies such as <see cref="SadSchoolContext"/>,  <see
+    /// cref="MongoContext"/>, and <see cref="ICacheService"/> to isolate the  functionality of <see
+    /// cref="MarksAnalyticsService"/>. It includes test methods  to validate specific scenarios, such as calculating
+    /// average marks.</remarks>
     public class MarksAnalyticsServiceTest
     {
         private readonly Mock<SadSchoolContext> sadSchoolContextMock;
@@ -36,12 +42,18 @@ namespace Tests.Services
             this.mongoContextMock = fixture.Create<Mock<MongoContext>>();
             this.cacheServiceMock = fixture.Create<Mock<ICacheService>>();
 
-            var service = new MarksAnalyticsService(
+            this.service = new MarksAnalyticsService(
                 this.mongoContextMock.Object,
                 this.cacheServiceMock.Object,
                 this.sadSchoolContextMock.Object);
         }
 
+        /// <summary>
+        /// Tests the <see cref="IMarksAnalyticsService.GetAverageMarks(int, int)"/> method to ensure it returns a valid
+        /// result.
+        /// </summary>
+        /// <remarks>This test verifies that the <see cref="IMarksAnalyticsService.GetAverageMarks(int, int)"/>
+        /// method does not return a null value when provided with valid student and subject identifiers.</remarks>
         [Fact]
         public void GetAverageMarksTest()
         {

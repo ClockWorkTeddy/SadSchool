@@ -154,7 +154,7 @@ namespace SadSchool.Controllers
                 this.context.Lessons.Update(lesson);
                 this.context.SaveChanges();
 
-                this.cacheService.RefreshObject(lesson);
+                this.cacheService.SetObject(lesson);
 
                 return this.RedirectToAction("Lessons");
             }

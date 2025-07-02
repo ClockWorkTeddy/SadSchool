@@ -9,6 +9,7 @@ namespace SadSchool.Controllers
     using MongoDB.Bson;
     using MongoDB.Driver;
     using SadSchool.Contracts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.DbContexts;
     using SadSchool.Dtos;
     using SadSchool.Models.Mongo;
@@ -20,28 +21,28 @@ namespace SadSchool.Controllers
     /// </summary>
     public class MarkController : Controller
     {
-        private readonly MongoContext mongoContext;
         private readonly SadSchoolContext sadSchoolContext;
         private readonly INavigationService navigationService;
         private readonly IMarksAnalyticsService marksAnalyticsService;
         private readonly IAuthService authService;
+        private readonly IMarkRepository markRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkController"/> class.
         /// </summary>
-        /// <param name="mongoContext">Mongo DB context.</param>
         /// <param name="sadSchoolContext">SQL Server DB context.</param>
         /// <param name="navigationService">Service instance processing Back button logic.</param>
         /// <param name="marksAnalyticsService">Service operates marks analytics.</param>
         /// <param name="authService">Authentication check service instance.</param>
+        /// <param name="markRepository">Mark repository instance.</param>"
         public MarkController(
-            MongoContext mongoContext,
             SadSchoolContext sadSchoolContext,
             INavigationService navigationService,
             IMarksAnalyticsService marksAnalyticsService,
-            IAuthService authService)
+            IAuthService authService,
+            IMarkRepository markRepository)
         {
-            this.mongoContext = mongoContext;
+            this.markRepository = markRepository;
             this.sadSchoolContext = sadSchoolContext;
             this.navigationService = navigationService;
             this.marksAnalyticsService = marksAnalyticsService;
@@ -53,16 +54,17 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for marks view.</returns>
         [HttpGet]
-        public IActionResult Marks()
+        public async Task<IActionResult> Marks()
         {
-            var marks = new List<MarkViewModel>();
+            var markViewModels = new List<MarkViewModel>();
+            var marks = await this.markRepository.GetAllMarksAsync();
 
-            foreach (var mark in this.mongoContext.Marks)
+            foreach (var mark in marks)
             {
                 var student = this.sadSchoolContext.Set<Student>().Find(mark.StudentId);
                 var lesson = this.sadSchoolContext.Set<Lesson>().Find(mark.LessonId);
 
-                marks.Add(new MarkViewModel
+                markViewModels.Add(new MarkViewModel
                 {
                     Id = mark.Id,
                     Value = mark.Value,
@@ -73,7 +75,7 @@ namespace SadSchool.Controllers
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/Marks.cshtml", marks);
+            return this.View(@"~/Views/Data/Marks.cshtml", markViewModels);
         }
 
         /// <summary>
@@ -118,8 +120,7 @@ namespace SadSchool.Controllers
                     LessonId = viewModel.LessonId,
                 };
 
-                this.mongoContext.Marks.Add(mark);
-                await this.mongoContext.SaveChangesAsync();
+                await this.markRepository.AddMarkAsync(mark);
 
                 return this.RedirectToAction("Marks");
             }
@@ -136,11 +137,11 @@ namespace SadSchool.Controllers
         /// <returns><see cref="ViewResult"/> for "Add" form or
         ///     <see cref="RedirectToActionResult"/> for action "Marks" in case of failure.</returns>
         [HttpGet]
-        public IActionResult Edit(ObjectId id)
+        public async Task<IActionResult> Edit(ObjectId id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedMark = this.mongoContext.Marks.Find(id);
+                var editedMark = await this.markRepository.GetMarkByIdAsync(id);
 
                 MarkViewModel viewModel = new()
                 {
@@ -168,7 +169,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var mark = await this.mongoContext.Marks.FindAsync(viewModel.Id);
+                var mark = await this.markRepository.GetMarkByIdAsync(viewModel.Id);
 
                 if (mark != null)
                 {
@@ -177,7 +178,7 @@ namespace SadSchool.Controllers
                     mark.Value = viewModel.Value;
                 }
 
-                await this.mongoContext.SaveChangesAsync();
+                await this.markRepository.UpdateMarkAsync(mark);
 
                 return this.RedirectToAction("Marks");
             }
@@ -197,12 +198,11 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var mark = await this.mongoContext.Marks.FindAsync(id);
+                var mark = await this.markRepository.GetMarkByIdAsync(id);
 
                 if (mark != null)
                 {
-                    this.mongoContext.Marks.Remove(mark);
-                    await this.mongoContext.SaveChangesAsync();
+                    await this.markRepository.DeleteMarkByIdAsync(mark.Id);
                 }
             }
 

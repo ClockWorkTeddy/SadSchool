@@ -40,7 +40,7 @@ namespace SadSchool.Controllers
         /// <param name="model"><see cref="LoginViewModel"/> DTO.</param>
         /// <returns>Login result.</returns>
         [HttpPost]
-        [ValidateAntiForgeryToken]
+
         public async Task<IActionResult> Login(LoginViewModel model)
         {
             if (this.ModelState.IsValid)

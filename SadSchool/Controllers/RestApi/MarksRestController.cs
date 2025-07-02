@@ -7,7 +7,7 @@ namespace SadSchool.Controllers.RestApi
     using Microsoft.AspNetCore.Mvc;
     using MongoDB.Bson;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.Mongo;
 
     /// <summary>
@@ -18,22 +18,22 @@ namespace SadSchool.Controllers.RestApi
     public class MarksRestController : Controller
     {
         private readonly string? apiKey = string.Empty;
-        private readonly MongoContext context;
+        private readonly IMarkRepository markRepository;
         private readonly IConfiguration configuration;
         private readonly IMarksAnalyticsService marksAnalyticsService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarksRestController"/> class.
         /// </summary>
-        /// <param name="context">Application DB context.</param>
+        /// <param name="markRepository">Mark repo.</param>
         /// <param name="configuration">Application configuration.</param>
         /// <param name="markAnalyticSevice">MarkAnalytic service instance.</param>
         public MarksRestController(
-            MongoContext context,
+            IMarkRepository markRepository,
             IConfiguration configuration,
             IMarksAnalyticsService markAnalyticSevice)
         {
-            this.context = context;
+            this.markRepository = markRepository;
             this.configuration = configuration;
             this.apiKey = this.configuration["api-key"];
             this.marksAnalyticsService = markAnalyticSevice;
@@ -44,13 +44,13 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <returns>The list of <see cref="Mark"/>.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var marks = this.context.Marks.ToList();
+                var marks = await this.markRepository.GetAllMarksAsync();
 
                 return this.Ok(marks);
             }
@@ -67,13 +67,13 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="studentId">Id of the desirable student.</param>
         /// <returns>The particalar <see cref="Mark"/>.</returns>
         [HttpGet("{lessonId}/{studentId}")]
-        public IActionResult Get(int lessonId, int studentId)
+        public async Task<IActionResult> Get(int lessonId, int studentId)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (apiKey == this.apiKey)
             {
-                var marks = this.context.Marks.Where(m => m.LessonId == lessonId && m.StudentId == studentId);
+                var marks = await this.markRepository.GetMarksByStudentIdAndLessonIdAsync(studentId, lessonId);
 
                 return this.Ok(marks);
             }
@@ -89,13 +89,13 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="markId">Id of the desirable mark.</param>
         /// <returns>The particalar <see cref="Mark"/>.</returns>
         [HttpGet("{markId}")]
-        public IActionResult Get(string markId)
+        public async Task<IActionResult> Get(string markId)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (apiKey == this.apiKey)
             {
-                var mark = this.context.Marks.Find(ObjectId.Parse(markId));
+                var mark = await this.markRepository.GetMarkByIdAsync(ObjectId.Parse(markId));
 
                 return this.Ok(mark);
             }
@@ -113,23 +113,23 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="updateMark">New mark data.</param>
         /// <returns>The resulting <see cref="IActionResult"/>.</returns>
         [HttpPut("{lessonId}/{studentId}")]
-        public IActionResult Put(int lessonId, int studentId, [FromBody] Mark updateMark)
+        public async Task<IActionResult> Put(int lessonId, int studentId, [FromBody] Mark updateMark)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (apiKey == this.apiKey)
             {
-                var mark = this.context.Marks.FirstOrDefault(m => m.LessonId == lessonId
-                    && m.StudentId == studentId);
+                var marks = await this.markRepository.GetMarksByStudentIdAndLessonIdAsync(studentId, lessonId);
 
-                if (mark == null)
+                if (marks == null)
                 {
                     return this.NotFound();
                 }
 
+                var mark = marks.First();
+
                 mark.Value = updateMark.Value;
-                this.context.Marks.Update(mark);
-                this.context.SaveChanges();
+                await this.markRepository.UpdateMarkAsync(mark);
 
                 return this.Ok();
             }
@@ -145,7 +145,7 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="studentId">Desirable student id.</param>
         /// <param name="subjectId">Desirable subject id.</param>
         /// <returns>List of <see cref="Dtos.AverageMarkDto"/>.</returns>
-        [HttpGet("/ave/{studentId}/{subjectId}")]
+        [HttpGet("ave/{studentId}/{subjectId}")]
         public IActionResult GetAverageMark(int studentId, int subjectId)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
@@ -168,14 +168,13 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="mark">New mark data.</param>
         /// <returns>The resulting <see cref="IActionResult"/>.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] Mark mark)
+        public async Task<IActionResult> Post([FromBody] Mark mark)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (apiKey == this.apiKey)
             {
-                this.context.Marks.Add(mark);
-                this.context.SaveChanges();
+                await this.markRepository.AddMarkAsync(mark);
 
                 return this.Ok();
             }

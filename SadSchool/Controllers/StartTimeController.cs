@@ -140,7 +140,7 @@ namespace SadSchool.Controllers
                 this.context.StartTimes.Update(startTime);
                 await this.context.SaveChangesAsync();
 
-                this.cacheService.RefreshObject(startTime);
+                this.cacheService.SetObject(startTime);
 
                 return this.RedirectToAction("StartTimes");
             }

@@ -154,7 +154,7 @@ namespace SadSchool.Controllers
                 this.context.ScheduledLessons.Update(scheduledLesson);
                 await this.context.SaveChangesAsync();
 
-                this.cacheService.RefreshObject(scheduledLesson);
+                this.cacheService.SetObject(scheduledLesson);
 
                 return this.RedirectToAction("ScheduledLessons");
             }

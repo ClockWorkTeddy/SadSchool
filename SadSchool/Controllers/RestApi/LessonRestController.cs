@@ -7,7 +7,7 @@ namespace SadSchool.Controllers.RestApi
     using System.Text.Json;
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
     /// <summary>
@@ -20,20 +20,20 @@ namespace SadSchool.Controllers.RestApi
         private readonly string? apiKey = string.Empty;
         private readonly IConfiguration configuration;
         private readonly ICacheService cacheService;
-        private readonly SadSchoolContext context;
+        private readonly ILessonRepository lessonRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LessonRestController"/> class.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="lessonRepository">DB context instance.</param>
         /// <param name="configuration">Configuration object instance.</param>
         /// <param name="cacheService">Cache service instanse.</param>
         public LessonRestController(
-            SadSchoolContext context,
+            ILessonRepository lessonRepository,
             IConfiguration configuration,
             ICacheService cacheService)
         {
-            this.context = context;
+            this.lessonRepository = lessonRepository;
             this.configuration = configuration;
             this.apiKey = this.configuration["api-key"];
             this.cacheService = cacheService;
@@ -44,13 +44,13 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <returns>Action result.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
-            if (apiKey == null || apiKey == this.apiKey)
+            if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var lessons = this.context.Lessons.ToList();
+                var lessons = await this.lessonRepository.GetAllLessonsAsync();
 
                 return this.Ok(JsonSerializer.Serialize(lessons));
             }
@@ -66,13 +66,13 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="id">Target lesson id.</param>
         /// <returns>Action result.</returns>
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
-            if (apiKey == null || apiKey == this.apiKey)
+            if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var lesson = this.context.Lessons.Find(id);
+                var lesson = await this.lessonRepository.GetLessonByIdAsync(id);
 
                 return this.Ok(JsonSerializer.Serialize(lesson));
             }
@@ -88,14 +88,13 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="lesson">Created lesson data.</param>
         /// <returns>Action result.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] Lesson lesson)
+        public async Task<IActionResult> Post([FromBody] Lesson lesson)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
-            if (apiKey == null || apiKey == this.apiKey)
+            if (this.apiKey == null || apiKey == this.apiKey)
             {
-                this.context.Lessons.Add(lesson);
-                this.context.SaveChanges();
+                await this.lessonRepository.AddLessonAsync(lesson);
 
                 return this.Ok();
             }
@@ -112,26 +111,22 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="lesson">Updated lesson's data.</param>
         /// <returns>Action result.</returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Lesson lesson)
+        public async Task<IActionResult> Put(int id, [FromBody] Lesson lesson)
         {
+            lesson.Id = id;
+
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
-            if (apiKey == null || apiKey == this.apiKey)
+            if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var lessonToUpdate = this.context.Lessons.Find(id);
-
-                if (lessonToUpdate == null)
+                if (await this.lessonRepository.UpdateLessonAsync(lesson))
+                {
+                    return this.Ok();
+                }
+                else
                 {
                     return this.NotFound();
                 }
-
-                lessonToUpdate.Date = lesson.Date;
-                lessonToUpdate.ScheduledLessonId = lesson.ScheduledLessonId;
-
-                this.context.Lessons.Update(lessonToUpdate);
-                this.context.SaveChanges();
-
-                return this.Ok();
             }
             else
             {
@@ -145,19 +140,14 @@ namespace SadSchool.Controllers.RestApi
         /// <param name="id">Deleted lesson's id.</param>
         /// <returns>Action data.</returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
-            if (apiKey == null || apiKey == this.apiKey)
+            if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var lesson = this.context.Lessons.Find(id);
-
-                if (lesson != null)
+                if (await this.lessonRepository.DeleteLessonAsync(id))
                 {
-                    this.context.Lessons.Remove(lesson);
-                    this.context.SaveChanges();
-
                     return this.Ok();
                 }
                 else

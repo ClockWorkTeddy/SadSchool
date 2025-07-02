@@ -138,7 +138,7 @@ namespace SadSchool.Controllers
                 this.context.Teachers.Update(teacher);
                 await this.context.SaveChangesAsync();
 
-                this.cacheService.RefreshObject(teacher);
+                this.cacheService.SetObject(teacher);
 
                 return this.RedirectToAction("Teachers");
             }

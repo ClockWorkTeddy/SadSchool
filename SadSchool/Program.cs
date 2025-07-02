@@ -9,9 +9,11 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using SadSchool.Contracts;
+using SadSchool.Contracts.Repositories;
 using SadSchool.Controllers.GraphQl;
 using SadSchool.DbContexts;
 using SadSchool.Mappers;
+using SadSchool.Repositories;
 using SadSchool.Services;
 using SadSchool.Services.ApiServices;
 using SadSchool.Services.Cache;
@@ -74,6 +76,12 @@ builder.Services.AddTransient<IClassBookService, ClassBookService>();
 builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 builder.Services.AddSingleton<ICommonMapper, CommonMapper>();
 builder.Services.AddSingleton<IScheduledLessonMapper, ScheduleLessonMapper>();
+
+builder.Services.AddSingleton<IMarkRepository, MarkRepository>();
+builder.Services.AddScoped<IClassRepository, ClassRepository>();
+builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+
 builder.Services.AddHangfireServer();
 
 var graphQlKey = builder.Configuration["graphql-key"];

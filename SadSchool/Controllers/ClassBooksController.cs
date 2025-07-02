@@ -18,7 +18,6 @@ namespace SadSchool.Controllers
         private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
         private readonly IClassBookService classBookService;
-        private readonly MongoContext mongoContext;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassBooksController"/> class.
@@ -28,17 +27,14 @@ namespace SadSchool.Controllers
         ///     that responces for the "Back" button operating.</param>
         /// <param name="classBookService">A class books service instance,
         ///     that responses for class book data operations.</param>
-        /// <param name="mongoContext">MongoDB context.</param>
         public ClassBooksController(
             SadSchoolContext sadSchoolContext,
             INavigationService navigationService,
-            IClassBookService classBookService,
-            MongoContext mongoContext)
+            IClassBookService classBookService)
         {
             this.classBookService = classBookService;
             this.context = sadSchoolContext;
             this.navigationService = navigationService;
-            this.mongoContext = mongoContext;
         }
 
         /// <summary>

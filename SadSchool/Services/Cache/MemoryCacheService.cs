@@ -54,12 +54,29 @@ namespace SadSchool.Services.Cache
             return cachedObject as T;
         }
 
+        public List<T>? GetObjects<T>()
+            where T : class
+        {
+            Log.Information(
+                "MemoryCacheService.GetObjects(): method called for type = {type}",
+                typeof(T));
+            var cacheKey = $"{typeof(T)}:All";
+
+            if (!this.memoryCache.TryGetValue(cacheKey, out List<T>? cachedObjects))
+            {
+                cachedObjects = this.context.Set<T>().ToList();
+                this.memoryCache.Set(cacheKey, cachedObjects);
+            }
+
+            return cachedObjects;
+        }
+
         /// <summary>
         /// Refreshes the object data if the object data was refreshed by the user.
         /// </summary>
         /// <typeparam name="T">Desirable object type.</typeparam>
         /// <param name="obj">Object that being refreshed.</param>
-        public void RefreshObject<T>(T obj)
+        public void SetObject<T>(T obj)
             where T : class
         {
             Log.Information(
@@ -73,6 +90,26 @@ namespace SadSchool.Services.Cache
             {
                 this.memoryCache.Set(cacheKey, obj as T);
             }
+        }
+
+        public void SetObjects<T>(List<T> objects)
+            where T : class
+        {
+            Log.Information(
+                "MemoryCacheService.SetObjects(): method called for type = {type}",
+                typeof(T));
+            var cacheKey = $"{typeof(T)}:All";
+            this.memoryCache.Set(cacheKey, objects);
+        }
+
+        public void RemoveObjects<T>()
+            where T : class
+        {
+            Log.Information(
+                "MemoryCacheService.RemoveObjects(): method called for type = {type}",
+                typeof(T));
+            var cacheKey = $"{typeof(T)}:All";
+            this.memoryCache.Remove(cacheKey);
         }
 
         /// <summary>

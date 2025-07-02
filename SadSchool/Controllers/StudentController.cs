@@ -155,7 +155,7 @@ namespace SadSchool.Controllers
                 this.context.Students.Update(student);
                 await this.context.SaveChangesAsync();
 
-                this.cacheService.RefreshObject(student);
+                this.cacheService.SetObject(student);
 
                 return this.RedirectToAction("Students");
             }
