@@ -50,7 +50,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var classes = await this.classRepository.GetAllClassesAsync();
+                var classes = await this.classRepository.GetAllEntitiesAsync<Class>();
 
                 return this.Ok(classes);
             }
@@ -72,7 +72,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var @class = await this.classRepository.GetClassByIdAsync(id);
+                var @class = await this.classRepository.GetEntityByIdAsync<Class>(id);
 
                 return this.Ok(@class);
             }
@@ -94,7 +94,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                await this.classRepository.AddClassAsync(@class);
+                await this.classRepository.AddEntityAsync(@class);
 
                 return this.Ok();
             }
@@ -117,7 +117,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                if (await this.classRepository.UpdateClassAsync(@class))
+                if (await this.classRepository.UpdateEntityAsync(@class))
                 {
                     return this.Ok();
                 }
@@ -144,7 +144,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                if (await this.classRepository.DeleteClassByIdAsync(id))
+                if (await this.classRepository.DeleteEntityAsync<Class>(id))
                 {
                     return this.Ok();
                 }

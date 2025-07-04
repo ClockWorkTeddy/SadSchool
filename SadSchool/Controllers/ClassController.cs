@@ -53,7 +53,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Classes()
         {
-            var classes = await this.classRepository.GetAllClassesAsync();
+            var classes = await this.classRepository.GetAllEntitiesAsync<Class>();
 
             var classViewModels = classes.Select(c => new ClassViewModel
             {
@@ -99,7 +99,7 @@ namespace SadSchool.Controllers
             {
                 var @class = this.commonMapper.ClassToModel(viewModel);
 
-                await this.classRepository.AddClassAsync(@class);
+                await this.classRepository.AddEntityAsync(@class);
 
                 return this.RedirectToAction("Classes");
             }
@@ -119,7 +119,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedClass = await this.classRepository.GetClassByIdAsync(id);
+                var editedClass = await this.classRepository.GetEntityByIdAsync<Class>(id);
 
                 ClassViewModel viewModel = new()
                 {
@@ -147,7 +147,7 @@ namespace SadSchool.Controllers
             {
                 var @class = this.commonMapper.ClassToModel(viewModel);
 
-                await this.classRepository.UpdateClassAsync(@class);
+                await this.classRepository.UpdateEntityAsync(@class);
 
                 return this.RedirectToAction("Classes");
             }
@@ -167,7 +167,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                await this.classRepository.DeleteClassByIdAsync(id);
+                await this.classRepository.DeleteEntityAsync<Class>(id);
 
                 return this.RedirectToAction("Classes");
             }

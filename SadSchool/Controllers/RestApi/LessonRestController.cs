@@ -50,7 +50,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var lessons = await this.lessonRepository.GetAllLessonsAsync();
+                var lessons = await this.lessonRepository.GetAllEntitiesAsync<Lesson>();
 
                 return this.Ok(JsonSerializer.Serialize(lessons));
             }
@@ -72,7 +72,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var lesson = await this.lessonRepository.GetLessonByIdAsync(id);
+                var lesson = await this.lessonRepository.GetEntityByIdAsync<Lesson>(id);
 
                 return this.Ok(JsonSerializer.Serialize(lesson));
             }
@@ -94,7 +94,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                await this.lessonRepository.AddLessonAsync(lesson);
+                await this.lessonRepository.AddEntityAsync(lesson);
 
                 return this.Ok();
             }
@@ -119,7 +119,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                if (await this.lessonRepository.UpdateLessonAsync(lesson))
+                if (await this.lessonRepository.UpdateEntityAsync(lesson))
                 {
                     return this.Ok();
                 }
@@ -146,7 +146,7 @@ namespace SadSchool.Controllers.RestApi
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                if (await this.lessonRepository.DeleteLessonAsync(id))
+                if (await this.lessonRepository.DeleteEntityAsync<Lesson>(id))
                 {
                     return this.Ok();
                 }
