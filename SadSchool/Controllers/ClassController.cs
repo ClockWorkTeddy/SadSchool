@@ -177,7 +177,7 @@ namespace SadSchool.Controllers
 
         private async Task<List<SelectListItem>> GetTeachersList(int? teacherId)
         {
-            var teachers = await this.teacherRepository.GetAllTeachersAsync();
+            var teachers = await this.teacherRepository.GetAllEntitiesAsync<Teacher>();
 
             return teachers.Select(teacher => new SelectListItem
             {
