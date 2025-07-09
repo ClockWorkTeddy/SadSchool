@@ -21,31 +21,41 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByStartTimeIdAsync(int startTimeId)
         {
-            return await this.context.ScheduledLessons.Where(x => x.StartTimeId == startTimeId).ToListAsync();
+            return await this.context.ScheduledLessons
+                .Where(x => x.StartTimeId == startTimeId)
+                .ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsBySubjectIdAsync(int subjectId)
         {
-            return await this.context.ScheduledLessons.Where(x => x.SubjectId == subjectId).ToListAsync();
+            return await this.context.ScheduledLessons
+                .Where(x => x.SubjectId == subjectId)
+                .ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByClassIdAsync(int classId)
         {
-            return await this.context.ScheduledLessons.Where(x => x.ClassId == classId).ToListAsync();
+            return await this.context.ScheduledLessons
+                .Where(x => x.ClassId == classId)
+                .ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByTeacherIdAsync(int teacherId)
         {
-            return await this.context.ScheduledLessons.Where(x => x.TeacherId == teacherId).ToListAsync();
+            return await this.context.ScheduledLessons
+                .Where(x => x.TeacherId == teacherId)
+                .ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByDayAsync(Days day)
         {
-            return await this.context.ScheduledLessons.Where(x => x.Day == day.ToString()).ToListAsync();
+            return await this.context.ScheduledLessons
+                .Where(x => x.Day == day.ToString())
+                .ToListAsync();
         }
     }
 }

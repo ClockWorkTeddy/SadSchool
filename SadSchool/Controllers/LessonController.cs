@@ -6,9 +6,8 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
-    using Microsoft.EntityFrameworkCore;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
     using SadSchool.Services;
     using SadSchool.ViewModels;
@@ -18,31 +17,31 @@ namespace SadSchool.Controllers
     /// </summary>
     public class LessonController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly ILessonRepository lessonRepository;
+        private readonly IScheduledLessonRepository scheduledLessonRepository;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
-        private readonly ICacheService cacheService;
         private readonly ICommonMapper commonMapper;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LessonController"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
+        /// <param name="lessonRepository">DB context repository instance.</param>
+        /// <param name="scheduledLessonRepository">Scheduled lesson repository instance.</param>
         /// <param name="navigationService">Service that operates "Back" button.</param>
         /// <param name="authService">Service that checks user authentication.</param>
-        /// <param name="cacheService">Service that operates cache.</param>
         /// <param name="commonMapper">Service that maps entities.</param>
         public LessonController(
-            SadSchoolContext context,
+            ILessonRepository lessonRepository,
+            IScheduledLessonRepository scheduledLessonRepository,
             INavigationService navigationService,
             IAuthService authService,
-            ICacheService cacheService,
             ICommonMapper commonMapper)
         {
-            this.context = context;
+            this.lessonRepository = lessonRepository;
+            this.scheduledLessonRepository = scheduledLessonRepository;
             this.navigationService = navigationService;
             this.authService = authService;
-            this.cacheService = cacheService;
             this.commonMapper = commonMapper;
         }
 
@@ -51,23 +50,21 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for lessons main page.</returns>
         [HttpGet]
-        public IActionResult Lessons()
+        public async Task<IActionResult> Lessons()
         {
-            var lessons = new List<LessonViewModel>();
+            var lessons = await this.lessonRepository.GetAllEntitiesAsync<Lesson>();
 
-            foreach (var lesson in this.context.Lessons.ToList())
+            var lessonViewModels = lessons.Select(lesson =>
             {
-                lessons.Add(new LessonViewModel
-                {
-                    Id = lesson.Id,
-                    Date = lesson?.Date,
-                    LessonData = $"{lesson?.ScheduledLesson}",
-                });
-            }
+                var lessonVm = this.commonMapper.LessonToVm(lesson);
+                lessonVm.LessonData = $"{lesson.ScheduledLesson}";
+
+                return lessonVm;
+            }).ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/Lessons.cshtml", lessons);
+            return this.View(@"~/Views/Data/Lessons.cshtml", lessonViewModels);
         }
 
         /// <summary>
@@ -75,13 +72,13 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for <see cref="Lesson"/> add form ot redirects to Lessons.</returns>
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
             if (this.authService.IsAutorized(this.User))
             {
                 LessonViewModel viewModel = new()
                 {
-                    ScheduledLessons = this.GetScheduledLessonsList(null),
+                    ScheduledLessons = await this.GetScheduledLessonsList(null),
                 };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
@@ -98,16 +95,13 @@ namespace SadSchool.Controllers
         /// <param name="viewModel"><see cref="LessonViewModel"/> with data about the lesson.</param>
         /// <returns><see cref="RedirectToActionResult"/> for Lessons view.</returns>
         [HttpPost]
-        public IActionResult Add(LessonViewModel viewModel)
+        public async Task<IActionResult> Add(LessonViewModel viewModel)
         {
             if (this.ModelState.IsValid)
             {
                 var lesson = this.commonMapper.LessonToModel(viewModel);
 
-                this.context.Lessons.Add(lesson);
-                this.context.SaveChanges();
-
-                this.cacheService.GetObject<Lesson>(lesson.Id!.Value);
+                await this.lessonRepository.AddEntityAsync(lesson);
             }
 
             return this.RedirectToAction("Lessons");
@@ -119,16 +113,16 @@ namespace SadSchool.Controllers
         /// <param name="id">Edited lesson id.</param>
         /// <returns><see cref="ViewResult"/> for the entity-edit form or <see cref="RedirectToActionResult"/> for Lessons view.</returns>
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedLesson = this.context.Lessons.Find(id);
+                var editedLesson = await this.lessonRepository.GetEntityByIdAsync<Lesson>(id);
 
                 if (editedLesson != null)
                 {
                     LessonViewModel viewModel = this.commonMapper.LessonToVm(editedLesson);
-                    viewModel.ScheduledLessons = this.GetScheduledLessonsList(viewModel.ScheduledLessonId);
+                    viewModel.ScheduledLessons = await this.GetScheduledLessonsList(viewModel.ScheduledLessonId);
 
                     this.navigationService.RefreshBackParams(this.RouteData);
 
@@ -145,16 +139,13 @@ namespace SadSchool.Controllers
         /// <param name="viewModel"><see cref="LessonViewModel"/> with new data.</param>
         /// <returns><see cref="RedirectToActionResult"/> for "Lessons" action or <see cref="ViewResult"/> for LessonEdit view.</returns>
         [HttpPost]
-        public IActionResult Edit(LessonViewModel viewModel)
+        public async Task<IActionResult> Edit(LessonViewModel viewModel)
         {
             if (this.ModelState.IsValid && viewModel != null)
             {
                 var lesson = this.commonMapper.LessonToModel(viewModel);
 
-                this.context.Lessons.Update(lesson);
-                this.context.SaveChanges();
-
-                this.cacheService.SetObject(lesson);
+                await this.lessonRepository.UpdateEntityAsync(lesson);
 
                 return this.RedirectToAction("Lessons");
             }
@@ -168,27 +159,19 @@ namespace SadSchool.Controllers
         /// <param name="id">Desirable instance id.</param>
         /// <returns><see cref="RedirectToActionResult"/> for action "Lessons".</returns>
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var lesson = this.context.Lessons.Find(id);
-
-                if (lesson != null)
-                {
-                    this.context.Lessons.Remove(lesson);
-                    this.context.SaveChanges();
-
-                    this.cacheService.RemoveObject(lesson);
-                }
+                await this.lessonRepository.DeleteEntityAsync<Lesson>(id);
             }
 
             return this.RedirectToAction("Lessons");
         }
 
-        private List<SelectListItem> GetScheduledLessonsList(int? lessonId)
+        private async Task<List<SelectListItem>> GetScheduledLessonsList(int? lessonId)
         {
-            var scheduledLessons = this.context.ScheduledLessons.ToList();
+            var scheduledLessons = await this.scheduledLessonRepository.GetAllEntitiesAsync<ScheduledLesson>();
 
             return scheduledLessons
                 .OrderBy(scheduledLesson => scheduledLesson?.Class?.Name, new MixedNumericStringComparer())

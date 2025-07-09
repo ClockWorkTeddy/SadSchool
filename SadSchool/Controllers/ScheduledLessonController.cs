@@ -7,7 +7,7 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
 
@@ -16,7 +16,8 @@ namespace SadSchool.Controllers
     /// </summary>
     public class ScheduledLessonController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly IScheduledLessonRepository scheduledLessonRepository;
+        private readonly IClassRepository classRepository;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICacheService cacheService;
@@ -25,19 +26,19 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledLessonController"/> class.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="scheduledLessonRepository">DB context repository instance.</param>
         /// <param name="navigationService">Service processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
         /// <param name="cacheService">Service processes cache operations.</param>
         /// <param name="scheduledLessonMapper">Service processes mapping operations.</param>
         public ScheduledLessonController(
-            SadSchoolContext context,
+            IScheduledLessonRepository scheduledLessonRepository,
             INavigationService navigationService,
             IAuthService authService,
             ICacheService cacheService,
             IScheduledLessonMapper scheduledLessonMapper)
         {
-            this.context = context;
+            this.scheduledLessonRepository = scheduledLessonRepository;
             this.navigationService = navigationService;
             this.authService = authService;
             this.cacheService = cacheService;
@@ -49,16 +50,16 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for the Scheduled lessons form.</returns>
         [HttpGet]
-        public IActionResult ScheduledLessons()
+        public async Task<IActionResult> ScheduledLessons()
         {
-            var scheduledLessons = this.context.ScheduledLessons
-                .ToList()
-                .Select(scheduledLesson => this.scheduledLessonMapper.ScheduledLessonToVm(scheduledLesson))
+            var scheduledLessons = await this.scheduledLessonRepository.GetAllEntitiesAsync<ScheduledLesson>();
+            var scheduledLessonsViewModels = scheduledLessons
+                .Select(this.scheduledLessonMapper.ScheduledLessonToVm)
                 .ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/ScheduledLessons.cshtml", scheduledLessons);
+            return this.View(@"~/Views/Data/ScheduledLessons.cshtml", scheduledLessonsViewModels);
         }
 
         /// <summary>
@@ -99,10 +100,7 @@ namespace SadSchool.Controllers
             {
                 var scheduledLesson = this.scheduledLessonMapper.ScheduledLessonToModel(viewModel);
 
-                this.context.ScheduledLessons.Add(scheduledLesson);
-                await this.context.SaveChangesAsync();
-
-                this.cacheService.GetObject<ScheduledLesson>(scheduledLesson.Id!.Value);
+                await this.scheduledLessonRepository.AddEntityAsync(scheduledLesson);
             }
 
             return this.RedirectToAction("ScheduledLessons");
@@ -115,11 +113,11 @@ namespace SadSchool.Controllers
         /// <returns><see cref="ViewResult"/> for "ScheduledLessonEdit" view or
         ///     <see cref="RedirectToActionResult"/> for the "ScheduledLessons" action in case of failure.</returns>
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedLesson = this.context.ScheduledLessons.Find(id);
+                var editedLesson = await this.scheduledLessonRepository.GetEntityByIdAsync<ScheduledLesson>(id);
 
                 ScheduledLessonViewModel viewModel = new()
                 {
@@ -151,10 +149,7 @@ namespace SadSchool.Controllers
             {
                 var scheduledLesson = this.scheduledLessonMapper.ScheduledLessonToModel(viewModel);
 
-                this.context.ScheduledLessons.Update(scheduledLesson);
-                await this.context.SaveChangesAsync();
-
-                this.cacheService.SetObject(scheduledLesson);
+                await this.scheduledLessonRepository.UpdateEntityAsync(scheduledLesson);
 
                 return this.RedirectToAction("ScheduledLessons");
             }
@@ -172,15 +167,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var lesson = await this.context.ScheduledLessons.FindAsync(id);
-
-                if (lesson != null)
-                {
-                    this.context.ScheduledLessons.Remove(lesson);
-                    await this.context.SaveChangesAsync();
-
-                    this.cacheService.RemoveObject(lesson);
-                }
+                await this.scheduledLessonRepository.DeleteEntityAsync<ScheduledLesson>(id);
             }
 
             return this.RedirectToAction("ScheduledLessons");

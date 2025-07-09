@@ -80,6 +80,7 @@ builder.Services.AddSingleton<IScheduledLessonMapper, ScheduleLessonMapper>();
 builder.Services.AddSingleton<IMarkRepository, MarkRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddScoped<IScheduledLessonRepository, ScheduledLessonRepository>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
 
 builder.Services.AddHangfireServer();
