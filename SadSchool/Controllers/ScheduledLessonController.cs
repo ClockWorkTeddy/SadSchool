@@ -17,10 +17,8 @@ namespace SadSchool.Controllers
     public class ScheduledLessonController : Controller
     {
         private readonly IScheduledLessonRepository scheduledLessonRepository;
-        private readonly IClassRepository classRepository;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
-        private readonly ICacheService cacheService;
         private readonly IScheduledLessonMapper scheduledLessonMapper;
 
         /// <summary>
@@ -29,19 +27,16 @@ namespace SadSchool.Controllers
         /// <param name="scheduledLessonRepository">DB context repository instance.</param>
         /// <param name="navigationService">Service processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
-        /// <param name="cacheService">Service processes cache operations.</param>
         /// <param name="scheduledLessonMapper">Service processes mapping operations.</param>
         public ScheduledLessonController(
             IScheduledLessonRepository scheduledLessonRepository,
             INavigationService navigationService,
             IAuthService authService,
-            ICacheService cacheService,
             IScheduledLessonMapper scheduledLessonMapper)
         {
             this.scheduledLessonRepository = scheduledLessonRepository;
             this.navigationService = navigationService;
             this.authService = authService;
-            this.cacheService = cacheService;
             this.scheduledLessonMapper = scheduledLessonMapper;
         }
 
@@ -68,16 +63,16 @@ namespace SadSchool.Controllers
         /// <returns><see cref="ViewResult"/> for the Scheduled lesson add form or
         ///     <see cref="RedirectToActionResult"/> for the "ScheduledLessons" actiion.</returns>
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
             if (this.authService.IsAutorized(this.User))
             {
                 ScheduledLessonViewModel viewModel = new()
                 {
-                    Classes = this.GetClassesList(null),
-                    Subjects = this.GetSubjectsList(null),
-                    Teachers = this.GetTeachersList(null),
-                    StartTimes = this.GetStartTimesList(null),
+                    Classes = await this.GetClassesList(null),
+                    Subjects = await this.GetSubjectsList(null),
+                    Teachers = await this.GetTeachersList(null),
+                    StartTimes = await this.GetStartTimesList(null),
                 };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
@@ -122,10 +117,10 @@ namespace SadSchool.Controllers
                 ScheduledLessonViewModel viewModel = new()
                 {
                     Day = editedLesson?.Day,
-                    StartTimes = this.GetStartTimesList(editedLesson?.StartTimeId),
-                    Subjects = this.GetSubjectsList(editedLesson?.SubjectId),
-                    Teachers = this.GetTeachersList(editedLesson?.TeacherId),
-                    Classes = this.GetClassesList(editedLesson?.ClassId),
+                    StartTimes = await this.GetStartTimesList(editedLesson?.StartTimeId),
+                    Subjects = await this.GetSubjectsList(editedLesson?.SubjectId),
+                    Teachers = await this.GetTeachersList(editedLesson?.TeacherId),
+                    Classes = await this.GetClassesList(editedLesson?.ClassId),
                 };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
@@ -173,9 +168,9 @@ namespace SadSchool.Controllers
             return this.RedirectToAction("ScheduledLessons");
         }
 
-        private List<SelectListItem> GetClassesList(int? classId)
+        private async Task<List<SelectListItem>> GetClassesList(int? classId)
         {
-            var classes = this.context.Classes.ToList();
+            var classes = await this.scheduledLessonRepository.GetAllEntitiesAsync<Class>();
 
             return classes.Select(theClass => new SelectListItem
             {
@@ -185,9 +180,9 @@ namespace SadSchool.Controllers
             }).ToList();
         }
 
-        private List<SelectListItem> GetSubjectsList(int? subjectId)
+        private async Task<List<SelectListItem>> GetSubjectsList(int? subjectId)
         {
-            var subjects = this.context.Subjects.ToList();
+            var subjects = await this.scheduledLessonRepository.GetAllEntitiesAsync<Subject>();
 
             return subjects.Select(subject => new SelectListItem
             {
@@ -197,9 +192,9 @@ namespace SadSchool.Controllers
             }).ToList();
         }
 
-        private List<SelectListItem> GetTeachersList(int? teacherId)
+        private async Task<List<SelectListItem>> GetTeachersList(int? teacherId)
         {
-            var teachers = this.context.Teachers.ToList();
+            var teachers = await this.scheduledLessonRepository.GetAllEntitiesAsync<Teacher>();
 
             return teachers.Select(teacher => new SelectListItem
             {
@@ -209,9 +204,9 @@ namespace SadSchool.Controllers
             }).ToList();
         }
 
-        private List<SelectListItem> GetStartTimesList(int? startId)
+        private async Task<List<SelectListItem>> GetStartTimesList(int? startId)
         {
-            var starts = this.context.StartTimes.ToList();
+            var starts = await this.scheduledLessonRepository.GetAllEntitiesAsync<StartTime>();
 
             return starts.Select(start => new SelectListItem
             {
