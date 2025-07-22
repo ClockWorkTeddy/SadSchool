@@ -3,8 +3,6 @@
 // </copyright>
 
 using Hangfire;
-using Hangfire.AspNetCore;
-using Hangfire.SqlServer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
@@ -77,11 +75,18 @@ builder.Services.AddTransient<IMarksAnalyticsService, MarksAnalyticsService>();
 builder.Services.AddSingleton<ICommonMapper, CommonMapper>();
 builder.Services.AddSingleton<IScheduledLessonMapper, ScheduleLessonMapper>();
 
-builder.Services.AddSingleton<IMarkRepository, MarkRepository>();
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+builder.Services.AddSingleton<IMarkRepository, MarkRepository>();
 builder.Services.AddScoped<IScheduledLessonRepository, ScheduledLessonRepository>();
+builder.Services.AddScoped<IStartTimeRepository, StartTimeRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
+builder.Services.AddScoped<ISubjectRepository, SubjectRepository>();
 builder.Services.AddScoped<ITeacherRepository, TeacherRepository>();
+
+builder.Services.AddScoped<IIndependentRepositories, IndependentRepositories>();
+builder.Services.AddScoped<IDerivedRepositories, DerivedRepositories>();
+builder.Services.AddScoped<IRepositories, Repositories>();
 
 builder.Services.AddHangfireServer();
 
