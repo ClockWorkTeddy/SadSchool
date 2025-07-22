@@ -7,7 +7,8 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc;
     using MongoDB.Driver;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
+    using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
 
     /// <summary>
@@ -15,25 +16,31 @@ namespace SadSchool.Controllers
     /// </summary>
     public class ClassBooksController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly IClassRepository classRepository;
+        private readonly ISubjectRepository subjectRepository;
         private readonly INavigationService navigationService;
         private readonly IClassBookService classBookService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassBooksController"/> class.
         /// </summary>
-        /// <param name="sadSchoolContext">DB Context.</param>
+        /// <param name="classRepository">Class repository instance,
+        ///     that responses for class data operations.</param>
+        /// <param name="subjectRepository">Subject repository instance,
+        ///     that responses for subject data operations.</param>
         /// <param name="navigationService">A navigation service instance,
         ///     that responces for the "Back" button operating.</param>
         /// <param name="classBookService">A class books service instance,
         ///     that responses for class book data operations.</param>
         public ClassBooksController(
-            SadSchoolContext sadSchoolContext,
+            IClassRepository classRepository,
+            ISubjectRepository subjectRepository,
             INavigationService navigationService,
             IClassBookService classBookService)
         {
+            this.classRepository = classRepository;
+            this.subjectRepository = subjectRepository;
             this.classBookService = classBookService;
-            this.context = sadSchoolContext;
             this.navigationService = navigationService;
         }
 
@@ -42,11 +49,12 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for a class book view.</returns>
         [HttpGet]
-        public IActionResult ClassBooks()
+        public async Task<IActionResult> ClassBooks()
         {
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            var classNames = this.context.Classes.Select(cl => cl.Name).ToList();
+            var classes = await this.classRepository.GetAllEntitiesAsync<Class>();
+            var classNames = classes.Select(c => c.Name).ToList();
 
             return this.View(@"~/Views/Data/Representation/ClassBooks.cshtml", classNames);
         }
@@ -57,7 +65,7 @@ namespace SadSchool.Controllers
         /// <param name="className">Name of desirable class.</param>
         /// <returns>A <see cref="ViewResult"/> for redirection to subject selection page.</returns>
         [HttpGet]
-        public IActionResult ClassSelector(string className)
+        public async Task<IActionResult> ClassSelector(string className)
         {
             if (className != null)
             {
@@ -70,14 +78,15 @@ namespace SadSchool.Controllers
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            var subjects = this.context.Subjects.Select(subject => subject.Name).ToList();
+            var subjects = await this.subjectRepository.GetAllEntitiesAsync<Subject>();
+            var subjectNames = subjects.Select(s => s.Name).ToList();
 
             return this.View(
                 @"~/Views/Data/Representation/ClassSubjects.cshtml",
                 new ClassSubjectViewModel
                 {
                     ClassName = className,
-                    Subjects = subjects,
+                    Subjects = subjectNames,
                 });
         }
 

@@ -6,7 +6,8 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
+    using SadSchool.Models.SqlServer;
     using SadSchool.Services.Schedule;
     using SadSchool.ViewModels;
 
@@ -15,17 +16,17 @@ namespace SadSchool.Controllers
     /// </summary>
     public class ScheduleController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly IScheduledLessonRepository scheduledLessonRepository;
         private readonly INavigationService navigationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduleController"/> class.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="scheduledLessonRepository">Scheduled lesson repository instance.</param>
         /// <param name="navigationService"><see cref="INavigationService"/> instance.</param>
-        public ScheduleController(SadSchoolContext context, INavigationService navigationService)
+        public ScheduleController(IScheduledLessonRepository scheduledLessonRepository, INavigationService navigationService)
         {
-            this.context = context;
+            this.scheduledLessonRepository = scheduledLessonRepository;
             this.navigationService = navigationService;
         }
 
@@ -34,9 +35,9 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for Schedule view.</returns>
         [HttpGet]
-        public IActionResult GetSchedule()
+        public async Task<IActionResult> GetSchedule()
         {
-            var scheduledLessons = this.context.ScheduledLessons.ToList();
+            var scheduledLessons = await this.scheduledLessonRepository.GetAllEntitiesAsync<ScheduledLesson>();
 
             ScheduleService service = new ScheduleService(scheduledLessons);
             var scheduleCells = service.GetScheduleCells();

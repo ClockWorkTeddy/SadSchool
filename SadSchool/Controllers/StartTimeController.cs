@@ -6,6 +6,7 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
@@ -15,7 +16,7 @@ namespace SadSchool.Controllers
     /// </summary>
     public class StartTimeController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly IStartTimeRepository startTimeRepository;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICacheService cacheService;
@@ -24,19 +25,19 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="StartTimeController"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
+        /// <param name="startTimeRepository">Start time repository instance.</param>
         /// <param name="navigationService">Service processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
         /// <param name="cacheService">Service processes cache operations.</param>
         /// <param name="commonMapper">Service processes mapping operations.</param>
         public StartTimeController(
-            SadSchoolContext context,
+            IStartTimeRepository startTimeRepository,
             INavigationService navigationService,
             IAuthService authService,
             ICacheService cacheService,
             ICommonMapper commonMapper)
         {
-            this.context = context;
+            this.startTimeRepository = startTimeRepository;
             this.navigationService = navigationService;
             this.authService = authService;
             this.cacheService = cacheService;
@@ -48,15 +49,16 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for the "StartTimes" view.</returns>
         [HttpGet]
-        public IActionResult StartTimes()
+        public async Task<IActionResult> StartTimes()
         {
-            List<StartTimeViewModel> startTimes = this.context.StartTimes
-                .Select(startTime => this.commonMapper.StartTimeToVm(startTime))
+            var startTimes = await this.startTimeRepository.GetAllEntitiesAsync<StartTime>();
+            var startTimesViewModels = startTimes
+                .Select(st => this.commonMapper.StartTimeToVm(st))
                 .ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            return this.View(@"~/Views/Data/StartTimes.cshtml", startTimes);
+            return this.View(@"~/Views/Data/StartTimes.cshtml", startTimesViewModels);
         }
 
         /// <summary>
@@ -83,14 +85,13 @@ namespace SadSchool.Controllers
         /// <param name="model">View model with data.</param>
         /// <returns><see cref="RedirectToActionResult"/> for the action "StartTimes".</returns>
         [HttpPost]
-        public IActionResult Add(StartTimeViewModel model)
+        public async Task<IActionResult> Add(StartTimeViewModel model)
         {
             if (this.ModelState.IsValid)
             {
                 var schedule = this.commonMapper.StartTimeToModel(model);
 
-                this.context.StartTimes.Add(schedule);
-                this.context.SaveChanges();
+                await this.startTimeRepository.AddEntityAsync(schedule);
 
                 this.cacheService.GetObject<StartTime>(schedule.Id!.Value);
             }
@@ -105,11 +106,11 @@ namespace SadSchool.Controllers
         /// <returns><see cref="ViewResult"/> for the "StartTimeEdit" view or
         ///     <see cref="RedirectToActionResult"/> for the "StartTimes" action.</returns>
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedStartTime = this.context.StartTimes.Find(id);
+                var editedStartTime = await this.startTimeRepository.GetEntityByIdAsync<StartTime>(id);
 
                 if (editedStartTime != null)
                 {
@@ -137,8 +138,7 @@ namespace SadSchool.Controllers
             {
                 var startTime = this.commonMapper.StartTimeToModel(viewModel);
 
-                this.context.StartTimes.Update(startTime);
-                await this.context.SaveChangesAsync();
+                await this.startTimeRepository.UpdateEntityAsync(startTime);
 
                 this.cacheService.SetObject(startTime);
 
@@ -156,18 +156,15 @@ namespace SadSchool.Controllers
         /// <param name="id">Deleted item id.</param>
         /// <returns><see cref="RedirectToActionResult"/> for the "StartTimes" action.</returns>
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var startTime = this.context.StartTimes.Find(id);
+                var startTime = await this.startTimeRepository.GetEntityByIdAsync<StartTime>(id);
 
                 if (startTime != null)
                 {
-                    this.context.StartTimes.Remove(startTime);
-                    this.context.SaveChanges();
-
-                    this.cacheService.RemoveObject(startTime);
+                    await this.startTimeRepository.DeleteEntityAsync<StartTime>(startTime.Id!.Value);
                 }
             }
 

@@ -16,22 +16,18 @@ namespace SadSchool.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> logger;
-        private readonly SadSchoolContext context;
         private readonly INavigationService navigationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HomeController"/> class.
         /// </summary>
         /// <param name="logger"><see cref="ILogger"/> instance.</param>
-        /// <param name="context">DB context.</param>
         /// <param name="navigationService">Service for "Back" button operating.</param>
         public HomeController(
             ILogger<HomeController> logger,
-            SadSchoolContext context,
             INavigationService navigationService)
         {
             this.logger = logger;
-            this.context = context;
             this.navigationService = navigationService;
         }
 

@@ -8,9 +8,7 @@ namespace SadSchool.Controllers
     using Microsoft.AspNetCore.Mvc.Rendering;
     using SadSchool.Contracts;
     using SadSchool.Contracts.Repositories;
-    using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
-    using SadSchool.Repositories;
     using SadSchool.ViewModels;
 
     /// <summary>

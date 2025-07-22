@@ -15,35 +15,36 @@ namespace SadSchool.Controllers
     using SadSchool.Models.Mongo;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
+    using System.Threading.Tasks;
 
     /// <summary>
     /// Processes <see cref="Mark"/> entities.
     /// </summary>
     public class MarkController : Controller
     {
-        private readonly SadSchoolContext sadSchoolContext;
+        private readonly ISubjectRepository subjectRepository;
+        private readonly IDerivedRepositories derivedRepositories;
         private readonly INavigationService navigationService;
         private readonly IMarksAnalyticsService marksAnalyticsService;
         private readonly IAuthService authService;
-        private readonly IMarkRepository markRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarkController"/> class.
         /// </summary>
-        /// <param name="sadSchoolContext">SQL Server DB context.</param>
+        /// <param name="subjectRepository">Subject repository instance.</param>"
+        /// <param name="derivedRepositories">Derived repositories instance.</param>
         /// <param name="navigationService">Service instance processing Back button logic.</param>
         /// <param name="marksAnalyticsService">Service operates marks analytics.</param>
         /// <param name="authService">Authentication check service instance.</param>
-        /// <param name="markRepository">Mark repository instance.</param>"
         public MarkController(
-            SadSchoolContext sadSchoolContext,
+            ISubjectRepository subjectRepository,
+            IDerivedRepositories derivedRepositories,
             INavigationService navigationService,
             IMarksAnalyticsService marksAnalyticsService,
-            IAuthService authService,
-            IMarkRepository markRepository)
+            IAuthService authService)
         {
-            this.markRepository = markRepository;
-            this.sadSchoolContext = sadSchoolContext;
+            this.subjectRepository = subjectRepository;
+            this.derivedRepositories = derivedRepositories;
             this.navigationService = navigationService;
             this.marksAnalyticsService = marksAnalyticsService;
             this.authService = authService;
@@ -57,12 +58,12 @@ namespace SadSchool.Controllers
         public async Task<IActionResult> Marks()
         {
             var markViewModels = new List<MarkViewModel>();
-            var marks = await this.markRepository.GetAllMarksAsync();
+            var marks = await this.derivedRepositories.MarkRepository.GetAllMarksAsync();
 
             foreach (var mark in marks)
             {
-                var student = this.sadSchoolContext.Set<Student>().Find(mark.StudentId);
-                var lesson = this.sadSchoolContext.Set<Lesson>().Find(mark.LessonId);
+                var student = await this.derivedRepositories.StudentRepository.GetEntityByIdAsync<Student>(mark.StudentId!.Value);
+                var lesson = await this.derivedRepositories.LessonRepository.GetEntityByIdAsync<Lesson>(mark.LessonId!.Value);
 
                 markViewModels.Add(new MarkViewModel
                 {
@@ -84,14 +85,14 @@ namespace SadSchool.Controllers
         /// <returns><see cref="ViewResult"/> for "Add" form or
         ///     <see cref="RedirectToActionResult"/> for action "Marks" in case of failure.</returns>
         [HttpGet]
-        public IActionResult Add()
+        public async Task<IActionResult> Add()
         {
             if (this.authService.IsAutorized(this.User))
             {
                 MarkViewModel viewModel = new MarkViewModel()
                 {
-                    Students = this.GetStudentsList(null),
-                    Lessons = this.GetLessonsList(null),
+                    Students = await this.GetStudentsList(null),
+                    Lessons = await this.GetLessonsList(null),
                 };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
@@ -120,7 +121,7 @@ namespace SadSchool.Controllers
                     LessonId = viewModel.LessonId,
                 };
 
-                await this.markRepository.AddMarkAsync(mark);
+                await this.derivedRepositories.MarkRepository.AddMarkAsync(mark);
 
                 return this.RedirectToAction("Marks");
             }
@@ -141,13 +142,13 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedMark = await this.markRepository.GetMarkByIdAsync(id);
+                var editedMark = await this.derivedRepositories.MarkRepository.GetMarkByIdAsync(id);
 
                 MarkViewModel viewModel = new()
                 {
                     Value = editedMark!.Value,
-                    Lessons = this.GetLessonsList(editedMark?.LessonId),
-                    Students = this.GetStudentsList(editedMark?.StudentId),
+                    Lessons = await this.GetLessonsList(editedMark?.LessonId),
+                    Students = await this.GetStudentsList(editedMark?.StudentId),
                 };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
@@ -169,7 +170,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var mark = await this.markRepository.GetMarkByIdAsync(viewModel.Id);
+                var mark = await this.derivedRepositories.MarkRepository.GetMarkByIdAsync(viewModel.Id);
 
                 if (mark != null)
                 {
@@ -178,7 +179,7 @@ namespace SadSchool.Controllers
                     mark.Value = viewModel.Value;
                 }
 
-                await this.markRepository.UpdateMarkAsync(mark);
+                await this.derivedRepositories.MarkRepository.UpdateMarkAsync(mark);
 
                 return this.RedirectToAction("Marks");
             }
@@ -198,11 +199,11 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var mark = await this.markRepository.GetMarkByIdAsync(id);
+                var mark = await this.derivedRepositories.MarkRepository.GetMarkByIdAsync(id);
 
                 if (mark != null)
                 {
-                    await this.markRepository.DeleteMarkByIdAsync(mark.Id);
+                    await this.derivedRepositories.MarkRepository.DeleteMarkByIdAsync(mark.Id);
                 }
             }
 
@@ -214,12 +215,12 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="ViewResult"/> for "StudentSubjectSelector" view.</returns>
         [HttpGet]
-        public IActionResult GetStudentSubject()
+        public async Task<IActionResult> GetStudentSubject()
         {
             StudentSubjectSelectorViewModel viewModel = new()
             {
-                Students = this.GetStudents(),
-                Subjects = this.GetSubjects(),
+                Students = await this.GetStudents(),
+                Subjects = await this.GetSubjects(),
             };
 
             this.navigationService.RefreshBackParams(this.RouteData);
@@ -262,9 +263,9 @@ namespace SadSchool.Controllers
             });
         }
 
-        private List<SelectListItem> GetLessonsList(int? lessonId)
+        private async Task<List<SelectListItem>> GetLessonsList(int? lessonId)
         {
-            var lessons = this.sadSchoolContext.Lessons.ToList();
+            var lessons = await this.derivedRepositories.LessonRepository.GetAllEntitiesAsync<Lesson>();
 
             return lessons.Select(lesson => new SelectListItem
             {
@@ -274,9 +275,9 @@ namespace SadSchool.Controllers
             }).ToList();
         }
 
-        private List<SelectListItem> GetStudentsList(int? studentId)
+        private async Task<List<SelectListItem>> GetStudentsList(int? studentId)
         {
-            var students = this.sadSchoolContext.Students.ToList();
+            var students = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>();
 
             return students.Select(student => new SelectListItem
             {
@@ -286,9 +287,9 @@ namespace SadSchool.Controllers
             }).ToList();
         }
 
-        private List<SelectListItem> GetStudents()
+        private async Task<List<SelectListItem>> GetStudents()
         {
-            var students = this.sadSchoolContext.Students.ToList();
+            var students = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>(); 
             var studentsItemList = new List<SelectListItem>()
             {
                 new SelectListItem
@@ -309,9 +310,9 @@ namespace SadSchool.Controllers
             return studentsItemList;
         }
 
-        private List<SelectListItem> GetSubjects()
+        private async Task<List<SelectListItem>> GetSubjects()
         {
-            var subjects = this.sadSchoolContext.Subjects.ToList();
+            var subjects = await this.subjectRepository.GetAllEntitiesAsync<Subject>();
             var subjectsList = new List<SelectListItem>()
             {
                 new SelectListItem { Value = 0.ToString(), Text = string.Empty, Selected = true },
