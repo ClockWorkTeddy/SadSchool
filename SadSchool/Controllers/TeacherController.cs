@@ -6,6 +6,7 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
@@ -15,7 +16,7 @@ namespace SadSchool.Controllers
     /// </summary>
     public class TeacherController : Controller
     {
-        private readonly SadSchoolContext context;
+        private readonly ITeacherRepository teacherRepository;
         private readonly INavigationService navigationService;
         private readonly IAuthService authService;
         private readonly ICommonMapper commonMapper;
@@ -24,19 +25,19 @@ namespace SadSchool.Controllers
         /// <summary>
         /// Initializes a new instance of the <see cref="TeacherController"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
+        /// <param name="teacherRepository">DB context.</param>
         /// <param name="navigationService">Services processes "Back" button.</param>
         /// <param name="authService">Service processes user authorization check.</param>
         /// <param name="cacheService">Service processes cache operations.</param>
         /// <param name="commonMapper">Service processes mapping operations.</param>
         public TeacherController(
-            SadSchoolContext context,
+            ITeacherRepository teacherRepository,
             INavigationService navigationService,
             IAuthService authService,
             ICommonMapper commonMapper,
             ICacheService cacheService)
         {
-            this.context = context;
+            this.teacherRepository = teacherRepository;
             this.navigationService = navigationService;
             this.authService = authService;
             this.commonMapper = commonMapper;
@@ -48,10 +49,12 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <returns><see cref="IActionResult"/> for the "Teachers" view.</returns>
         [HttpGet]
-        public IActionResult Teachers()
+        public async Task<IActionResult> Teachers()
         {
+            var teachers = await this.teacherRepository.GetAllEntitiesAsync<Teacher>();
+
             List<TeacherViewModel> teacherViewModels =
-                [.. this.context.Teachers.Select(t => this.commonMapper.TeacherToVm(t))];
+                teachers.Select(t => this.commonMapper.TeacherToVm(t)).ToList();
 
             this.navigationService.RefreshBackParams(this.RouteData);
 
@@ -82,14 +85,13 @@ namespace SadSchool.Controllers
         /// <param name="viewModel">ViewModel with data.</param>
         /// <returns><see cref="IActionResult"/> reditrect to the "Teachers" action.</returns>
         [HttpPost]
-        public IActionResult Add(TeacherViewModel viewModel)
+        public async Task<IActionResult> Add(TeacherViewModel viewModel)
         {
             if (this.ModelState.IsValid)
             {
                 var teacher = this.commonMapper.TeacherToModel(viewModel);
 
-                this.context.Teachers.Add(teacher);
-                this.context.SaveChanges();
+                await this.teacherRepository.AddEntityAsync(teacher);
 
                 this.cacheService.GetObject<Teacher>(teacher.Id!.Value);
             }
@@ -103,11 +105,11 @@ namespace SadSchool.Controllers
         /// <param name="id">Edited item id.</param>
         /// <returns><see cref="IActionResult"/> for the "TeacherEdit" view.</returns>
         [HttpGet]
-        public IActionResult Edit(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var editedTeacher = this.context.Teachers.FirstOrDefault(_ => _.Id == id);
+                var editedTeacher = await this.teacherRepository.GetEntityByIdAsync<Teacher>(id);
 
                 if (editedTeacher != null)
                 {
@@ -135,8 +137,7 @@ namespace SadSchool.Controllers
             {
                 var teacher = this.commonMapper.TeacherToModel(viewModel);
 
-                this.context.Teachers.Update(teacher);
-                await this.context.SaveChangesAsync();
+                await this.teacherRepository.UpdateEntityAsync(teacher);
 
                 this.cacheService.SetObject(teacher);
 
@@ -154,17 +155,15 @@ namespace SadSchool.Controllers
         /// <param name="id">Deleted item id.</param>
         /// <returns><see cref="IActionResult"/> for the "Teachers" action.</returns>
         [HttpPost]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id)
         {
             if (this.authService.IsAutorized(this.User))
             {
-                var teacher = this.context.Teachers.FirstOrDefault(_ => _.Id == id);
+                var teacher = await this.teacherRepository.GetEntityByIdAsync<Teacher>(id);
 
                 if (teacher != null)
                 {
-                    this.context.Teachers.Remove(teacher);
-                    this.context.SaveChanges();
-
+                    await this.teacherRepository.DeleteEntityAsync<Teacher>(id);
                     this.cacheService.RemoveObject(teacher);
                 }
             }
