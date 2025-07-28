@@ -18,18 +18,13 @@ namespace SadSchool.Repositories
     /// entities, including retrieving marks by student or lesson identifiers, adding new marks, updating existing
     /// marks, and deleting marks by their unique identifier. It interacts with the underlying data store through the
     /// provided <see cref="MongoContext"/>.</remarks>
-    public class MarkRepository : IMarkRepository
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MarkRepository"/> class with the specified database context.
+    /// </remarks>
+    /// <param name="context">The <see cref="MongoContext"/> used to interact with the database. Cannot be null.</param>
+    public class MarkRepository(MongoContext context) : IMarkRepository
     {
-        private readonly MongoContext context;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MarkRepository"/> class with the specified database context.
-        /// </summary>
-        /// <param name="context">The <see cref="MongoContext"/> used to interact with the database. Cannot be null.</param>
-        public MarkRepository(MongoContext context)
-        {
-            this.context = context;
-        }
+        private readonly MongoContext context = context;
 
         /// <summary>
         /// Asynchronously retrieves a list of marks associated with the specified student ID.

@@ -13,21 +13,15 @@ namespace SadSchool.Services.Cache
     /// <summary>
     /// Memory cache service.
     /// </summary>
-    public class MemoryCacheService : ICacheService
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MemoryCacheService"/> class.
+    /// </remarks>
+    /// <param name="context">DB context instance.</param>
+    /// <param name="memoryCache">Memory cache instance.</param>
+    public class MemoryCacheService(SadSchoolContext context, IMemoryCache memoryCache) : ICacheService
     {
-        private readonly SadSchoolContext context;
-        private readonly IMemoryCache memoryCache;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MemoryCacheService"/> class.
-        /// </summary>
-        /// <param name="context">DB context instance.</param>
-        /// <param name="memoryCache">Memory cache instance.</param>
-        public MemoryCacheService(SadSchoolContext context, IMemoryCache memoryCache)
-        {
-            this.context = context;
-            this.memoryCache = memoryCache;
-        }
+        private readonly SadSchoolContext context = context;
+        private readonly IMemoryCache memoryCache = memoryCache;
 
         /// <summary>
         /// Returns the object from the cache or from the database if it's not in the cache.
@@ -54,6 +48,15 @@ namespace SadSchool.Services.Cache
             return cachedObject as T;
         }
 
+        /// <summary>
+        /// Retrieves a list of objects of the specified type from the cache or database.
+        /// </summary>
+        /// <remarks>This method first attempts to retrieve the objects from the memory cache. If the
+        /// objects are not found in the cache, it queries the database context to retrieve them and stores the result
+        /// in the cache for future requests. This can improve performance by reducing database access for frequently
+        /// requested data.</remarks>
+        /// <typeparam name="T">The type of objects to retrieve. Must be a reference type.</typeparam>
+        /// <returns>A list of objects of type <typeparamref name="T"/>. Returns an empty list if no objects are found.</returns>
         public List<T>? GetObjects<T>()
             where T : class
         {
@@ -64,18 +67,14 @@ namespace SadSchool.Services.Cache
 
             if (!this.memoryCache.TryGetValue(cacheKey, out List<T>? cachedObjects))
             {
-                cachedObjects = this.context.Set<T>().ToList();
+                cachedObjects = [.. this.context.Set<T>()];
                 this.memoryCache.Set(cacheKey, cachedObjects);
             }
 
             return cachedObjects;
         }
 
-        /// <summary>
-        /// Refreshes the object data if the object data was refreshed by the user.
-        /// </summary>
-        /// <typeparam name="T">Desirable object type.</typeparam>
-        /// <param name="obj">Object that being refreshed.</param>
+        /// <inheritdoc />
         public void SetObject<T>(T obj)
             where T : class
         {
@@ -86,12 +85,13 @@ namespace SadSchool.Services.Cache
 
             var cacheKey = $"{typeof(T)}:{(obj as BaseModel)?.Id}";
 
-            if (this.memoryCache.TryGetValue(cacheKey, out object? cachedObject))
+            if (this.memoryCache.TryGetValue(cacheKey, out _))
             {
                 this.memoryCache.Set(cacheKey, obj as T);
             }
         }
 
+        /// <inheritdoc />
         public void SetObjects<T>(List<T> objects)
             where T : class
         {
@@ -102,6 +102,7 @@ namespace SadSchool.Services.Cache
             this.memoryCache.Set(cacheKey, objects);
         }
 
+        /// <inheritdoc />
         public void RemoveObjects<T>()
             where T : class
         {
@@ -112,11 +113,7 @@ namespace SadSchool.Services.Cache
             this.memoryCache.Remove(cacheKey);
         }
 
-        /// <summary>
-        /// Removes the object from the cache.
-        /// </summary>
-        /// <typeparam name="T">Desirable object type.</typeparam>
-        /// <param name="obj">Object that being removed.</param>
+        /// <inheritdoc />
         public void RemoveObject<T>(T obj)
             where T : class
         {

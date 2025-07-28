@@ -1,52 +1,48 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SadSchool.Contracts;
-using SadSchool.Contracts.Repositories;
-using SadSchool.DbContexts;
-using SadSchool.Models.SqlServer;
-using Serilog;
+﻿// <copyright file="BaseRepository.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Repositories
 {
+    using Microsoft.EntityFrameworkCore;
+    using SadSchool.Contracts;
+    using SadSchool.Contracts.Repositories;
+    using SadSchool.DbContexts;
+    using SadSchool.Models.SqlServer;
+    using Serilog;
+
     /// <inheritdoc/>
-    public abstract class BaseRepository : IBaseRepository
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BaseRepository"/> class.
+    /// </summary>
+    /// <param name="context">DB context.</param>
+    /// <param name="cacheService">Cache service instance.</param>
+    public abstract class BaseRepository(SadSchoolContext context, ICacheService cacheService) : IBaseRepository
     {
-        #pragma warning disable SA1401 // Fields should be private
         /// <summary>
-        /// Database context instance.
+        /// Gets database context instance.
         /// </summary>
-        protected readonly SadSchoolContext context;
+        protected SadSchoolContext Context { get; } = context;
 
         /// <summary>
-        /// Cache service instance.
+        /// Gets cache service instance.
         /// </summary>
-        protected readonly ICacheService cacheService;
-#pragma warning restore SA1401
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="BaseRepository"/> class.
-        /// </summary>
-        /// <param name="context">DB context.</param>
-        /// <param name="cacheService">Cache service instance.</param>
-        public BaseRepository(SadSchoolContext context, ICacheService cacheService)
-        {
-            this.context = context;
-            this.cacheService = cacheService;
-        }
+        protected ICacheService CacheService { get; } = cacheService;
 
         /// <inheritdoc/>
         public async Task<List<T>> GetAllEntitiesAsync<T>()
             where T : BaseModel
         {
-            var entities = this.cacheService.GetObjects<T>();
+            var entities = this.CacheService.GetObjects<T>();
 
             if (entities != null)
             {
                 return entities;
             }
 
-            entities = await this.context.Set<T>().ToListAsync();
+            entities = await this.Context.Set<T>().ToListAsync();
 
-            this.cacheService.SetObjects(entities);
+            this.CacheService.SetObjects(entities);
 
             return entities;
         }
@@ -55,18 +51,18 @@ namespace SadSchool.Repositories
         public async Task<T?> GetEntityByIdAsync<T>(int id)
             where T : BaseModel
         {
-            var entity = this.cacheService.GetObject<T>(id);
+            var entity = this.CacheService.GetObject<T>(id);
 
             if (entity != null)
             {
                 return entity;
             }
 
-            entity = await this.context.Set<T>().FindAsync(id);
+            entity = await this.Context.Set<T>().FindAsync(id);
 
             if (entity != null)
             {
-                this.cacheService.SetObject(entity);
+                this.CacheService.SetObject(entity);
             }
 
             return entity;
@@ -78,11 +74,11 @@ namespace SadSchool.Repositories
         {
             try
             {
-                await this.context.Set<T>().AddAsync(entity);
-                await this.context.SaveChangesAsync();
+                await this.Context.Set<T>().AddAsync(entity);
+                await this.Context.SaveChangesAsync();
 
-                this.cacheService.RemoveObjects<T>();
-                this.cacheService.SetObject(entity);
+                this.CacheService.RemoveObjects<T>();
+                this.CacheService.SetObject(entity);
 
                 return entity;
             }
@@ -100,7 +96,7 @@ namespace SadSchool.Repositories
         public async Task<bool> UpdateEntityAsync<T>(T entity)
             where T : BaseModel
         {
-            var existing = await this.context.Set<T>().FindAsync(entity.Id);
+            var existing = await this.Context.Set<T>().FindAsync(entity.Id);
 
             if (existing == null)
             {
@@ -109,12 +105,12 @@ namespace SadSchool.Repositories
                 return false;
             }
 
-            this.context.Entry(existing).CurrentValues.SetValues(entity);
+            this.Context.Entry(existing).CurrentValues.SetValues(entity);
 
-            await this.context.SaveChangesAsync();
+            await this.Context.SaveChangesAsync();
 
-            this.cacheService.RemoveObject(existing);
-            this.cacheService.RemoveObjects<T>();
+            this.CacheService.RemoveObject(existing);
+            this.CacheService.RemoveObjects<T>();
 
             return true;
         }
@@ -127,11 +123,11 @@ namespace SadSchool.Repositories
 
             if (entity != null)
             {
-                this.context.Set<T>().Remove(entity);
-                await this.context.SaveChangesAsync();
+                this.Context.Set<T>().Remove(entity);
+                await this.Context.SaveChangesAsync();
 
-                this.cacheService.RemoveObject(entity);
-                this.cacheService.RemoveObjects<T>();
+                this.CacheService.RemoveObject(entity);
+                this.CacheService.RemoveObjects<T>();
 
                 return true;
             }

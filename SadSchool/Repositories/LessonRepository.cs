@@ -27,7 +27,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<Lesson>> GetLessonsByDateAsync(string date)
         {
-            return await this.context.Lessons
+            return await this.Context.Lessons
                 .Where(l => l.Date == date)
                 .ToListAsync();
         }
@@ -35,7 +35,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<Lesson?> GetLessonByScheduledLessonIdAsync(int scheduledLessonId)
         {
-            return await this.context.Lessons
+            return await this.Context.Lessons
                 .FirstOrDefaultAsync(l => l.ScheduledLessonId == scheduledLessonId);
         }
     }

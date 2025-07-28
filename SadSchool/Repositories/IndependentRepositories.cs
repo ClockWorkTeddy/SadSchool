@@ -1,7 +1,11 @@
-﻿using SadSchool.Contracts.Repositories;
+﻿// <copyright file="IndependentRepositories.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Repositories
 {
+    using SadSchool.Contracts.Repositories;
+
     /// <inheritdoc/>
     public class IndependentRepositories(
         ITeacherRepository teacherRepository,

@@ -1,4 +1,8 @@
-﻿namespace SadSchool.Repositories
+﻿// <copyright file="StartTimeRepository.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+namespace SadSchool.Repositories
 {
     using SadSchool.Contracts;
     using SadSchool.Contracts.Repositories;

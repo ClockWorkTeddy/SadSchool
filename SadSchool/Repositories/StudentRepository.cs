@@ -1,4 +1,8 @@
-﻿namespace SadSchool.Repositories
+﻿// <copyright file="StudentRepository.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
+namespace SadSchool.Repositories
 {
     using Microsoft.EntityFrameworkCore;
     using SadSchool.Contracts;
@@ -20,31 +24,31 @@
         /// <inheritdoc/>
         public async Task<List<Student>> GetStudentsByFirstNameAsync(string firstName)
         {
-            return await this.context.Students.Where(s => s.FirstName == firstName).ToListAsync();
+            return await this.Context.Students.Where(s => s.FirstName == firstName).ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<Student>> GetStudentsByLastNameAsync(string lastName)
         {
-            return await this.context.Students.Where(s => s.LastName == lastName).ToListAsync();
+            return await this.Context.Students.Where(s => s.LastName == lastName).ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<Student>> GetStudentsByDateOfBirthAsync(DateOnly dateOfBirth)
         {
-            return await this.context.Students.Where(s => s.DateOfBirth == dateOfBirth).ToListAsync();
+            return await this.Context.Students.Where(s => s.DateOfBirth == dateOfBirth).ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<Student>> GetStudentsByClassIdAsync(int classId)
         {
-            return await this.context.Students.Where(s => s.ClassId == classId).ToListAsync();
+            return await this.Context.Students.Where(s => s.ClassId == classId).ToListAsync();
         }
 
         /// <inheritdoc/>
         public async Task<List<Student>> GetStudentsBySexAsync(bool isMale)
         {
-            return await this.context.Students.Where(s => s.Sex == isMale).ToListAsync();
+            return await this.Context.Students.Where(s => s.Sex == isMale).ToListAsync();
         }
     }
 }

@@ -14,35 +14,27 @@ namespace SadSchool.Controllers
     /// <summary>
     /// Manages class books processing.
     /// </summary>
-    public class ClassBooksController : Controller
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ClassBooksController"/> class.
+    /// </remarks>
+    /// <param name="classRepository">Class repository instance,
+    ///     that responses for class data operations.</param>
+    /// <param name="subjectRepository">Subject repository instance,
+    ///     that responses for subject data operations.</param>
+    /// <param name="navigationService">A navigation service instance,
+    ///     that responces for the "Back" button operating.</param>
+    /// <param name="classBookService">A class books service instance,
+    ///     that responses for class book data operations.</param>
+    public class ClassBooksController(
+        IClassRepository classRepository,
+        ISubjectRepository subjectRepository,
+        INavigationService navigationService,
+        IClassBookService classBookService) : Controller
     {
-        private readonly IClassRepository classRepository;
-        private readonly ISubjectRepository subjectRepository;
-        private readonly INavigationService navigationService;
-        private readonly IClassBookService classBookService;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ClassBooksController"/> class.
-        /// </summary>
-        /// <param name="classRepository">Class repository instance,
-        ///     that responses for class data operations.</param>
-        /// <param name="subjectRepository">Subject repository instance,
-        ///     that responses for subject data operations.</param>
-        /// <param name="navigationService">A navigation service instance,
-        ///     that responces for the "Back" button operating.</param>
-        /// <param name="classBookService">A class books service instance,
-        ///     that responses for class book data operations.</param>
-        public ClassBooksController(
-            IClassRepository classRepository,
-            ISubjectRepository subjectRepository,
-            INavigationService navigationService,
-            IClassBookService classBookService)
-        {
-            this.classRepository = classRepository;
-            this.subjectRepository = subjectRepository;
-            this.classBookService = classBookService;
-            this.navigationService = navigationService;
-        }
+        private readonly IClassRepository classRepository = classRepository;
+        private readonly ISubjectRepository subjectRepository = subjectRepository;
+        private readonly INavigationService navigationService = navigationService;
+        private readonly IClassBookService classBookService = classBookService;
 
         /// <summary>
         /// Gets class books view.

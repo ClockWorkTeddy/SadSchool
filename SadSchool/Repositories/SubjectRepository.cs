@@ -1,11 +1,15 @@
-﻿using Microsoft.EntityFrameworkCore;
-using SadSchool.Contracts.Repositories;
-using SadSchool.Contracts;
-using SadSchool.DbContexts;
-using SadSchool.Models.SqlServer;
+﻿// <copyright file="SubjectRepository.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
 
 namespace SadSchool.Repositories
 {
+    using Microsoft.EntityFrameworkCore;
+    using SadSchool.Contracts;
+    using SadSchool.Contracts.Repositories;
+    using SadSchool.DbContexts;
+    using SadSchool.Models.SqlServer;
+
     /// <summary>
     /// Provides methods for accessing and managing subjects within the data store.
     /// </summary>
@@ -19,7 +23,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<Subject?> GetSubjectByNameAsync(string name)
         {
-            return await this.context.Subjects.FirstOrDefaultAsync(s => s.Name == name);
+            return await this.Context.Subjects.FirstOrDefaultAsync(s => s.Name == name);
         }
     }
 }

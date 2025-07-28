@@ -4,51 +4,41 @@
 
 namespace SadSchool.Controllers
 {
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using MongoDB.Bson;
     using MongoDB.Driver;
     using SadSchool.Contracts;
     using SadSchool.Contracts.Repositories;
-    using SadSchool.DbContexts;
     using SadSchool.Dtos;
     using SadSchool.Models.Mongo;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Processes <see cref="Mark"/> entities.
     /// </summary>
-    public class MarkController : Controller
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="MarkController"/> class.
+    /// </remarks>
+    /// <param name="subjectRepository">Subject repository instance.</param>"
+    /// <param name="derivedRepositories">Derived repositories instance.</param>
+    /// <param name="navigationService">Service instance processing Back button logic.</param>
+    /// <param name="marksAnalyticsService">Service operates marks analytics.</param>
+    /// <param name="authService">Authentication check service instance.</param>
+    public class MarkController(
+        ISubjectRepository subjectRepository,
+        IDerivedRepositories derivedRepositories,
+        INavigationService navigationService,
+        IMarksAnalyticsService marksAnalyticsService,
+        IAuthService authService) : Controller
     {
-        private readonly ISubjectRepository subjectRepository;
-        private readonly IDerivedRepositories derivedRepositories;
-        private readonly INavigationService navigationService;
-        private readonly IMarksAnalyticsService marksAnalyticsService;
-        private readonly IAuthService authService;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MarkController"/> class.
-        /// </summary>
-        /// <param name="subjectRepository">Subject repository instance.</param>"
-        /// <param name="derivedRepositories">Derived repositories instance.</param>
-        /// <param name="navigationService">Service instance processing Back button logic.</param>
-        /// <param name="marksAnalyticsService">Service operates marks analytics.</param>
-        /// <param name="authService">Authentication check service instance.</param>
-        public MarkController(
-            ISubjectRepository subjectRepository,
-            IDerivedRepositories derivedRepositories,
-            INavigationService navigationService,
-            IMarksAnalyticsService marksAnalyticsService,
-            IAuthService authService)
-        {
-            this.subjectRepository = subjectRepository;
-            this.derivedRepositories = derivedRepositories;
-            this.navigationService = navigationService;
-            this.marksAnalyticsService = marksAnalyticsService;
-            this.authService = authService;
-        }
+        private readonly ISubjectRepository subjectRepository = subjectRepository;
+        private readonly IDerivedRepositories derivedRepositories = derivedRepositories;
+        private readonly INavigationService navigationService = navigationService;
+        private readonly IMarksAnalyticsService marksAnalyticsService = marksAnalyticsService;
+        private readonly IAuthService authService = authService;
 
         /// <summary>
         /// Gets marks view.
@@ -89,7 +79,7 @@ namespace SadSchool.Controllers
         {
             if (this.authService.IsAutorized(this.User))
             {
-                MarkViewModel viewModel = new MarkViewModel()
+                MarkViewModel viewModel = new()
                 {
                     Students = await this.GetStudentsList(null),
                     Lessons = await this.GetLessonsList(null),
@@ -177,9 +167,9 @@ namespace SadSchool.Controllers
                     mark.LessonId = viewModel.LessonId;
                     mark.StudentId = viewModel.StudentId;
                     mark.Value = viewModel.Value;
-                }
 
-                await this.derivedRepositories.MarkRepository.UpdateMarkAsync(mark);
+                    await this.derivedRepositories.MarkRepository.UpdateMarkAsync(mark);
+                }
 
                 return this.RedirectToAction("Marks");
             }
@@ -267,32 +257,33 @@ namespace SadSchool.Controllers
         {
             var lessons = await this.derivedRepositories.LessonRepository.GetAllEntitiesAsync<Lesson>();
 
-            return lessons.Select(lesson => new SelectListItem
+            return [.. lessons.Select(lesson => new SelectListItem
             {
                 Value = lesson.Id.ToString(),
                 Text = $"{lesson.Date} {lesson.ScheduledLesson}",
                 Selected = lesson.Id == lessonId,
-            }).ToList();
+            })];
         }
 
         private async Task<List<SelectListItem>> GetStudentsList(int? studentId)
         {
             var students = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>();
 
-            return students.Select(student => new SelectListItem
+            return [.. students.Select(student => new SelectListItem
             {
                 Value = student.Id.ToString(),
                 Text = $"{student.FirstName} {student.LastName}",
                 Selected = student.Id == studentId,
-            }).ToList();
+            })];
         }
 
         private async Task<List<SelectListItem>> GetStudents()
         {
-            var students = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>(); 
+            var students = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>();
+
             var studentsItemList = new List<SelectListItem>()
             {
-                new SelectListItem
+                new()
                 {
                     Value = 0.ToString(),
                     Text = string.Empty,
@@ -300,12 +291,12 @@ namespace SadSchool.Controllers
                 },
             };
 
-            studentsItemList.AddRange(students.Select(student => new SelectListItem
+            studentsItemList.AddRange([.. students.Select(student => new SelectListItem
             {
                 Value = student.Id.ToString(),
                 Text = student.ToString(),
                 Selected = false,
-            }).ToList());
+            })]);
 
             return studentsItemList;
         }
@@ -315,15 +306,15 @@ namespace SadSchool.Controllers
             var subjects = await this.subjectRepository.GetAllEntitiesAsync<Subject>();
             var subjectsList = new List<SelectListItem>()
             {
-                new SelectListItem { Value = 0.ToString(), Text = string.Empty, Selected = true },
+                new() { Value = 0.ToString(), Text = string.Empty, Selected = true },
             };
 
-            subjectsList.AddRange(subjects.Select(subject => new SelectListItem
+            subjectsList.AddRange([.. subjects.Select(subject => new SelectListItem
             {
                 Value = subject.Id.ToString(),
                 Text = subject.Name,
                 Selected = false,
-            }).ToList());
+            })]);
 
             return subjectsList;
         }

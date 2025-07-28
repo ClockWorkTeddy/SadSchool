@@ -14,31 +14,23 @@ namespace SadSchool.Controllers
     /// <summary>
     /// Processes requests for scheduled lesson data.
     /// </summary>
-    public class ScheduledLessonController : Controller
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="ScheduledLessonController"/> class.
+    /// </remarks>
+    /// <param name="scheduledLessonRepository">DB context repository instance.</param>
+    /// <param name="navigationService">Service processes "Back" button.</param>
+    /// <param name="authService">Service processes user authorization check.</param>
+    /// <param name="scheduledLessonMapper">Service processes mapping operations.</param>
+    public class ScheduledLessonController(
+        IScheduledLessonRepository scheduledLessonRepository,
+        INavigationService navigationService,
+        IAuthService authService,
+        IScheduledLessonMapper scheduledLessonMapper) : Controller
     {
-        private readonly IScheduledLessonRepository scheduledLessonRepository;
-        private readonly INavigationService navigationService;
-        private readonly IAuthService authService;
-        private readonly IScheduledLessonMapper scheduledLessonMapper;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="ScheduledLessonController"/> class.
-        /// </summary>
-        /// <param name="scheduledLessonRepository">DB context repository instance.</param>
-        /// <param name="navigationService">Service processes "Back" button.</param>
-        /// <param name="authService">Service processes user authorization check.</param>
-        /// <param name="scheduledLessonMapper">Service processes mapping operations.</param>
-        public ScheduledLessonController(
-            IScheduledLessonRepository scheduledLessonRepository,
-            INavigationService navigationService,
-            IAuthService authService,
-            IScheduledLessonMapper scheduledLessonMapper)
-        {
-            this.scheduledLessonRepository = scheduledLessonRepository;
-            this.navigationService = navigationService;
-            this.authService = authService;
-            this.scheduledLessonMapper = scheduledLessonMapper;
-        }
+        private readonly IScheduledLessonRepository scheduledLessonRepository = scheduledLessonRepository;
+        private readonly INavigationService navigationService = navigationService;
+        private readonly IAuthService authService = authService;
+        private readonly IScheduledLessonMapper scheduledLessonMapper = scheduledLessonMapper;
 
         /// <summary>
         /// Gets the scheduled lessons view.
@@ -172,48 +164,48 @@ namespace SadSchool.Controllers
         {
             var classes = await this.scheduledLessonRepository.GetAllEntitiesAsync<Class>();
 
-            return classes.Select(theClass => new SelectListItem
+            return [.. classes.Select(theClass => new SelectListItem
             {
                 Value = theClass.Id.ToString(),
                 Text = theClass.Name,
                 Selected = theClass.Id == classId,
-            }).ToList();
+            })];
         }
 
         private async Task<List<SelectListItem>> GetSubjectsList(int? subjectId)
         {
             var subjects = await this.scheduledLessonRepository.GetAllEntitiesAsync<Subject>();
 
-            return subjects.Select(subject => new SelectListItem
+            return [.. subjects.Select(subject => new SelectListItem
             {
                 Value = subject.Id.ToString(),
                 Text = subject.Name,
                 Selected = subject.Id == subjectId,
-            }).ToList();
+            })];
         }
 
         private async Task<List<SelectListItem>> GetTeachersList(int? teacherId)
         {
             var teachers = await this.scheduledLessonRepository.GetAllEntitiesAsync<Teacher>();
 
-            return teachers.Select(teacher => new SelectListItem
+            return [.. teachers.Select(teacher => new SelectListItem
             {
                 Value = teacher.Id.ToString(),
                 Text = $"{teacher.FirstName} {teacher.LastName}",
                 Selected = teacher.Id == teacherId,
-            }).ToList();
+            })];
         }
 
         private async Task<List<SelectListItem>> GetStartTimesList(int? startId)
         {
             var starts = await this.scheduledLessonRepository.GetAllEntitiesAsync<StartTime>();
 
-            return starts.Select(start => new SelectListItem
+            return [.. starts.Select(start => new SelectListItem
             {
                 Value = start.Id.ToString(),
                 Text = start.Value,
                 Selected = start.Id == startId,
-            }).ToList();
+            })];
         }
     }
 }

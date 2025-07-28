@@ -14,35 +14,26 @@ namespace SadSchool.Controllers
     /// <summary>
     /// Processes requests for teacher data.
     /// </summary>
-    public class TeacherController : Controller
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="TeacherController"/> class.
+    /// </remarks>
+    /// <param name="teacherRepository">DB context.</param>
+    /// <param name="navigationService">Services processes "Back" button.</param>
+    /// <param name="authService">Service processes user authorization check.</param>
+    /// <param name="cacheService">Service processes cache operations.</param>
+    /// <param name="commonMapper">Service processes mapping operations.</param>
+    public class TeacherController(
+        ITeacherRepository teacherRepository,
+        INavigationService navigationService,
+        IAuthService authService,
+        ICommonMapper commonMapper,
+        ICacheService cacheService) : Controller
     {
-        private readonly ITeacherRepository teacherRepository;
-        private readonly INavigationService navigationService;
-        private readonly IAuthService authService;
-        private readonly ICommonMapper commonMapper;
-        private readonly ICacheService cacheService;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TeacherController"/> class.
-        /// </summary>
-        /// <param name="teacherRepository">DB context.</param>
-        /// <param name="navigationService">Services processes "Back" button.</param>
-        /// <param name="authService">Service processes user authorization check.</param>
-        /// <param name="cacheService">Service processes cache operations.</param>
-        /// <param name="commonMapper">Service processes mapping operations.</param>
-        public TeacherController(
-            ITeacherRepository teacherRepository,
-            INavigationService navigationService,
-            IAuthService authService,
-            ICommonMapper commonMapper,
-            ICacheService cacheService)
-        {
-            this.teacherRepository = teacherRepository;
-            this.navigationService = navigationService;
-            this.authService = authService;
-            this.commonMapper = commonMapper;
-            this.cacheService = cacheService;
-        }
+        private readonly ITeacherRepository teacherRepository = teacherRepository;
+        private readonly INavigationService navigationService = navigationService;
+        private readonly IAuthService authService = authService;
+        private readonly ICommonMapper commonMapper = commonMapper;
+        private readonly ICacheService cacheService = cacheService;
 
         /// <summary>
         /// Gets the teachers view.
@@ -54,7 +45,7 @@ namespace SadSchool.Controllers
             var teachers = await this.teacherRepository.GetAllEntitiesAsync<Teacher>();
 
             List<TeacherViewModel> teacherViewModels =
-                teachers.Select(t => this.commonMapper.TeacherToVm(t)).ToList();
+                [.. teachers.Select(t => this.commonMapper.TeacherToVm(t))];
 
             this.navigationService.RefreshBackParams(this.RouteData);
 

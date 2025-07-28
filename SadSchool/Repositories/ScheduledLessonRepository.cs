@@ -1,4 +1,7 @@
-﻿
+﻿// <copyright file="ScheduledLessonRepository.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
 namespace SadSchool.Repositories
 {
     using Microsoft.EntityFrameworkCore;
@@ -21,7 +24,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByStartTimeIdAsync(int startTimeId)
         {
-            return await this.context.ScheduledLessons
+            return await this.Context.ScheduledLessons
                 .Where(x => x.StartTimeId == startTimeId)
                 .ToListAsync();
         }
@@ -29,7 +32,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsBySubjectIdAsync(int subjectId)
         {
-            return await this.context.ScheduledLessons
+            return await this.Context.ScheduledLessons
                 .Where(x => x.SubjectId == subjectId)
                 .ToListAsync();
         }
@@ -37,7 +40,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByClassIdAsync(int classId)
         {
-            return await this.context.ScheduledLessons
+            return await this.Context.ScheduledLessons
                 .Where(x => x.ClassId == classId)
                 .ToListAsync();
         }
@@ -45,7 +48,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByTeacherIdAsync(int teacherId)
         {
-            return await this.context.ScheduledLessons
+            return await this.Context.ScheduledLessons
                 .Where(x => x.TeacherId == teacherId)
                 .ToListAsync();
         }
@@ -53,7 +56,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<ScheduledLesson>> GetScheduledLessonsByDayAsync(Days day)
         {
-            return await this.context.ScheduledLessons
+            return await this.Context.ScheduledLessons
                 .Where(x => x.Day == day.ToString())
                 .ToListAsync();
         }

@@ -4,49 +4,38 @@
 
 namespace SadSchool.Controllers
 {
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Mvc.Rendering;
     using SadSchool.Contracts;
     using SadSchool.Contracts.Repositories;
-    using SadSchool.DbContexts;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Processes requests for student data.
     /// </summary>
-    public class StudentController : Controller
+    /// <remarks>
+    /// Initializes a new instance of the <see cref="StudentController"/> class.
+    /// </remarks>
+    /// <param name="derivedRepositories">Students repository instance.</param>
+    /// <param name="navigationService">Service processes the "Back" button.</param>
+    /// <param name="cacheService">Cache instance.</param>
+    /// <param name="authService">Service processes user authorization check.</param>"
+    /// <param name="commonMapper">Service processes mapping operations.</param>
+    public class StudentController(
+        IDerivedRepositories derivedRepositories,
+        INavigationService navigationService,
+        ICacheService cacheService,
+        IAuthService authService,
+        ICommonMapper commonMapper) : Controller
     {
-        private readonly IStudentRepository studentRepository;
-        private readonly IClassRepository classRepository;
-        private readonly INavigationService navigationService;
-        private readonly ICacheService cacheService;
-        private readonly IAuthService authService;
-        private readonly ICommonMapper commonMapper;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StudentController"/> class.
-        /// </summary>
-        /// <param name="derivedRepositories">Students repository instance.</param>
-        /// <param name="navigationService">Service processes the "Back" button.</param>
-        /// <param name="cacheService">Cache instance.</param>
-        /// <param name="authService">Service processes user authorization check.</param>"
-        /// <param name="commonMapper">Service processes mapping operations.</param>
-        public StudentController(
-            IDerivedRepositories derivedRepositories,
-            INavigationService navigationService,
-            ICacheService cacheService,
-            IAuthService authService,
-            ICommonMapper commonMapper)
-        {
-            this.studentRepository = derivedRepositories.StudentRepository;
-            this.classRepository = derivedRepositories.ClassRepository;
-            this.navigationService = navigationService;
-            this.cacheService = cacheService;
-            this.authService = authService;
-            this.commonMapper = commonMapper;
-        }
+        private readonly IStudentRepository studentRepository = derivedRepositories.StudentRepository;
+        private readonly IClassRepository classRepository = derivedRepositories.ClassRepository;
+        private readonly INavigationService navigationService = navigationService;
+        private readonly ICacheService cacheService = cacheService;
+        private readonly IAuthService authService = authService;
+        private readonly ICommonMapper commonMapper = commonMapper;
 
         /// <summary>
         /// Gets the students view.
@@ -76,7 +65,7 @@ namespace SadSchool.Controllers
                 var viewModel = new StudentViewModel
                 {
                     Classes = await this.GetClassesList(null),
-                    Sexes = this.GetSexes(null),
+                    Sexes = GetSexes(null),
                 };
 
                 this.navigationService.RefreshBackParams(this.RouteData);
@@ -126,7 +115,7 @@ namespace SadSchool.Controllers
                 if (editedStudent != null)
                 {
                     StudentViewModel viewModel = this.commonMapper.StudentToVm(editedStudent);
-                    viewModel.Sexes = this.GetSexes(editedStudent?.Sex);
+                    viewModel.Sexes = GetSexes(editedStudent?.Sex);
                     viewModel.Classes = await this.GetClassesList(editedStudent?.ClassId);
 
                     this.navigationService.RefreshBackParams(this.RouteData);
@@ -183,38 +172,38 @@ namespace SadSchool.Controllers
             return this.RedirectToAction("Students");
         }
 
-        private async Task<List<SelectListItem>> GetClassesList(int? classId)
+        private static List<SelectListItem> GetSexes(bool? sex)
         {
-            var classes = await this.classRepository.GetAllEntitiesAsync<Class>();
-
-            return classes.Select(@class => new SelectListItem
-            {
-                Value = @class.Id.ToString(),
-                Text = $"{@class.Name}",
-                Selected = @class.Id == classId,
-            }).ToList();
-        }
-
-        private List<SelectListItem> GetSexes(bool? sex)
-        {
-            List<SelectListItem> sexes = new()
-            {
+            List<SelectListItem> sexes =
+            [
                 new SelectListItem()
                 {
                     Value = "False",
                     Text = "Male",
-                    Selected = sex.HasValue ? !sex.Value : false,
+                    Selected = sex.HasValue && !sex.Value,
                 },
 
                 new SelectListItem()
                 {
                     Value = "True",
                     Text = "Female",
-                    Selected = sex.HasValue ? sex.Value : false,
+                    Selected = sex.HasValue && sex.Value,
                 },
-            };
+            ];
 
             return sexes;
+        }
+
+        private async Task<List<SelectListItem>> GetClassesList(int? classId)
+        {
+            var classes = await this.classRepository.GetAllEntitiesAsync<Class>();
+
+            return [.. classes.Select(@class => new SelectListItem
+            {
+                Value = @class.Id.ToString(),
+                Text = $"{@class.Name}",
+                Selected = @class.Id == classId,
+            })];
         }
     }
 }

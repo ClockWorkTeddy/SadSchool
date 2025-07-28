@@ -1,4 +1,7 @@
-﻿
+﻿// <copyright file="TeacherRepository.cs" company="ClockWorkTeddy">
+// Written by ClockWorkTeddy.
+// </copyright>
+
 namespace SadSchool.Repositories
 {
     using Microsoft.EntityFrameworkCore;
@@ -8,23 +11,18 @@ namespace SadSchool.Repositories
     using SadSchool.Models.SqlServer;
 
     /// <inheritdoc/>
-    public class TeacherRepository : BaseRepository, ITeacherRepository
+    /// <summary>
+    /// Initializes a new instance of the <see cref="TeacherRepository"/> class with the specified database context.
+    /// </summary>
+    /// <param name="context">The <see cref="SadSchoolContext"/> instance used to interact with the database.  This parameter cannot be
+    /// <see langword="null"/>.</param>
+    /// <param name="cacheService">Cache service instance for caching operations.</param>
+    public class TeacherRepository(SadSchoolContext context, ICacheService cacheService) : BaseRepository(context, cacheService), ITeacherRepository
     {
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TeacherRepository"/> class with the specified database context.
-        /// </summary>
-        /// <param name="context">The <see cref="SadSchoolContext"/> instance used to interact with the database.  This parameter cannot be
-        /// <see langword="null"/>.</param>
-        /// <param name="cacheService">Cache service instance for caching operations.</param>
-        public TeacherRepository(SadSchoolContext context, ICacheService cacheService)
-            : base(context, cacheService)
-        {
-        }
-
         /// <inheritdoc/>
         public async Task<List<Teacher>> GetTeachersByFirstNameAsync(string firstName)
         {
-            return await this.context.Teachers
+            return await this.Context.Teachers
                 .Where(t => t.FirstName == firstName)
                 .ToListAsync();
         }
@@ -32,7 +30,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<Teacher>> GetTeachersByLastNameAsync(string lastName)
         {
-            return await this.context.Teachers
+            return await this.Context.Teachers
                 .Where(t => t.LastName == lastName)
                 .ToListAsync();
         }
@@ -40,7 +38,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<Teacher>> GetTeachersByDateOfBirthAsync(DateOnly dateOfBirth)
         {
-            return await this.context.Teachers
+            return await this.Context.Teachers
                 .Where(t => t.DateOfBirth == dateOfBirth)
                 .ToListAsync();
         }
@@ -48,7 +46,7 @@ namespace SadSchool.Repositories
         /// <inheritdoc/>
         public async Task<List<Teacher>> GetTeachersByGradeAsync(int grade)
         {
-            return await this.context.Teachers
+            return await this.Context.Teachers
                 .Where(t => t.Grade == grade)
                 .ToListAsync();
         }
