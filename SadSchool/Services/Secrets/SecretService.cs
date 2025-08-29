@@ -33,7 +33,7 @@ namespace SadSchool.Services.Secrets
         /// <returns>String with redis conn string.</returns>
         public string? GetSecret(string keyName)
         {
-            Log.Information("SecretService.GetSecret(): method called with parameters: keyName = {keyName}", keyName);
+            Log.Information("SecretService.GetSecret(): method called with parameters: keyName = {KeyName}", keyName);
 
             var varKeyVault = this.confManager[this.destVariableName];
 

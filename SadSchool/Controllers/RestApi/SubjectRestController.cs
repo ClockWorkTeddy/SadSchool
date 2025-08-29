@@ -5,9 +5,9 @@
 namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
     /// <summary>
@@ -15,42 +15,35 @@ namespace SadSchool.Controllers.RestApi
     /// </summary>
     [ApiController]
     [Route("api/rest/subjects")]
-    public class SubjectRestController : Controller
+    public class SubjectRestController : ControllerBase
     {
-        private readonly string? apiKey = string.Empty;
-        private readonly IConfiguration configuration;
-        private readonly ICacheService cacheService;
-        private readonly SadSchoolContext context;
+        private readonly string? apiKey;
+        private readonly ISubjectRepository subjectRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SubjectRestController"/> class.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="subjectRepository">DB context instance.</param>
         /// <param name="configuration">Configuration object instance.</param>
-        /// <param name="cacheService">Cache service instance.</param>
         public SubjectRestController(
-            SadSchoolContext context,
-            IConfiguration configuration,
-            ICacheService cacheService)
+            ISubjectRepository subjectRepository,
+            IConfiguration configuration)
         {
-            this.context = context;
-            this.configuration = configuration;
-            this.apiKey = this.configuration["api-key"];
-            this.cacheService = cacheService;
+            this.subjectRepository = subjectRepository;
+            this.apiKey = configuration["api-key"];
         }
 
         /// <summary>
         /// The method gets collection of subjects from DB.
         /// </summary>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var subjects = this.context.Subjects.ToList();
+                var subjects = await this.subjectRepository.GetAllEntitiesAsync<Subject>();
 
                 return this.Ok(JsonSerializer.Serialize(subjects));
             }
@@ -64,15 +57,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method gets subject by id.
         /// </summary>
         /// <param name="id">Desirable subject id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var subject = this.cacheService.GetObject<Subject>(id);
+                var subject = await this.subjectRepository.GetEntityByIdAsync<Subject>(id);
 
                 return this.Ok(JsonSerializer.Serialize(subject));
             }
@@ -86,17 +78,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method adds a new subject to DB.
         /// </summary>
         /// <param name="subject">Created subject data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] Subject subject)
+        public async Task<IActionResult> Post([FromBody] Subject subject, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                this.context.Subjects.Add(subject);
-                this.context.SaveChanges();
-
+                await this.subjectRepository.AddEntityAsync(subject);
                 return this.Ok();
             }
             else
@@ -110,21 +99,20 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="subjectId">Edited subject id.</param>
         /// <param name="subject">Edited subject data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPut("{subjectId}")]
-        public IActionResult Put(int subjectId, [FromBody] Subject subject)
+        public async Task<IActionResult> Put(int subjectId, [FromBody] Subject subject, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var subjectToUpdate = this.context.Subjects.Find(subjectId);
+                var subjectToUpdate = await this.subjectRepository.GetEntityByIdAsync<Subject>(subjectId);
 
                 if (subjectToUpdate != null)
                 {
                     subjectToUpdate.Name = subject.Name;
 
-                    this.context.SaveChanges();
+                    await this.subjectRepository.UpdateEntityAsync(subjectToUpdate);
 
                     return this.Ok();
                 }
@@ -132,6 +120,28 @@ namespace SadSchool.Controllers.RestApi
                 {
                     return this.NotFound();
                 }
+            }
+            else
+            {
+                return this.Unauthorized();
+            }
+        }
+
+        /// <summary>
+        /// Deletes a subject with the specified identifier.
+        /// </summary>
+        /// <param name="subjectId">The unique identifier of the subject to delete.</param>
+        /// <param name="apiKey">The API key provided in the request header for authentication.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.  Returns <see cref="OkResult"/> if
+        /// the subject is successfully deleted, or  <see cref="UnauthorizedResult"/> if the provided API key is
+        /// invalid.</returns>
+        [HttpDelete("{subjectId}")]
+        public async Task<IActionResult> Delete(int subjectId, [FromHeader(Name = "api-key")] string apiKey)
+        {
+            if (apiKey == null || apiKey == this.apiKey)
+            {
+                await this.subjectRepository.DeleteEntityAsync<Subject>(subjectId);
+                return this.Ok();
             }
             else
             {

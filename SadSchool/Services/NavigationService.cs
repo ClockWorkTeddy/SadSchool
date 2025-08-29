@@ -12,7 +12,7 @@ namespace SadSchool.Services
     /// </summary>
     public class NavigationService : INavigationService
     {
-        private Dictionary<string, UrlParams> map = new();
+        private readonly Dictionary<string, UrlParams> map = new();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="NavigationService"/> class.
@@ -81,7 +81,7 @@ namespace SadSchool.Services
         /// <param name="className">Class name.</param>
         public void StoreClassName(string className)
         {
-            Log.Information($"NavigationService.StoreClassName(): method called for className = {className}");
+            Log.Information("NavigationService.StoreClassName(): method called for className = {ClassName}", className);
 
             this.ClassName = className;
         }
@@ -94,13 +94,13 @@ namespace SadSchool.Services
         {
             Log.Information("NavigationService.RefreshBackParams(): method called.");
 
-            string adress = this.GetAdress(routeData);
+            string adress = GetAdress(routeData);
 
             this.Controller = this.map[adress].Controller;
             this.Action = this.map[adress].Action;
         }
 
-        private string GetAdress(RouteData routeData) =>
+        private static string GetAdress(RouteData routeData) =>
             routeData?.Values["controller"]?.ToString() + ":" + routeData?.Values["action"]?.ToString();
     }
 }

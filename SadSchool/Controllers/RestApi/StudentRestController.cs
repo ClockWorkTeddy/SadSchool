@@ -6,8 +6,7 @@ namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
     /// <summary>
@@ -15,42 +14,35 @@ namespace SadSchool.Controllers.RestApi
     /// </summary>
     [ApiController]
     [Route("api/rest/students")]
-    public class StudentRestController : Controller
+    public class StudentRestController : ControllerBase
     {
-        private readonly string? apiKey = string.Empty;
-        private readonly IConfiguration configuration;
-        private readonly ICacheService cacheService;
-        private readonly SadSchoolContext context;
+        private readonly string? apiKey;
+        private readonly IDerivedRepositories derivedRepositories;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StudentRestController"/> class.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="derivedRepositories">Derived repo instance.</param>
         /// <param name="configuration">Configuration object instance.</param>
-        /// <param name="cacheService">Cache service instance.</param>
         public StudentRestController(
-            SadSchoolContext context,
-            IConfiguration configuration,
-            ICacheService cacheService)
+            IDerivedRepositories derivedRepositories,
+            IConfiguration configuration)
         {
-            this.context = context;
-            this.configuration = configuration;
-            this.apiKey = this.configuration["api-key"];
-            this.cacheService = cacheService;
+            this.derivedRepositories = derivedRepositories;
+            this.apiKey = configuration["api-key"];
         }
 
         /// <summary>
         /// The method gets collection of students from DB.
         /// </summary>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var students = this.context.Students.ToList();
+                var students = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>();
 
                 return this.Ok(JsonSerializer.Serialize(students));
             }
@@ -64,15 +56,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method gets student by id from DB.
         /// </summary>
         /// <param name="id">Target student's id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var student = this.cacheService.GetObject<Student>(id);
+                var student = await this.derivedRepositories.StudentRepository.GetEntityByIdAsync<Student>(id);
 
                 return this.Ok(JsonSerializer.Serialize(student));
             }
@@ -86,16 +77,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method adds a new student to DB.
         /// </summary>
         /// <param name="student">Created student's name.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] Student student)
+        public async Task<IActionResult> Post([FromBody] Student student, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == this.apiKey)
             {
-                this.context.Students.Add(student);
-                this.context.SaveChanges();
+                await this.derivedRepositories.StudentRepository.AddEntityAsync(student);
 
                 return this.Ok();
             }
@@ -110,15 +99,14 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="id">Updated student's id.</param>
         /// <param name="student">Updated student's data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] Student student)
+        public async Task<IActionResult> Put(int id, [FromBody] Student student, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == this.apiKey)
             {
-                var studentToUpdate = this.context.Students.Find(id);
+                var studentToUpdate = await this.derivedRepositories.StudentRepository.GetEntityByIdAsync<Student>(id);
 
                 if (studentToUpdate == null)
                 {
@@ -131,8 +119,31 @@ namespace SadSchool.Controllers.RestApi
                 studentToUpdate.ClassId = student.ClassId;
                 studentToUpdate.Sex = student.Sex;
 
-                this.context.Students.Update(studentToUpdate);
-                this.context.SaveChanges();
+                await this.derivedRepositories.StudentRepository.UpdateEntityAsync(studentToUpdate);
+
+                return this.Ok();
+            }
+            else
+            {
+                return this.Unauthorized();
+            }
+        }
+
+        /// <summary>
+        /// Deletes a student entity with the specified identifier.
+        /// </summary>
+        /// <remarks>The API key must match the expected value for the operation to proceed. If the API
+        /// key is invalid, the request will be rejected with an unauthorized response.</remarks>
+        /// <param name="id">The unique identifier of the student entity to delete.</param>
+        /// <param name="apiKey">The API key provided in the request header for authentication.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.  Returns <see cref="OkResult"/> if
+        /// the deletion is successful, or <see cref="UnauthorizedResult"/> if the provided API key is invalid.</returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id, [FromHeader(Name = "api-key")] string apiKey)
+        {
+            if (apiKey == this.apiKey)
+            {
+                await this.derivedRepositories.StudentRepository.DeleteEntityAsync<Student>(id);
 
                 return this.Ok();
             }

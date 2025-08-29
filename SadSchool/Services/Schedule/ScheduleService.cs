@@ -13,8 +13,8 @@ namespace SadSchool.Services.Schedule
     /// </summary>
     public class ScheduleService
     {
-        private List<ScheduledLesson> scheduledLessons = new();
-        private List<ScheduleCellDto> unsortedCells = new();
+        private readonly List<ScheduledLesson> scheduledLessons;
+        private readonly List<ScheduleCellDto> unsortedCells = new();
         private List<string?> classes = new();
 
         /// <summary>
@@ -47,8 +47,6 @@ namespace SadSchool.Services.Schedule
         private void GetOverallCells()
         {
             Log.Debug("ScheduleService.GetOverallCells(): method called.");
-
-            List<ScheduleCellDto> cells = new();
 
             foreach (var scheduledLesson in this.scheduledLessons)
             {
@@ -108,7 +106,7 @@ namespace SadSchool.Services.Schedule
 
         private bool Check(ScheduleCellDto cell, string day, int classIndex)
         {
-            Log.Debug($"ScheduleService.Check(): method called for day = {day}, classIndex = {classIndex}");
+            Log.Debug("ScheduleService.Check(): method called for day = {Day}, classIndex = {ClassIndex}", day, classIndex);
 
             return cell.Day == day && cell.ClassName == this.classes[classIndex];
         }
@@ -117,8 +115,11 @@ namespace SadSchool.Services.Schedule
         {
             Log.Debug("ScheduleService.GetClasses(): method called.");
 
-            this.classes = this.unsortedCells.Select(cell => cell.ClassName).Distinct().ToList();
-            this.classes.OrderBy(s => s, new MixedNumericStringComparer()).ToList();
+            this.classes = this.unsortedCells
+                .Select(cell => cell.ClassName)
+                .Distinct()
+                .OrderBy(s => s, new MixedNumericStringComparer())
+                .ToList();
         }
     }
 }

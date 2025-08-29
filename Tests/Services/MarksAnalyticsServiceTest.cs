@@ -41,11 +41,6 @@ namespace Tests.Services
             this.sadSchoolContextMock = fixture.Create<Mock<SadSchoolContext>>();
             this.mongoContextMock = fixture.Create<Mock<MongoContext>>();
             this.cacheServiceMock = fixture.Create<Mock<ICacheService>>();
-
-            this.service = new MarksAnalyticsService(
-                this.mongoContextMock.Object,
-                this.cacheServiceMock.Object,
-                this.sadSchoolContextMock.Object);
         }
 
         /// <summary>

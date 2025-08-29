@@ -6,7 +6,6 @@ namespace SadSchool.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
-    using SadSchool.Services;
 
     /// <summary>
     /// Processes requests for stuff data.

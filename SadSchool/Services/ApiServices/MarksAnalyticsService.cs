@@ -5,8 +5,10 @@
 namespace SadSchool.Services.ApiServices
 {
     using SadSchool.Contracts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.DbContexts;
     using SadSchool.Dtos;
+    using SadSchool.Models.Mongo;
     using SadSchool.Models.SqlServer;
     using Serilog;
 
@@ -15,21 +17,24 @@ namespace SadSchool.Services.ApiServices
     /// </summary>
     public class MarksAnalyticsService : IMarksAnalyticsService
     {
-        private readonly ICacheService cacheService;
-        private MongoContext mongoContext;
-        private SadSchoolContext context;
+        private readonly IMarkRepository markRepository;
+        private readonly IDerivedRepositories derivedRepositories;
+        private readonly ISubjectRepository subjectRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MarksAnalyticsService"/> class.
         /// </summary>
-        /// <param name="mongoContext">DB context instance.</param>
-        /// <param name="cacheService">Cache servece instance.</param>
-        /// <param name="context">SadSchool context.</param>
-        public MarksAnalyticsService(MongoContext mongoContext, ICacheService cacheService, SadSchoolContext context)
+        /// <param name="markRepository">Mark repo instance.</param>
+        /// <param name="derivedRepositories">Derived repo collection instance.</param>
+        /// <param name="subjectRepository">Subject repo instance.</param>
+        public MarksAnalyticsService(
+            IMarkRepository markRepository,
+            IDerivedRepositories derivedRepositories,
+            ISubjectRepository subjectRepository)
         {
-            this.context = context;
-            this.mongoContext = mongoContext;
-            this.cacheService = cacheService;
+            this.markRepository = markRepository;
+            this.derivedRepositories = derivedRepositories;
+            this.subjectRepository = subjectRepository;
         }
 
         /// <summary>
@@ -39,21 +44,21 @@ namespace SadSchool.Services.ApiServices
         /// <param name="subjectId">The id of the desirable subject.</param>
         /// <returns>Average marks collection for selected student and subject
         ///     (for all students\subject if none selected).</returns>
-        public List<AverageMarkDto> GetAverageMarks(int studentId, int subjectId)
+        public async Task<List<AverageMarkDto>> GetAverageMarks(int studentId, int subjectId)
         {
-            Log.Information("MarksAnalyticsService.GetAverageMarks(): method called with parameters: studentId = {studentId}, subjectId = {subjectId}", studentId, subjectId);
+            Log.Information("MarksAnalyticsService.GetAverageMarks(): method called with parameters: studentId = {StudentId}, ubjectId = {SubjectId}", studentId, subjectId);
 
             List<AverageMarkDto> averageMarks = [];
-            var students = this.GetStudents(studentId);
-            var subjects = this.GetSubjects(subjectId);
+            var students = await this.GetStudents(studentId);
+            var subjects = await this.GetSubjects(subjectId);
 
             foreach (var student in students)
             {
                 foreach (var subject in subjects)
                 {
-                    var averageMark = this.GetAveragesMark(student, subject!);
+                    var averageMark = await this.GetAveragesMark(student!, subject!);
 
-                    if (averageMark.MarkValue != 0)
+                    if (averageMark.MarkValue.Equals(0))
                     {
                         averageMarks.Add(averageMark);
                     }
@@ -63,43 +68,52 @@ namespace SadSchool.Services.ApiServices
             return averageMarks;
         }
 
-        private List<Subject?> GetSubjects(int? subjectId)
+        private async Task<List<Subject?>> GetSubjects(int? subjectId)
         {
-            Log.Information("MarksAnalyticsService.GetSubjects(): method called with parameter: subjectId = {subjectId}", subjectId);
+            Log.Information("MarksAnalyticsService.GetSubjects(): method called with parameter: subjectId = {SubjectId}", subjectId);
 
             if (subjectId == null || subjectId < 1)
             {
-                return this.context.Set<Subject>().ToList<Subject?>();
+                var subjects = await this.subjectRepository.GetAllEntitiesAsync<Subject>();
+                return subjects.ToList<Subject?>();
             }
             else
             {
-                return [this.cacheService.GetObject<Subject>(subjectId.Value)];
+                return [await this.derivedRepositories.StudentRepository.GetEntityByIdAsync<Subject>(subjectId.Value)];
             }
         }
 
-        private List<Student> GetStudents(int? studentId)
+        private async Task<List<Student?>> GetStudents(int? studentId)
         {
-            Log.Information("MarksAnalyticsService.GetStudents(): method called with parameter: studentId = {studentId}", studentId);
+            Log.Information("MarksAnalyticsService.GetStudents(): method called with parameter: studentId = {StudentId}", studentId);
 
             if (studentId == null || studentId < 1)
             {
-                return this.context.Students.ToList();
+                var students = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>();
+                return students.ToList<Student?>();
             }
             else
             {
-                return [this.cacheService.GetObject<Student>(studentId.Value)]!;
+                var student = await this.derivedRepositories.StudentRepository.GetEntityByIdAsync<Student>(studentId.Value);
+                return [student]!;
             }
         }
 
-        private AverageMarkDto GetAveragesMark(Student student, Subject subject)
+        private async Task<AverageMarkDto> GetAveragesMark(Student student, Subject subject)
         {
-            Log.Information("MarksAnalyticsService.GetAveragesMark(): method called with parameters: student = {student}, subject = {subject}", student, subject);
+            Log.Information("MarksAnalyticsService.GetAveragesMark(): method called with parameters: student = {Student}, subject = {Subject}", student, subject);
 
-            var marksForStudent = this.mongoContext.Marks
-                .Where(m => m.StudentId == student.Id).ToList();
+            var marksForStudent = await this.markRepository.GetMarksByStudentIdAsync(student.Id!.Value);
 
-            var foundMarks = marksForStudent.Where(m => m.LessonId != null
-                && this.context.Lessons.Find(m.LessonId)!.ScheduledLesson!.Subject!.Name == subject.Name).ToList();
+            var foundMarks = new List<Mark>();
+            foreach (var m in marksForStudent)
+            {
+                var lesson = await this.derivedRepositories.LessonRepository.GetEntityByIdAsync<Lesson>(m.LessonId!.Value);
+                if (lesson?.ScheduledLesson?.Subject?.Name == subject.Name)
+                {
+                    foundMarks.Add(m);
+                }
+            }
 
             var sum = foundMarks.Sum(mdr => int.Parse(mdr.Value!));
 

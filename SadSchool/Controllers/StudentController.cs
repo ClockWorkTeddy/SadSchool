@@ -20,20 +20,17 @@ namespace SadSchool.Controllers
     /// </remarks>
     /// <param name="derivedRepositories">Students repository instance.</param>
     /// <param name="navigationService">Service processes the "Back" button.</param>
-    /// <param name="cacheService">Cache instance.</param>
     /// <param name="authService">Service processes user authorization check.</param>"
     /// <param name="commonMapper">Service processes mapping operations.</param>
     public class StudentController(
         IDerivedRepositories derivedRepositories,
         INavigationService navigationService,
-        ICacheService cacheService,
         IAuthService authService,
         ICommonMapper commonMapper) : Controller
     {
         private readonly IStudentRepository studentRepository = derivedRepositories.StudentRepository;
         private readonly IClassRepository classRepository = derivedRepositories.ClassRepository;
         private readonly INavigationService navigationService = navigationService;
-        private readonly ICacheService cacheService = cacheService;
         private readonly IAuthService authService = authService;
         private readonly ICommonMapper commonMapper = commonMapper;
 
@@ -84,16 +81,11 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Add(StudentViewModel viewModel)
         {
-            if (this.ModelState.IsValid)
+            if (this.ModelState.IsValid && viewModel != null)
             {
-                if (viewModel != null)
-                {
-                    var student = this.commonMapper.StudentToModel(viewModel);
+                var student = this.commonMapper.StudentToModel(viewModel);
 
-                    await this.studentRepository.AddEntityAsync(student);
-
-                    this.cacheService.GetObject<Student>(student.Id!.Value);
-                }
+                await this.studentRepository.AddEntityAsync(student);
             }
 
             return this.RedirectToAction("Students");
@@ -108,7 +100,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var editedStudent = await this.studentRepository.GetEntityByIdAsync<Student>(id);
 
@@ -142,8 +134,6 @@ namespace SadSchool.Controllers
 
                 await this.studentRepository.UpdateEntityAsync(student);
 
-                this.cacheService.SetObject(student);
-
                 return this.RedirectToAction("Students");
             }
 
@@ -158,14 +148,13 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var student = await this.studentRepository.GetEntityByIdAsync<Student>(id);
 
                 if (student != null)
                 {
                     await this.studentRepository.DeleteEntityAsync<Student>(id);
-                    this.cacheService.RemoveObject(student);
                 }
             }
 

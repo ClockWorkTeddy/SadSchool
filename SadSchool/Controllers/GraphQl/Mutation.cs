@@ -127,7 +127,7 @@ namespace SadSchool.Controllers.GraphQl
                 FirstName = firstName,
                 LastName = lastName,
                 ClassId = classId,
-                DateOfBirth = DateOnly.Parse(dateOfBirth),
+                DateOfBirth = DateOnly.Parse(dateOfBirth, System.Globalization.CultureInfo.InvariantCulture),
             };
 
             context.Students.Add(newStudent);
@@ -174,7 +174,7 @@ namespace SadSchool.Controllers.GraphQl
             {
                 FirstName = firstName,
                 LastName = lastName,
-                DateOfBirth = DateOnly.Parse(dateOfBirth),
+                DateOfBirth = DateOnly.Parse(dateOfBirth, System.Globalization.CultureInfo.InvariantCulture),
                 Grade = grade,
             };
 

@@ -2,8 +2,10 @@
 // Written by ClockWorkTeddy.
 // </copyright>
 
-using Contracts;
+namespace SadSchool.Services.SignalR;
+
 using Microsoft.AspNetCore.SignalR;
+using SadSchool.Contracts;
 
 /// <summary>
 /// SignalR hub for blackboard functionality.

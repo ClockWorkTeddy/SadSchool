@@ -20,20 +20,17 @@ namespace SadSchool.Controllers
     /// <param name="teacherRepository">DB context.</param>
     /// <param name="navigationService">Services processes "Back" button.</param>
     /// <param name="authService">Service processes user authorization check.</param>
-    /// <param name="cacheService">Service processes cache operations.</param>
     /// <param name="commonMapper">Service processes mapping operations.</param>
     public class TeacherController(
         ITeacherRepository teacherRepository,
         INavigationService navigationService,
         IAuthService authService,
-        ICommonMapper commonMapper,
-        ICacheService cacheService) : Controller
+        ICommonMapper commonMapper) : Controller
     {
         private readonly ITeacherRepository teacherRepository = teacherRepository;
         private readonly INavigationService navigationService = navigationService;
         private readonly IAuthService authService = authService;
         private readonly ICommonMapper commonMapper = commonMapper;
-        private readonly ICacheService cacheService = cacheService;
 
         /// <summary>
         /// Gets the teachers view.
@@ -83,8 +80,6 @@ namespace SadSchool.Controllers
                 var teacher = this.commonMapper.TeacherToModel(viewModel);
 
                 await this.teacherRepository.AddEntityAsync(teacher);
-
-                this.cacheService.GetObject<Teacher>(teacher.Id!.Value);
             }
 
             return this.RedirectToAction("Teachers");
@@ -98,7 +93,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var editedTeacher = await this.teacherRepository.GetEntityByIdAsync<Teacher>(id);
 
@@ -130,8 +125,6 @@ namespace SadSchool.Controllers
 
                 await this.teacherRepository.UpdateEntityAsync(teacher);
 
-                this.cacheService.SetObject(teacher);
-
                 return this.RedirectToAction("Teachers");
             }
             else
@@ -148,14 +141,13 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var teacher = await this.teacherRepository.GetEntityByIdAsync<Teacher>(id);
 
                 if (teacher != null)
                 {
                     await this.teacherRepository.DeleteEntityAsync<Teacher>(id);
-                    this.cacheService.RemoveObject(teacher);
                 }
             }
 

@@ -46,9 +46,9 @@ namespace SadSchool.Repositories
         }
 
         /// <inheritdoc/>
-        public async Task<List<Student>> GetStudentsBySexAsync(bool isMale)
+        public async Task<List<Student>> GetStudentsBySexAsync(bool sex)
         {
-            return await this.Context.Students.Where(s => s.Sex == isMale).ToListAsync();
+            return await this.Context.Students.Where(s => s.Sex == sex).ToListAsync();
         }
     }
 }

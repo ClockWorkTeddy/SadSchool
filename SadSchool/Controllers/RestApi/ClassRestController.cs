@@ -15,11 +15,9 @@ namespace SadSchool.Controllers.RestApi
     /// </summary>
     [ApiController]
     [Route("api/rest/classes")]
-    public class ClassRestController : Controller
+    public class ClassRestController : ControllerBase
     {
-        private readonly string? apiKey = string.Empty;
-        private readonly IConfiguration configuration;
-        private readonly ICacheService cacheService;
+        private readonly string? apiKey;
         private readonly IClassRepository classRepository;
 
         /// <summary>
@@ -27,27 +25,22 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="classRepository">DB context instance.</param>
         /// <param name="configuration">Configuration object instance.</param>
-        /// <param name="cacheService">Cache instance.</param>
         public ClassRestController(
             IClassRepository classRepository,
-            IConfiguration configuration,
-            ICacheService cacheService)
+            IConfiguration configuration)
         {
             this.classRepository = classRepository;
-            this.configuration = configuration;
-            this.apiKey = this.configuration["api-key"];
-            this.cacheService = cacheService;
+            this.apiKey = configuration["api-key"];
         }
 
         /// <summary>
         /// Gets all classes.
         /// </summary>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action results.</returns>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 var classes = await this.classRepository.GetAllEntitiesAsync<Class>();
@@ -64,12 +57,11 @@ namespace SadSchool.Controllers.RestApi
         /// Gets a class by id.
         /// </summary>
         /// <param name="id">Target class id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 var @class = await this.classRepository.GetEntityByIdAsync<Class>(id);
@@ -86,12 +78,11 @@ namespace SadSchool.Controllers.RestApi
         /// Adds new class.
         /// </summary>
         /// <param name="class">Created class data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Class @class)
+        public async Task<IActionResult> Post([FromBody] Class @class, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 await this.classRepository.AddEntityAsync(@class);
@@ -109,14 +100,15 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="id">Updated class id.</param>
         /// <param name="class">Updated class data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Class @class)
+        public async Task<IActionResult> Put(int id, [FromBody] Class @class, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
+                @class.Id = id;
+
                 if (await this.classRepository.UpdateEntityAsync(@class))
                 {
                     return this.Ok();
@@ -136,12 +128,11 @@ namespace SadSchool.Controllers.RestApi
         /// Deletes class by id.
         /// </summary>
         /// <param name="id">Deleted class id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 if (await this.classRepository.DeleteEntityAsync<Class>(id))

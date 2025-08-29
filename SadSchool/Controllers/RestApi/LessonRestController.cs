@@ -6,7 +6,6 @@ namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Contracts;
     using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
@@ -15,11 +14,9 @@ namespace SadSchool.Controllers.RestApi
     /// </summary>
     [ApiController]
     [Route("api/rest/lessons")]
-    public class LessonRestController : Controller
+    public class LessonRestController : ControllerBase
     {
-        private readonly string? apiKey = string.Empty;
-        private readonly IConfiguration configuration;
-        private readonly ICacheService cacheService;
+        private readonly string? apiKey;
         private readonly ILessonRepository lessonRepository;
 
         /// <summary>
@@ -27,27 +24,22 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="lessonRepository">DB context instance.</param>
         /// <param name="configuration">Configuration object instance.</param>
-        /// <param name="cacheService">Cache service instanse.</param>
         public LessonRestController(
             ILessonRepository lessonRepository,
-            IConfiguration configuration,
-            ICacheService cacheService)
+            IConfiguration configuration)
         {
             this.lessonRepository = lessonRepository;
-            this.configuration = configuration;
-            this.apiKey = this.configuration["api-key"];
-            this.cacheService = cacheService;
+            this.apiKey = configuration["api-key"];
         }
 
         /// <summary>
         /// Gets all lessons.
         /// </summary>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 var lessons = await this.lessonRepository.GetAllEntitiesAsync<Lesson>();
@@ -64,12 +56,11 @@ namespace SadSchool.Controllers.RestApi
         /// Gets lesson by id.
         /// </summary>
         /// <param name="id">Target lesson id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        public async Task<IActionResult> Get(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 var lesson = await this.lessonRepository.GetEntityByIdAsync<Lesson>(id);
@@ -86,12 +77,11 @@ namespace SadSchool.Controllers.RestApi
         /// Adds new lesson.
         /// </summary>
         /// <param name="lesson">Created lesson data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Lesson lesson)
+        public async Task<IActionResult> Post([FromBody] Lesson lesson, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 await this.lessonRepository.AddEntityAsync(lesson);
@@ -109,13 +99,12 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="id">Updated lesson's id.</param>
         /// <param name="lesson">Updated lesson's data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put(int id, [FromBody] Lesson lesson)
+        public async Task<IActionResult> Put(int id, [FromBody] Lesson lesson, [FromHeader(Name = "api-key")] string apiKey)
         {
             lesson.Id = id;
-
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
 
             if (this.apiKey == null || apiKey == this.apiKey)
             {
@@ -138,12 +127,11 @@ namespace SadSchool.Controllers.RestApi
         /// Deletes lesson.
         /// </summary>
         /// <param name="id">Deleted lesson's id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action data.</returns>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
                 if (await this.lessonRepository.DeleteEntityAsync<Lesson>(id))

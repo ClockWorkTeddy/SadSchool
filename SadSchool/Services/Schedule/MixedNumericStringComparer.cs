@@ -19,15 +19,14 @@ namespace SadSchool.Services
         /// <returns>Comparation result: -1, 0 or 1.</returns>
         public int Compare(string? x, string? y)
         {
-            Log.Information($"MixedNumericStringComparer.Compare(): " +
-                $"method called with parameters: x = {x} and y = {y}");
+            Log.Information("MixedNumericStringComparer.Compare(): " + "method called with parameters: x = {X} and y = {Y}", x, y);
 
             int numX, numY;
             string alphaX, alphaY;
 
             // Separate numeric and non-numeric parts
-            this.SplitNumericAndAlpha(x, out numX, out alphaX);
-            this.SplitNumericAndAlpha(y, out numY, out alphaY);
+            SplitNumericAndAlpha(x, out numX, out alphaX);
+            SplitNumericAndAlpha(y, out numY, out alphaY);
 
             // Compare numeric parts first
             int numComparison = numX.CompareTo(numY);
@@ -40,10 +39,9 @@ namespace SadSchool.Services
             return numComparison;
         }
 
-        private void SplitNumericAndAlpha(string? input, out int numericPart, out string alphaPart)
+        private static void SplitNumericAndAlpha(string? input, out int numericPart, out string alphaPart)
         {
-            Log.Debug($"MixedNumericStringComparer.SplitNumericAndAlpha(): " +
-                $"method called with parameter: input = {input}");
+            Log.Debug("MixedNumericStringComparer.SplitNumericAndAlpha(): method called with parameter: {Input}", input);
 
             alphaPart = string.Empty;
             numericPart = 0;

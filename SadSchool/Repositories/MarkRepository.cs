@@ -37,8 +37,6 @@ namespace SadSchool.Repositories
         /// objects associated with the specified student ID. If no marks are found, an empty list is returned.</returns>
         public async Task<List<Mark>> GetMarksByStudentIdAsync(int studentId)
         {
-            var filter = Builders<Mark>.Filter.Eq(m => m.StudentId, studentId);
-
             return await this.context.Marks.Where(m => m.StudentId == studentId).ToListAsync();
         }
 
@@ -53,10 +51,6 @@ namespace SadSchool.Repositories
         /// objects associated with the specified student and lesson. If no marks are found, the list will be empty.</returns>
         public async Task<List<Mark>> GetMarksByStudentIdAndLessonIdAsync(int studentId, int lessonId)
         {
-            var filter = Builders<Mark>.Filter.And(
-                Builders<Mark>.Filter.Eq(m => m.StudentId, studentId),
-                Builders<Mark>.Filter.Eq(m => m.LessonId, lessonId));
-
             return await this.context.Marks.Where(m => m.StudentId == studentId && m.LessonId == lessonId).ToListAsync();
         }
 

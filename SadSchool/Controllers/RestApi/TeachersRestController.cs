@@ -5,9 +5,9 @@
 namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
     /// <summary>
@@ -15,42 +15,35 @@ namespace SadSchool.Controllers.RestApi
     /// </summary>
     [ApiController]
     [Route("api/rest/teachers")]
-    public class TeachersRestController : Controller
+    public class TeachersRestController : ControllerBase
     {
-        private readonly string? apiKey = string.Empty;
-        private readonly SadSchoolContext context;
-        private readonly IConfiguration configuration;
-        private readonly ICacheService cacheService;
+        private readonly string? apiKey;
+        private readonly ITeacherRepository teacherRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TeachersRestController"/> class.
         /// </summary>
-        /// <param name="context">Application DB context.</param>
+        /// <param name="teacherRepository">Teachers repo instance.</param>
         /// <param name="configuration">Application configuration.</param>
-        /// <param name="cacheService">Cache service instance.</param>
         public TeachersRestController(
-            SadSchoolContext context,
-            IConfiguration configuration,
-            ICacheService cacheService)
+            ITeacherRepository teacherRepository,
+            IConfiguration configuration)
         {
-            this.context = context;
-            this.configuration = configuration;
-            this.apiKey = this.configuration["api-key"];
-            this.cacheService = cacheService;
+            this.teacherRepository = teacherRepository;
+            this.apiKey = configuration["api-key"];
         }
 
         /// <summary>
         /// The method gets collection of teachers from DB.
         /// </summary>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>The list of <see cref="Teacher"/>.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var teachers = this.context.Teachers.ToList();
+                var teachers = await this.teacherRepository.GetAllEntitiesAsync<Teacher>();
 
                 return this.Ok(JsonSerializer.Serialize(teachers));
             }
@@ -63,16 +56,15 @@ namespace SadSchool.Controllers.RestApi
         /// <summary>
         /// The method gets teacher by id from DB.
         /// </summary>
-        /// <param name="teacherId">Desirable tescher's id.</param>
+        /// <param name="teacherId">Desirable teacher's id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>The particular <see cref="Teacher"/>.</returns>
         [HttpGet("{teacherId}")]
-        public IActionResult Get(int teacherId)
+        public async Task<IActionResult> Get(int teacherId, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var teacher = this.cacheService.GetObject<Teacher>(teacherId);
+                var teacher = await this.teacherRepository.GetEntityByIdAsync<Teacher>(teacherId);
 
                 return teacher != null ? this.Ok(teacher) : this.NotFound();
             }
@@ -86,16 +78,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method adds a new teacher to DB.
         /// </summary>
         /// <param name="teacher">The teacher to add.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>The result of the operation.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] Teacher teacher)
+        public async Task<IActionResult> Post([FromBody] Teacher teacher, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                this.context.Teachers.Add(teacher);
-                this.context.SaveChanges();
+                await this.teacherRepository.AddEntityAsync(teacher);
 
                 return this.Ok();
             }
@@ -110,15 +100,14 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="teacherId">Desirable teacher's id.</param>
         /// <param name="updateTeacher">New teacher data.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>The result of the operation.</returns>
         [HttpPut("{teacherId}")]
-        public IActionResult Put(int teacherId, [FromBody] Teacher updateTeacher)
+        public async Task<IActionResult> Put(int teacherId, [FromBody] Teacher updateTeacher, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (this.apiKey == null || apiKey == this.apiKey)
             {
-                var teacher = this.context.Teachers.Find(teacherId);
+                var teacher = await this.teacherRepository.GetEntityByIdAsync<Teacher>(teacherId);
 
                 if (teacher == null)
                 {
@@ -130,8 +119,28 @@ namespace SadSchool.Controllers.RestApi
                 teacher.DateOfBirth = updateTeacher.DateOfBirth;
                 teacher.Grade = updateTeacher.Grade;
 
-                this.context.Teachers.Update(teacher);
-                this.context.SaveChanges();
+                await this.teacherRepository.UpdateEntityAsync(teacher);
+
+                return this.Ok();
+            }
+            else
+            {
+                return this.Unauthorized();
+            }
+        }
+
+        /// <summary>
+        /// The method deletes a teacher from DB.
+        /// </summary>
+        /// <param name="teacherId">The unique identifier of the teacher to delete.</param>
+        /// <param name="apiKey">The API key provided in the request header for authentication.</param>
+        /// <returns>An <see cref="IActionResult"/> indicating the result of the operation.</returns>
+        [HttpDelete("{teacherId}")]
+        public async Task<IActionResult> Delete(int teacherId, [FromHeader(Name = "api-key")] string apiKey)
+        {
+            if (this.apiKey == null || apiKey == this.apiKey)
+            {
+                await this.teacherRepository.DeleteEntityAsync<Teacher>(teacherId);
 
                 return this.Ok();
             }

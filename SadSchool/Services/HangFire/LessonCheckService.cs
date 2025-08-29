@@ -4,7 +4,8 @@
 
 namespace SadSchool.Services.HangFire
 {
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
+    using SadSchool.Models.SqlServer;
     using Serilog;
 
     /// <summary>
@@ -12,32 +13,31 @@ namespace SadSchool.Services.HangFire
     /// </summary>
     public class LessonCheckService
     {
-        private readonly SadSchoolContext sadSchoolContext;
+        private readonly ILessonRepository lessonRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="LessonCheckService"/> class.
         /// </summary>
-        /// <param name="sadSchoolContext">DB context.</param>
-        public LessonCheckService(SadSchoolContext sadSchoolContext)
+        /// <param name="lessonRepository">Lessons repo instance.</param>
+        public LessonCheckService(ILessonRepository lessonRepository)
         {
-            this.sadSchoolContext = sadSchoolContext;
+            this.lessonRepository = lessonRepository;
         }
 
         /// <summary>
         /// Checks for lessons without a date and deletes them.
         /// </summary>
-        public void DeleteLessonWithoutDate()
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task DeleteLessonWithoutDate()
         {
-            var lessonsWithoutDate = this.sadSchoolContext.Lessons
-                .Where(x => x.Date == null)
-                .ToList();
+            var lessons = await this.lessonRepository.GetAllEntitiesAsync<Lesson>();
+            var lessonsWithoutDate = lessons.Where(x => x.Date == null).ToList();
 
             if (lessonsWithoutDate.Count > 0)
             {
-                var firstLessonWithoutDate = lessonsWithoutDate.First();
-                this.sadSchoolContext.Remove(firstLessonWithoutDate);
-                this.sadSchoolContext.SaveChanges();
-                Log.Information($"LessonCheckService.DeleteLessonWithoutDate(): Deleted lesson without date, Id: {firstLessonWithoutDate.Id}");
+                var firstLessonWithoutDate = lessonsWithoutDate[0];
+                await this.lessonRepository.DeleteEntityAsync<Lesson>(firstLessonWithoutDate.Id!.Value);
+                Log.Information("LessonCheckService.DeleteLessonWithoutDate(): Deleted lesson without date, Id: {FirstLessonWithoutDateId}", firstLessonWithoutDate.Id);
             }
         }
     }

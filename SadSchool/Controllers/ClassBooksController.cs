@@ -89,11 +89,11 @@ namespace SadSchool.Controllers
         /// <param name="className">Desirable class name.</param>
         /// <returns><see cref="ViewResult"/> for ClassBook page.</returns>
         [HttpGet]
-        public IActionResult ClassBookTable(string subject, string className)
+        public async Task<IActionResult> ClassBookTable(string subject, string className)
         {
             this.navigationService.RefreshBackParams(this.RouteData);
 
-            var viewModel = this.classBookService.GetClassBookViewModel(subject, className);
+            var viewModel = await this.classBookService.GetClassBookViewModel(subject, className);
 
             return this.View(@"~/Views/Data/Representation/ClassBook.cshtml", viewModel);
         }

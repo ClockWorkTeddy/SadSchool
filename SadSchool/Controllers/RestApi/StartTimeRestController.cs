@@ -5,9 +5,9 @@
 namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
     /// <summary>
@@ -15,42 +15,35 @@ namespace SadSchool.Controllers.RestApi
     /// </summary>
     [ApiController]
     [Route("api/rest/starttimes")]
-    public class StartTimeRestController : Controller
+    public class StartTimeRestController : ControllerBase
     {
-        private readonly string? apiKey = string.Empty;
-        private readonly IConfiguration configuration;
-        private readonly ICacheService cacheService;
-        private readonly SadSchoolContext context;
+        private readonly string? apiKey;
+        private readonly IStartTimeRepository startTimeRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StartTimeRestController"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
+        /// <param name="startTimeRepository">Start time repo instanse.</param>
         /// <param name="configuration">Configuration object.</param>
-        /// <param name="cacheService">Cache service instance.</param>
         public StartTimeRestController(
-            SadSchoolContext context,
-            IConfiguration configuration,
-            ICacheService cacheService)
+            IStartTimeRepository startTimeRepository,
+            IConfiguration configuration)
         {
-            this.context = context;
-            this.configuration = configuration;
-            this.apiKey = this.configuration["api-key"];
-            this.cacheService = cacheService;
+            this.startTimeRepository = startTimeRepository;
+            this.apiKey = configuration["api-key"];
         }
 
         /// <summary>
         /// The method gets collection of start times from DB.
         /// </summary>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var startTime = this.context.StartTimes.ToList();
+                var startTime = await this.startTimeRepository.GetAllEntitiesAsync<StartTime>();
 
                 return this.Ok(JsonSerializer.Serialize(startTime));
             }
@@ -64,15 +57,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method gets start time by id.
         /// </summary>
         /// <param name="id">Target instanse's id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var startTime = this.cacheService.GetObject<StartTime>(id);
+                var startTime = await this.startTimeRepository.GetEntityByIdAsync<StartTime>(id);
 
                 return this.Ok(JsonSerializer.Serialize(startTime));
             }
@@ -86,16 +78,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method adds a new start time to DB.
         /// </summary>
         /// <param name="startTime">Start time object's data for the creation.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] StartTime startTime)
+        public async Task<IActionResult> Post([FromBody] StartTime startTime, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                this.context.StartTimes.Add(startTime);
-                this.context.SaveChanges();
+                await this.startTimeRepository.AddEntityAsync(startTime);
 
                 return this.Ok();
             }
@@ -110,15 +100,14 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="id">Target start time's id.</param>
         /// <param name="startTime">Start time object's date for update.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] StartTime startTime)
+        public async Task<IActionResult> Put(int id, [FromBody] StartTime startTime, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var startTimeToUpdate = this.context.StartTimes.Find(id);
+                var startTimeToUpdate = await this.startTimeRepository.GetEntityByIdAsync<StartTime>(id);
                 if (startTimeToUpdate == null)
                 {
                     return this.NotFound();
@@ -126,9 +115,28 @@ namespace SadSchool.Controllers.RestApi
 
                 startTimeToUpdate.Value = startTime.Value;
 
-                this.context.StartTimes.Update(startTimeToUpdate);
-                this.context.SaveChanges();
+                await this.startTimeRepository.UpdateEntityAsync(startTimeToUpdate);
 
+                return this.Ok();
+            }
+            else
+            {
+                return this.Unauthorized();
+            }
+        }
+
+        /// <summary>
+        /// The method deletes start time by id.
+        /// </summary>
+        /// <param name="id">Start Time Id.</param>
+        /// <param name="apiKey">The Api Key.</param>
+        /// <returns>Action result.</returns>
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete(int id, [FromHeader(Name = "api-key")] string apiKey)
+        {
+            if (apiKey == null || apiKey == this.apiKey)
+            {
+                await this.startTimeRepository.DeleteEntityAsync<StartTime>(id);
                 return this.Ok();
             }
             else

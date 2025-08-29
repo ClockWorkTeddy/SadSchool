@@ -12,7 +12,7 @@
         public partial ScheduledLessonViewModel ScheduledLessonToVm(ScheduledLesson scheduledLesson);
         public partial ScheduledLesson ScheduledLessonToModel(ScheduledLessonViewModel scheduledLessonViewModel);
         
-        private string MapTeacherName(Teacher teacher) =>
+        private static string MapTeacherName(Teacher teacher) =>
             $"{teacher.FirstName} {teacher.LastName}";
     }
 }

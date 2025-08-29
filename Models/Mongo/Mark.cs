@@ -16,6 +16,8 @@ namespace SadSchool.Models.Mongo
         /// </summary>
         public ObjectId Id { get; set; }
 
+        public string IdString => Id.ToString();
+
         /// <summary>
         /// Gets or sets mark value (from 1 to 5, 5 is the best).
         /// </summary>

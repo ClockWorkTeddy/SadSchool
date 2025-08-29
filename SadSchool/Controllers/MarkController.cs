@@ -130,7 +130,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(ObjectId id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var editedMark = await this.derivedRepositories.MarkRepository.GetMarkByIdAsync(id);
 
@@ -158,7 +158,7 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(MarkViewModel viewModel)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var mark = await this.derivedRepositories.MarkRepository.GetMarkByIdAsync(viewModel.Id);
 
@@ -187,7 +187,7 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(ObjectId id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var mark = await this.derivedRepositories.MarkRepository.GetMarkByIdAsync(id);
 
@@ -224,12 +224,17 @@ namespace SadSchool.Controllers
         /// <param name="viewModel"><see cref="StudentSubjectSelectorViewModel"/> instance with data.</param>
         /// <returns><see cref="ViewResult"/> for "AverageMarks" view.</returns>
         [HttpGet]
-        public IActionResult GetAverageMarks(StudentSubjectSelectorViewModel viewModel)
+        public async Task<IActionResult> GetAverageMarks(StudentSubjectSelectorViewModel viewModel)
         {
+            if (!this.ModelState.IsValid)
+            {
+                return this.RedirectToAction("GetStudentSubject");
+            }
+
             var studentId = viewModel.SelectedStudentId;
             var subjectId = viewModel.SelectedSubjectId;
 
-            var marks = this.marksAnalyticsService.GetAverageMarks(studentId, subjectId);
+            var marks = await this.marksAnalyticsService.GetAverageMarks(studentId, subjectId);
             var students = marks.Select(m => m.StudentName).Distinct().Order().ToList();
             var subjects = marks.Select(m => m.SubjectName).Distinct().Order().ToList();
 

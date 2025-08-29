@@ -18,7 +18,6 @@ namespace SadSchool.Controllers
     {
         private readonly ISubjectRepository subjectRepository;
         private readonly INavigationService navigationService;
-        private readonly ICacheService cacheService;
         private readonly IAuthService authService;
         private readonly ICommonMapper commonMapper;
 
@@ -27,19 +26,16 @@ namespace SadSchool.Controllers
         /// </summary>
         /// <param name="subjectRepository">DB context instance.</param>
         /// <param name="navigationService">Service processes the "Back" button.</param>
-        /// <param name="cacheService">Cahce instance.</param>
         /// <param name="authService">Service processes user authorization check.</param>
         /// <param name="commonMapper">Service processes mapping operations.</param>
         public SubjectController(
             ISubjectRepository subjectRepository,
             INavigationService navigationService,
-            ICacheService cacheService,
             IAuthService authService,
             ICommonMapper commonMapper)
         {
             this.subjectRepository = subjectRepository;
             this.navigationService = navigationService;
-            this.cacheService = cacheService;
             this.authService = authService;
             this.commonMapper = commonMapper;
         }
@@ -90,8 +86,6 @@ namespace SadSchool.Controllers
                 var subject = this.commonMapper.SubjectToModel(viewModel);
 
                 await this.subjectRepository.AddEntityAsync(subject);
-
-                this.cacheService.GetObject<Subject>(subject.Id!.Value);
             }
 
             return this.RedirectToAction("Subjects");
@@ -105,7 +99,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var editedSubject = await this.subjectRepository.GetEntityByIdAsync<Subject>(id);
 
@@ -130,18 +124,13 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(SubjectViewModel viewModel)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid && viewModel != null)
             {
-                if (this.ModelState.IsValid && viewModel != null)
-                {
-                    var subject = this.commonMapper.SubjectToModel(viewModel);
+                var subject = this.commonMapper.SubjectToModel(viewModel);
 
-                    await this.subjectRepository.UpdateEntityAsync(subject);
+                await this.subjectRepository.UpdateEntityAsync(subject);
 
-                    this.cacheService.SetObject(subject);
-
-                    return this.RedirectToAction("Subjects");
-                }
+                return this.RedirectToAction("Subjects");
             }
 
             return this.View(@"~/Views/Data/SubjectEdit.cshtml", viewModel);
@@ -155,15 +144,13 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var subject = await this.subjectRepository.GetEntityByIdAsync<Subject>(id);
 
                 if (subject != null)
                 {
                     await this.subjectRepository.DeleteEntityAsync<Subject>(id);
-
-                    this.cacheService.RemoveObject(subject);
                 }
             }
 

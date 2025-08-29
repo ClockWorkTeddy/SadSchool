@@ -59,7 +59,6 @@ builder.Services.AddHangfire(configuration => configuration
 
 builder.Services
     .AddGraphQLServer()
-    .RegisterDbContext<SadSchoolContext>()
     .AddQueryType<Query>() // Register Query class
     .AddMutationType<Mutation>()
     .AddSorting()
@@ -77,7 +76,7 @@ builder.Services.AddSingleton<IScheduledLessonMapper, ScheduleLessonMapper>();
 
 builder.Services.AddScoped<IClassRepository, ClassRepository>();
 builder.Services.AddScoped<ILessonRepository, LessonRepository>();
-builder.Services.AddSingleton<IMarkRepository, MarkRepository>();
+builder.Services.AddScoped<IMarkRepository, MarkRepository>();
 builder.Services.AddScoped<IScheduledLessonRepository, ScheduledLessonRepository>();
 builder.Services.AddScoped<IStartTimeRepository, StartTimeRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
@@ -105,7 +104,6 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHangfireDashboard();
 
-RecurringJob.AddOrUpdate<LoggerJobService>("LoggerJobService", x => x.LogJob(), Cron.Minutely);
 RecurringJob.AddOrUpdate<LessonCheckService>("LessonCheckService", x => x.DeleteLessonWithoutDate(), Cron.Minutely);
 
 app.UseHttpsRedirection();
@@ -142,7 +140,7 @@ app.MapRazorPages();
 app.MapHub<SignalRChatHub>("/chatHub");
 app.MapHub<BlackboardHub>("/blackboardHub");
 
-app.Run();
+await app.RunAsync();
 
 void SetupLogger()
 {
@@ -160,7 +158,7 @@ void SelectCacheSource(WebApplicationBuilder builder, SecretService secretServic
 
         if (redisConnStr == null)
         {
-            throw new Exception("Redis connection string is null");
+            throw new InvalidOperationException("Redis connection string is null");
         }
 
         builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnStr));
@@ -168,11 +166,11 @@ void SelectCacheSource(WebApplicationBuilder builder, SecretService secretServic
 
         Log.Information("Redis cache service selected.");
     }
-    catch
+    catch (InvalidOperationException ex)
     {
         builder.Services.AddScoped<ICacheService, MemoryCacheService>();
 
-        Log.Information("Memory cache service selected.");
+        Log.Information(ex, $"Redis cache server failed with exception. Memory cache service selected");
     }
 }
 
@@ -184,17 +182,38 @@ void SetUpMongo(WebApplicationBuilder builder, SecretService secretService)
 
         if (mongoConnStr == null)
         {
-            throw new Exception("Mongo connection string is null");
+            throw new InvalidOperationException("Mongo connection string is null");
         }
 
-        var client = new MongoClient(mongoConnStr);
-        var bd = MongoContext.Create(client.GetDatabase("SadSchool"));
+        var settings = MongoClientSettings.FromConnectionString(mongoConnStr);
+
+        // Configure timeouts for Azure environment
+        settings.ServerSelectionTimeout = TimeSpan.FromSeconds(30);
+        settings.ConnectTimeout = TimeSpan.FromSeconds(30);
+        settings.SocketTimeout = TimeSpan.FromSeconds(30);
+        settings.MaxConnectionPoolSize = 100;
+
+        // Explicit SSL configuration for Azure App Service
+        settings.UseTls = true;
+        settings.SslSettings = new SslSettings
+        {
+            EnabledSslProtocols = System.Security.Authentication.SslProtocols.Tls12,
+            CheckCertificateRevocation = false,
+        };
+
+        var client = new MongoClient(settings);
+        var database = client.GetDatabase("SadSchool");
+        var bd = MongoContext.Create(database);
 
         builder.Services.AddSingleton(bd);
+
+        Log.Information("MongoDB connection configured successfully.");
     }
-    catch
+    catch (InvalidOperationException ex)
     {
-        // Nothing yet
+        Log.Error(ex, "Failed to configure MongoDB connection: {Message}", ex.Message);
+
+        // Don't rethrow - let the app start without MongoDB if needed
     }
 }
 

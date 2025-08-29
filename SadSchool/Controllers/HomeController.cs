@@ -7,7 +7,6 @@ namespace SadSchool.Controllers
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
     using SadSchool.ViewModels;
 
     /// <summary>
@@ -15,19 +14,15 @@ namespace SadSchool.Controllers
     /// </summary>
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> logger;
         private readonly INavigationService navigationService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="HomeController"/> class.
         /// </summary>
-        /// <param name="logger"><see cref="ILogger"/> instance.</param>
         /// <param name="navigationService">Service for "Back" button operating.</param>
         public HomeController(
-            ILogger<HomeController> logger,
             INavigationService navigationService)
         {
-            this.logger = logger;
             this.navigationService = navigationService;
         }
 

@@ -24,7 +24,7 @@ namespace SadSchool.Contracts
         /// <summary>
         /// The method prepares students/dates table for using in the model.
         /// </summary>
-        public void GetMarkData();
+        public Task GetMarkData();
 
         /// <summary>
         /// The mothod creates view model for class books.
@@ -32,6 +32,6 @@ namespace SadSchool.Contracts
         /// <param name="subjectName">Name of the selected subject.</param>
         /// <param name="className">Name of the selected class.</param>
         /// <returns>Class book view model with mark table of the particular subject and class.</returns>
-        public ClassBookViewModel GetClassBookViewModel(string subjectName, string className);
+        public Task<ClassBookViewModel> GetClassBookViewModel(string subjectName, string className);
     }
 }

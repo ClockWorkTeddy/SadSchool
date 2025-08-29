@@ -70,7 +70,7 @@ namespace SadSchool.Repositories
 
         /// <inheritdoc/>
         public async Task<T?> AddEntityAsync<T>(T entity)
-            where T : BaseModel
+    where T : BaseModel
         {
             try
             {
@@ -86,7 +86,7 @@ namespace SadSchool.Repositories
             {
                 // Handle the exception as needed (e.g., log it, rethrow it, etc.)
                 // For now, we just return null to indicate failure.
-                Log.Error(ex, $"Error adding {typeof(T)} to the database.");
+                Log.Error(ex, "Error adding to the database {Message}", ex.Message);
 
                 return null;
             }
@@ -100,7 +100,7 @@ namespace SadSchool.Repositories
 
             if (existing == null)
             {
-                Log.Error($"Entity of type {typeof(T)} with ID {entity.Id} not found");
+                Log.Error("Entity of type {EntityType} with ID {EntityId} not found", typeof(T), entity.Id);
 
                 return false;
             }
@@ -133,7 +133,7 @@ namespace SadSchool.Repositories
             }
             else
             {
-                Log.Error($"Entity of type {typeof(T)} with ID {id} not found for deletion.");
+                Log.Error("Entity of type {EntityType} with ID {EntityId} not found", typeof(T), id);
                 return false;
             }
         }

@@ -115,7 +115,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var editedClass = await this.classRepository.GetEntityByIdAsync<Class>(id);
 
@@ -163,7 +163,7 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 await this.classRepository.DeleteEntityAsync<Class>(id);
 

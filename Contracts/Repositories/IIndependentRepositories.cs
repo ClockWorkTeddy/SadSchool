@@ -1,5 +1,4 @@
-﻿
-namespace SadSchool.Contracts.Repositories
+﻿namespace SadSchool.Contracts.Repositories
 {
     public interface IIndependentRepositories
     {

@@ -14,9 +14,9 @@ namespace SadSchool.Contracts
         /// <summary>
         /// Gets the average marks.
         /// </summary>
-        /// <param name="studentName">Desirable student's name.</param>
-        /// <param name="subjectName">Desirable subject's name.</param>
+        /// <param name="studentId">Desirable student's ID.</param>
+        /// <param name="subjectId">Desirable subject's ID.</param>
         /// <returns>List of average marks.</returns>
-        List<AverageMarkDto> GetAverageMarks(int studentName, int subjectName);
+        Task<List<AverageMarkDto>> GetAverageMarks(int studentId, int subjectId);
     }
 }

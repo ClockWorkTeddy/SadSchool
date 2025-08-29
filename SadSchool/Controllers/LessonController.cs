@@ -115,7 +115,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var editedLesson = await this.lessonRepository.GetEntityByIdAsync<Lesson>(id);
 
@@ -161,7 +161,7 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 await this.lessonRepository.DeleteEntityAsync<Lesson>(id);
             }
@@ -169,22 +169,7 @@ namespace SadSchool.Controllers
             return this.RedirectToAction("Lessons");
         }
 
-        private async Task<List<SelectListItem>> GetScheduledLessonsList(int? lessonId)
-        {
-            var scheduledLessons = await this.scheduledLessonRepository.GetAllEntitiesAsync<ScheduledLesson>();
-
-            return scheduledLessons
-                .OrderBy(scheduledLesson => scheduledLesson?.Class?.Name, new MixedNumericStringComparer())
-                .OrderBy(scheduledLesson => this.GetDayOfWeekNumber(scheduledLesson.Day))
-                .Select(scheduledLesson => new SelectListItem
-                {
-                    Value = scheduledLesson.Id.ToString(),
-                    Text = $"{scheduledLesson}",
-                    Selected = lessonId?.ToString() == scheduledLesson.Id.ToString(),
-                }).ToList();
-        }
-
-        private int GetDayOfWeekNumber(string? day)
+        private static int GetDayOfWeekNumber(string? day)
         {
             return day switch
             {
@@ -195,6 +180,21 @@ namespace SadSchool.Controllers
                 "Fri" => 5,
                 _ => int.MaxValue, // Place unknown days at the end
             };
+        }
+
+        private async Task<List<SelectListItem>> GetScheduledLessonsList(int? lessonId)
+        {
+            var scheduledLessons = await this.scheduledLessonRepository.GetAllEntitiesAsync<ScheduledLesson>();
+
+            return scheduledLessons
+                .OrderBy(scheduledLesson => scheduledLesson?.Class?.Name, new MixedNumericStringComparer())
+                .ThenBy(scheduledLesson => GetDayOfWeekNumber(scheduledLesson.Day))
+                .Select(scheduledLesson => new SelectListItem
+                {
+                    Value = scheduledLesson.Id.ToString(),
+                    Text = $"{scheduledLesson}",
+                    Selected = lessonId?.ToString() == scheduledLesson.Id.ToString(),
+                }).ToList();
         }
     }
 }

@@ -6,8 +6,7 @@ namespace SadSchool.Controllers.RestApi
 {
     using System.Text.Json;
     using Microsoft.AspNetCore.Mvc;
-    using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
     /// <summary>
@@ -15,42 +14,35 @@ namespace SadSchool.Controllers.RestApi
     /// </summary>
     [ApiController]
     [Route("api/rest/scheduledlessons")]
-    public class ScheduledLessonRestController : Controller
+    public class ScheduledLessonRestController : ControllerBase
     {
-        private readonly string? apiKey = string.Empty;
-        private readonly IConfiguration configuration;
-        private readonly ICacheService cacheService;
-        private readonly SadSchoolContext context;
+        private readonly string? apiKey;
+        private readonly IScheduledLessonRepository scheduledLessonRepository;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScheduledLessonRestController"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
+        /// <param name="scheduledLessonRepository">Scheduled lesson repo instance.</param>
         /// <param name="configuration">Configuration of the app.</param>
-        /// <param name="cacheService">Cache service object.</param>
         public ScheduledLessonRestController(
-            SadSchoolContext context,
-            IConfiguration configuration,
-            ICacheService cacheService)
+            IScheduledLessonRepository scheduledLessonRepository,
+            IConfiguration configuration)
         {
-            this.context = context;
-            this.configuration = configuration;
-            this.apiKey = this.configuration["api-key"];
-            this.cacheService = cacheService;
+            this.scheduledLessonRepository = scheduledLessonRepository;
+            this.apiKey = configuration["api-key"];
         }
 
         /// <summary>
         /// The method gets collection of scheduled lessons from DB.
         /// </summary>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var scheduledLessons = this.context.ScheduledLessons.ToList();
+                var scheduledLessons = await this.scheduledLessonRepository.GetAllEntitiesAsync<ScheduledLesson>();
 
                 return this.Ok(JsonSerializer.Serialize(scheduledLessons));
             }
@@ -64,15 +56,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method gets scheduled lesson by id.
         /// </summary>
         /// <param name="id">Desirable scheduled lesson.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpGet("{id}")]
-        public IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                var scheduledLesson = this.cacheService.GetObject<ScheduledLesson>(id);
+                var scheduledLesson = await this.scheduledLessonRepository.GetEntityByIdAsync<ScheduledLesson>(id);
 
                 return this.Ok(JsonSerializer.Serialize(scheduledLesson));
             }
@@ -86,16 +77,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method adds a new scheduled lesson to DB.
         /// </summary>
         /// <param name="scheduledLesson">Scheduled lesson for the creation.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPost]
-        public IActionResult Post([FromBody] ScheduledLesson scheduledLesson)
+        public async Task<IActionResult> Post([FromBody] ScheduledLesson scheduledLesson, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == null || apiKey == this.apiKey)
             {
-                this.context.ScheduledLessons.Add(scheduledLesson);
-                this.context.SaveChanges();
+                await this.scheduledLessonRepository.AddEntityAsync(scheduledLesson);
 
                 return this.Ok();
             }
@@ -110,15 +99,14 @@ namespace SadSchool.Controllers.RestApi
         /// </summary>
         /// <param name="id">Selected lesson's id.</param>
         /// <param name="scheduledLesson">Scheduled lesson's data for update.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpPut("{id}")]
-        public IActionResult Put(int id, [FromBody] ScheduledLesson scheduledLesson)
+        public async Task<IActionResult> Put(int id, [FromBody] ScheduledLesson scheduledLesson, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == this.apiKey)
             {
-                var scheduledLessonForUpdate = this.context.ScheduledLessons.Find(id);
+                var scheduledLessonForUpdate = await this.scheduledLessonRepository.GetEntityByIdAsync<ScheduledLesson>(id);
 
                 if (scheduledLessonForUpdate == null)
                 {
@@ -131,8 +119,7 @@ namespace SadSchool.Controllers.RestApi
                 scheduledLessonForUpdate.SubjectId = scheduledLesson.SubjectId;
                 scheduledLessonForUpdate.TeacherId = scheduledLesson.TeacherId;
 
-                this.context.ScheduledLessons.Update(scheduledLessonForUpdate);
-                this.context.SaveChanges();
+                await this.scheduledLessonRepository.UpdateEntityAsync(scheduledLessonForUpdate);
 
                 return this.Ok();
             }
@@ -146,23 +133,14 @@ namespace SadSchool.Controllers.RestApi
         /// The method deletes scheduled lesson from DB.
         /// </summary>
         /// <param name="id">Deleted lesson's id.</param>
+        /// <param name="apiKey">The API key.</param>
         /// <returns>Action result.</returns>
         [HttpDelete("{id}")]
-        public IActionResult Delete(int id)
+        public async Task<IActionResult> Delete(int id, [FromHeader(Name = "api-key")] string apiKey)
         {
-            var apiKey = this.HttpContext.Request.Headers["api-key"].FirstOrDefault();
-
             if (apiKey == this.apiKey)
             {
-                var scheduledLesson = this.context.ScheduledLessons.Find(id);
-
-                if (scheduledLesson == null)
-                {
-                    return this.NotFound();
-                }
-
-                this.context.ScheduledLessons.Remove(scheduledLesson);
-                this.context.SaveChanges();
+                await this.scheduledLessonRepository.DeleteEntityAsync<ScheduledLesson>(id);
 
                 return this.Ok();
             }

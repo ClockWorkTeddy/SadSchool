@@ -20,7 +20,7 @@ namespace SadSchool.Services
         /// <returns>Is user has rights.</returns>
         public bool IsAutorized(ClaimsPrincipal user)
         {
-            Log.Information("AuthService.IsAutorized(): method called with parameters: user = {user?.Identity?.Name}");
+            Log.Information("AuthService.IsAutorized(): method called with parameters: user = {User}", user?.Identity?.Name);
 
             if (user?.Identity?.IsAuthenticated != null)
             {
@@ -41,7 +41,7 @@ namespace SadSchool.Services
         /// <returns>Is a user has admin rights.</returns>
         public bool IsAdmin(ClaimsPrincipal user)
         {
-            Log.Information($"AuthService.IsAdmin(): method called with parameters: user = {user?.Identity?.Name}");
+            Log.Information("AuthService.IsAdmin(): method called with parameters: user = {User}", user?.Identity?.Name);
 
             if (user?.Identity?.IsAuthenticated != null)
             {

@@ -16,11 +16,9 @@ namespace SadSchool.Services.Cache
     /// <remarks>
     /// Initializes a new instance of the <see cref="MemoryCacheService"/> class.
     /// </remarks>
-    /// <param name="context">DB context instance.</param>
     /// <param name="memoryCache">Memory cache instance.</param>
-    public class MemoryCacheService(SadSchoolContext context, IMemoryCache memoryCache) : ICacheService
+    public class MemoryCacheService(IMemoryCache memoryCache) : ICacheService
     {
-        private readonly SadSchoolContext context = context;
         private readonly IMemoryCache memoryCache = memoryCache;
 
         /// <summary>
@@ -33,19 +31,15 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "MemoryCacheService.GetObject(): method called with parameters: id = {id} and for type = {type}",
+                "MemoryCacheService.GetObject(): method called with parameters: id = {Id} and for type = {Type}",
                 id,
                 typeof(T));
 
             var cacheKey = $"{typeof(T)}:{id}";
 
-            if (!this.memoryCache.TryGetValue(cacheKey, out object? cachedObject))
-            {
-                cachedObject = this.context.Set<T>().Find(id);
-                this.memoryCache.Set(cacheKey, cachedObject);
-            }
+            var value = this.memoryCache.Get(cacheKey);
 
-            return cachedObject as T;
+            return value as T;
         }
 
         /// <summary>
@@ -60,15 +54,12 @@ namespace SadSchool.Services.Cache
         public List<T>? GetObjects<T>()
             where T : class
         {
-            Log.Information(
-                "MemoryCacheService.GetObjects(): method called for type = {type}",
-                typeof(T));
+            Log.Information("MemoryCacheService.GetObjects(): method called for type = {Type}", typeof(T));
             var cacheKey = $"{typeof(T)}:All";
 
             if (!this.memoryCache.TryGetValue(cacheKey, out List<T>? cachedObjects))
             {
-                cachedObjects = [.. this.context.Set<T>()];
-                this.memoryCache.Set(cacheKey, cachedObjects);
+                return null;
             }
 
             return cachedObjects;
@@ -79,7 +70,7 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "MemoryCacheService.RefreshObject(): method called with parameters: obj = {obj} and for type = {type}",
+                "MemoryCacheService.RefreshObject(): method called with parameters: obj = {Obj} and for type = {Type}",
                 obj,
                 typeof(T));
 
@@ -87,7 +78,7 @@ namespace SadSchool.Services.Cache
 
             if (this.memoryCache.TryGetValue(cacheKey, out _))
             {
-                this.memoryCache.Set(cacheKey, obj as T);
+                this.memoryCache.Set(cacheKey, obj);
             }
         }
 
@@ -96,7 +87,7 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "MemoryCacheService.SetObjects(): method called for type = {type}",
+                "MemoryCacheService.SetObjects(): method called for type = {Type}",
                 typeof(T));
             var cacheKey = $"{typeof(T)}:All";
             this.memoryCache.Set(cacheKey, objects);
@@ -107,7 +98,7 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "MemoryCacheService.RemoveObjects(): method called for type = {type}",
+                "MemoryCacheService.RemoveObjects(): method called for type = {Type}",
                 typeof(T));
             var cacheKey = $"{typeof(T)}:All";
             this.memoryCache.Remove(cacheKey);
@@ -118,7 +109,7 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "MemoryCacheService.RemoveObject(): method called with parameters: obj = {obj} and for type = {type}",
+                "MemoryCacheService.RemoveObject(): method called with parameters: obj = {Obj} and for type = {Type}",
                 obj,
                 typeof(T));
 

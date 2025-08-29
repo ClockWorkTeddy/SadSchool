@@ -102,7 +102,7 @@ namespace SadSchool.Controllers
         [HttpGet]
         public async Task<IActionResult> Edit(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var editedLesson = await this.scheduledLessonRepository.GetEntityByIdAsync<ScheduledLesson>(id);
 
@@ -132,7 +132,7 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(ScheduledLessonViewModel viewModel)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 var scheduledLesson = this.scheduledLessonMapper.ScheduledLessonToModel(viewModel);
 
@@ -152,7 +152,7 @@ namespace SadSchool.Controllers
         [HttpPost]
         public async Task<IActionResult> Delete(int id)
         {
-            if (this.authService.IsAutorized(this.User))
+            if (this.authService.IsAutorized(this.User) && this.ModelState.IsValid)
             {
                 await this.scheduledLessonRepository.DeleteEntityAsync<ScheduledLesson>(id);
             }

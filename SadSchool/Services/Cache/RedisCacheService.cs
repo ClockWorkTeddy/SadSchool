@@ -40,7 +40,7 @@ namespace SadSchool.Services.Cache
         public List<T>? GetObjects<T>()
             where T : class
         {
-            Log.Information("RedisCacheService.GetObjects(): method called for type = {type}", typeof(T));
+            Log.Information("RedisCacheService.GetObjects(): method called for type = {Type}", typeof(T));
             var rKey = new RedisKey($"{typeof(T)}:all");
             var value = this.redis.StringGet(rKey);
 
@@ -65,7 +65,7 @@ namespace SadSchool.Services.Cache
         public void SetObjects<T>(List<T> objects)
             where T : class
         {
-            Log.Information("RedisCacheService.SetObjects(): method called for type = {type}", typeof(T));
+            Log.Information("RedisCacheService.SetObjects(): method called for type = {Type}", typeof(T));
 
             var rKey = new RedisKey($"{typeof(T)}:all");
             var value = new RedisValue(this.JsonSerialize(objects));
@@ -83,7 +83,7 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "RedisCacheService.GetObject(): method called with parameters: id = {id} and for type = {type}",
+                "RedisCacheService.GetObject(): method called with parameters: id = {Id} and for type = {Type}",
                 id,
                 typeof(T));
 
@@ -109,7 +109,7 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "RedisCacheService.RefreshObject(): method called with parameters: obj = {obj} and for type = {type}",
+                "RedisCacheService.RefreshObject(): method called with parameters: obj = {Obj} and for type = {Type}",
                 obj,
                 typeof(T));
 
@@ -131,7 +131,7 @@ namespace SadSchool.Services.Cache
             where T : class
         {
             Log.Information(
-                "RedisCacheService.RemoveObject(): method called with parameters: id = {id} and for type = {type}",
+                "RedisCacheService.RemoveObject(): method called with parameters: id = {Id} and for type = {Type}",
                 obj,
                 typeof(T));
 
@@ -150,7 +150,7 @@ namespace SadSchool.Services.Cache
         public void RemoveObjects<T>()
             where T : class
         {
-            Log.Information("RedisCacheService.RemoveObjects(): method called for type = {type}", typeof(T));
+            Log.Information("RedisCacheService.RemoveObjects(): method called for type = {Type}", typeof(T));
 
             var redisKey = new RedisKey($"{typeof(T)}:all");
 

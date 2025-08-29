@@ -4,9 +4,8 @@
 
 namespace SadSchool.Services.ClassBook
 {
-    using Microsoft.EntityFrameworkCore;
     using SadSchool.Contracts;
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.Mongo;
     using SadSchool.Models.SqlServer;
     using SadSchool.ViewModels;
@@ -17,27 +16,30 @@ namespace SadSchool.Services.ClassBook
     /// </summary>
     public class ClassBookService : IClassBookService
     {
-        private SadSchoolContext context;
-        private MongoContext mongoContext;
+        private readonly List<Mark> rawMarks = [];
+        private readonly IMarkRepository markRepository;
+        private readonly IDerivedRepositories derivedRepositories;
+
         private List<string> dates = [];
         private List<string> students = [];
         private List<MarkCellDto> markCells = [];
         private string className = string.Empty;
         private string subjectName = string.Empty;
-        private List<Mark> rawMarks = [];
         private MarkCellDto[,]? markCellsTable = new MarkCellDto[0, 0];
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClassBookService"/> class.
         /// </summary>
-        /// <param name="context">DB context.</param>
-        /// <param name="mongoContext">MongoDB context.</param>
-        public ClassBookService(SadSchoolContext context, MongoContext mongoContext)
+        /// <param name="lessonRepository">Lesson repo instance.</param>
+        /// <param name="markRepository">Mark repo instance.</param>
+        /// <param name="derivedRepositories">Derived repositories instance.</param>
+        public ClassBookService(ILessonRepository lessonRepository, IMarkRepository markRepository, IDerivedRepositories derivedRepositories)
         {
-            this.context = context;
-            this.mongoContext = mongoContext;
+            this.derivedRepositories = derivedRepositories;
             this.Dates = [];
             this.Students = [];
+            this.markRepository = markRepository;
+            this.derivedRepositories = derivedRepositories;
         }
 
         /// <summary>
@@ -56,13 +58,13 @@ namespace SadSchool.Services.ClassBook
         /// <param name="subjectName">The name of the subject.</param>
         /// <param name="className">The name of the class.</param>
         /// <returns>Class book view model instance.</returns>
-        public ClassBookViewModel GetClassBookViewModel(string subjectName, string className)
+        public async Task<ClassBookViewModel> GetClassBookViewModel(string subjectName, string className)
         {
             this.className = className;
             this.subjectName = subjectName;
 
-            this.GetRawMarks();
-            this.GetMarkData();
+            await this.GetRawMarks();
+            await this.GetMarkData();
             this.GetMarkTable();
 
             return new ClassBookViewModel
@@ -78,37 +80,39 @@ namespace SadSchool.Services.ClassBook
         /// <summary>
         /// Prepares the mark data.
         /// </summary>
-        public void GetMarkData()
+        /// <returns>Task for asynchronous operation.</returns>
+        public async Task GetMarkData()
         {
             Log.Information("ClassBookService.GetMarkData(): method called.");
 
-            this.markCells = this.rawMarks.Select(mc => new MarkCellDto
-            {
-                Date = $"{this.GetLessonData(mc).Date} {this.GetLessonData(mc)?.ScheduledLesson?.StartTime?.Value}",
-                Mark = mc?.Value,
-                StudentName = $"{this.GetStudentData(mc!).LastName} {this.GetStudentData(mc!).FirstName}",
-            }).ToList();
+            var markCellsQuery = this.rawMarks.Select(async mc => await this.GetMarkCellData(mc));
+
+            this.markCells = (await Task.WhenAll(markCellsQuery)).ToList();
 
             this.GetDates();
             this.GetStudents();
         }
 
-        private Lesson GetLessonData(Mark mc)
+        private async Task<MarkCellDto> GetMarkCellData(Mark mc)
         {
-            Log.Debug($"ClassBookService.GetLessonData(): method called with Mark.LessonId = {mc.LessonId}");
+            Log.Debug("ClassBookService.GetMarkCellData(): method called with Mark.Id = {MarkId}", mc.Id);
+            var lesson = await this.GetLessonData(mc);
+            var student = await this.derivedRepositories.StudentRepository.GetEntityByIdAsync<Student>(mc.StudentId!.Value);
 
-            return this.context.Lessons
-                .Include(l => l.ScheduledLesson)
-                .ThenInclude(sl => sl!.StartTime)
-                .First(l => l.Id == mc.LessonId);
+            return new MarkCellDto
+            {
+                Date = $"{lesson.Date} {lesson.ScheduledLesson?.StartTime?.Value}",
+                Mark = mc.Value,
+                StudentName = $"{student?.LastName} {student?.FirstName}",
+            };
         }
 
-        private Student GetStudentData(Mark mc)
+        private async Task<Lesson> GetLessonData(Mark mc)
         {
-            Log.Debug($"ClassBookService.GetStudentData(): method called with Mark.StudentId = {mc.StudentId}");
-
-            return this.context.Students
-                .First(s => s.Id == mc.StudentId);
+            Log.Debug("ClassBookService.GetLessonData(): method called with Mark.LessonId = {LessonId}", mc.LessonId);
+            var lessons = await this.derivedRepositories.LessonRepository.GetAllEntitiesAsync<Lesson>();
+            return lessons
+                .First(l => l.Id == mc.LessonId);
         }
 
         private void GetMarkTable()
@@ -135,15 +139,16 @@ namespace SadSchool.Services.ClassBook
             }
         }
 
-        private void GetRawMarks()
+        private async Task GetRawMarks()
         {
             Log.Debug("ClassBookService.GetRawMarks(): method called.");
 
-            var allMarks = this.mongoContext.Marks.ToList();
+            var allMarks = await this.markRepository.GetAllMarksAsync();
+            var allLessons = await this.derivedRepositories.LessonRepository.GetAllEntitiesAsync<Lesson>();
 
-            foreach (var mark in this.mongoContext.Marks)
+            foreach (var mark in allMarks)
             {
-                var scheduledLesson = this.context.Lessons.Find(mark.LessonId)?.ScheduledLesson;
+                var scheduledLesson = allLessons.FirstOrDefault(l => l.Id == mark.LessonId)?.ScheduledLesson;
 
                 if (scheduledLesson?.Subject?.Name == this.subjectName
                     && scheduledLesson?.Class?.Name == this.className)

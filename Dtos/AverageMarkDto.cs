@@ -31,7 +31,7 @@ namespace SadSchool.Dtos
         ///     and formatted value otherwise.</returns>
         public override string ToString()
         {
-            if (this.MarkValue == double.NaN)
+            if (double.IsNaN(this.MarkValue))
             {
                 return base.ToString() ?? string.Empty;
             }
