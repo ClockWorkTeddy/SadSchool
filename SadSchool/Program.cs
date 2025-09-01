@@ -154,12 +154,7 @@ void SelectCacheSource(WebApplicationBuilder builder, SecretService secretServic
 {
     try
     {
-        var redisConnStr = secretService?.GetSecret("RedisSecretName");
-
-        if (redisConnStr == null)
-        {
-            throw new InvalidOperationException("Redis connection string is null");
-        }
+        var redisConnStr = secretService?.GetSecret("RedisSecretName") ?? throw new InvalidOperationException("Redis connection string is null");
 
         builder.Services.AddSingleton<IConnectionMultiplexer>(ConnectionMultiplexer.Connect(redisConnStr));
         builder.Services.AddScoped<ICacheService, RedisCacheService>();
@@ -178,13 +173,7 @@ void SetUpMongo(WebApplicationBuilder builder, SecretService secretService)
 {
     try
     {
-        var mongoConnStr = secretService?.GetSecret("MongoConnStr");
-
-        if (mongoConnStr == null)
-        {
-            throw new InvalidOperationException("Mongo connection string is null");
-        }
-
+        var mongoConnStr = secretService?.GetSecret("MongoConnStr") ?? throw new InvalidOperationException("Mongo connection string is null");
         var settings = MongoClientSettings.FromConnectionString(mongoConnStr);
 
         // Configure timeouts for Azure environment
@@ -223,7 +212,7 @@ void SetUpConfiguration(WebApplicationBuilder builder)
         .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
         .Build();
 
-    ConfigurationManager confManager = new ConfigurationManager();
+    ConfigurationManager confManager = new();
     confManager.AddConfiguration(configuration);
 
     builder.Configuration.AddConfiguration(confManager);

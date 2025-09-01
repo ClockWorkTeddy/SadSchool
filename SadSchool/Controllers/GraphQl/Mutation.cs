@@ -4,7 +4,7 @@
 
 namespace SadSchool.Controllers.GraphQl
 {
-    using SadSchool.DbContexts;
+    using SadSchool.Contracts.Repositories;
     using SadSchool.Models.SqlServer;
 
     /// <summary>
@@ -15,11 +15,11 @@ namespace SadSchool.Controllers.GraphQl
         /// <summary>
         /// Creates a new class.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="classRepository">Class repo instance.</param>
         /// <param name="name">Name of the created class.</param>
         /// <param name="teacherId">Id of the class's teacher.</param>
         /// <returns>New class instance.</returns>
-        public Class CreateClass(SadSchoolContext context, string name, int teacherId)
+        public async Task<Class> CreateClass([Service] IClassRepository classRepository, string name, int teacherId)
         {
             var newClass = new Class()
             {
@@ -27,8 +27,7 @@ namespace SadSchool.Controllers.GraphQl
                 TeacherId = teacherId,
             };
 
-            context.Classes.Add(newClass);
-            context.SaveChanges();
+            await classRepository.AddEntityAsync(newClass);
 
             return newClass;
         }
@@ -36,11 +35,11 @@ namespace SadSchool.Controllers.GraphQl
         /// <summary>
         /// Creates a new lesson.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="lessonRepository">Lesson repo instance.</param>
         /// <param name="date">Date of the lesson.</param>
         /// <param name="scheduledLessonId">Id of the related scheduled lesson.</param>
         /// <returns>A new instance of a lesson class.</returns>
-        public Lesson CreateLesson(SadSchoolContext context, string date, int scheduledLessonId)
+        public async Task<Lesson> CreateLesson([Service] ILessonRepository lessonRepository, string date, int scheduledLessonId)
         {
             var newLesson = new Lesson()
             {
@@ -48,8 +47,7 @@ namespace SadSchool.Controllers.GraphQl
                 ScheduledLessonId = scheduledLessonId,
             };
 
-            context.Lessons.Add(newLesson);
-            context.SaveChanges();
+            await lessonRepository.AddEntityAsync(newLesson);
 
             return newLesson;
         }
@@ -57,15 +55,15 @@ namespace SadSchool.Controllers.GraphQl
         /// <summary>
         /// Creates a new Scheduled Lesson.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="scheduledLessonRepository">Scheduled lesson repo instance.</param>
         /// <param name="startTimeId">Start time Id of the lesson.</param>
         /// <param name="subjectId">Subject's id of the lesson.</param>
         /// <param name="classId">Id of the class of the lesson.</param>
         /// <param name="teacherId">If of the teacher.</param>
         /// <param name="day">Lesson's day.</param>
         /// <returns>A new ScheduledLesson instance.</returns>
-        public ScheduledLesson CreateScheduledLesson(
-            SadSchoolContext context,
+        public async Task<ScheduledLesson> CreateScheduledLesson(
+            [Service] IScheduledLessonRepository scheduledLessonRepository,
             int startTimeId,
             int subjectId,
             int classId,
@@ -81,8 +79,7 @@ namespace SadSchool.Controllers.GraphQl
                 Day = day,
             };
 
-            context.ScheduledLessons.Add(newScheduledLesson);
-            context.SaveChangesAsync();
+            await scheduledLessonRepository.AddEntityAsync(newScheduledLesson);
 
             return newScheduledLesson;
         }
@@ -90,18 +87,17 @@ namespace SadSchool.Controllers.GraphQl
         /// <summary>
         /// Creates a new start time.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="startTimeRepository">Start time repo instance.</param>
         /// <param name="value">Start time's value.</param>
         /// <returns>A new StartTime instance.</returns>
-        public StartTime CreateStartTime(SadSchoolContext context, string value)
+        public async Task<StartTime> CreateStartTime([Service] IStartTimeRepository startTimeRepository, string value)
         {
             var newStartTime = new StartTime
             {
                 Value = value,
             };
 
-            context.StartTimes.Add(newStartTime);
-            context.SaveChangesAsync();
+            await startTimeRepository.AddEntityAsync(newStartTime);
 
             return newStartTime;
         }
@@ -109,14 +105,14 @@ namespace SadSchool.Controllers.GraphQl
         /// <summary>
         /// Creates a new student.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="studentRepository">Student repo instance.</param>
         /// <param name="firstName">First name of the student.</param>
         /// <param name="lastName">Last name of the student.</param>
         /// <param name="classId">Id of the class of the student.</param>
         /// <param name="dateOfBirth">Student's date of birth.</param>
         /// <returns>New student object.</returns>
-        public Student CreateStudent(
-            SadSchoolContext context,
+        public async Task<Student> CreateStudent(
+            [Service] IStudentRepository studentRepository,
             string firstName,
             string lastName,
             int classId,
@@ -130,26 +126,24 @@ namespace SadSchool.Controllers.GraphQl
                 DateOfBirth = DateOnly.Parse(dateOfBirth, System.Globalization.CultureInfo.InvariantCulture),
             };
 
-            context.Students.Add(newStudent);
-            context.SaveChanges();
+            await studentRepository.AddEntityAsync(newStudent);
             return newStudent;
         }
 
         /// <summary>
         /// Creates a new subject.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="subjectRepository">Subject repo instance.</param>
         /// <param name="name">The name of the subject.</param>
         /// <returns>A new subject instance.</returns>
-        public Subject CreateSubject(SadSchoolContext context, string name)
+        public async Task<Subject> CreateSubject([Service] ISubjectRepository subjectRepository, string name)
         {
             var newSubject = new Subject
             {
                 Name = name,
             };
 
-            context.Subjects.Add(newSubject);
-            context.SaveChangesAsync();
+            await subjectRepository.AddEntityAsync(newSubject);
 
             return newSubject;
         }
@@ -157,14 +151,14 @@ namespace SadSchool.Controllers.GraphQl
         /// <summary>
         /// Creates a new teacher.
         /// </summary>
-        /// <param name="context">DB context instance.</param>
+        /// <param name="teacherRepository">Teacher repo instance.</param>
         /// <param name="firstName">The first name of the teacher.</param>
         /// <param name="lastName">The last name of the teacher.</param>
         /// <param name="dateOfBirth">Teacher's date of birth.</param>
         /// <param name="grade">Teacher's grade.</param>
         /// <returns>A new Teacher instance.</returns>
-        public Teacher CreateTeacher(
-            SadSchoolContext context,
+        public async Task<Teacher> CreateTeacher(
+            [Service] ITeacherRepository teacherRepository,
             string firstName,
             string lastName,
             string dateOfBirth,
@@ -178,8 +172,7 @@ namespace SadSchool.Controllers.GraphQl
                 Grade = grade,
             };
 
-            context.Teachers.Add(newTeacher);
-            context.SaveChangesAsync();
+            await teacherRepository.AddEntityAsync(newTeacher);
 
             return newTeacher;
         }
