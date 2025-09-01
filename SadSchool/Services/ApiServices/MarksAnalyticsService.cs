@@ -58,7 +58,7 @@ namespace SadSchool.Services.ApiServices
                 {
                     var averageMark = await this.GetAveragesMark(student!, subject!);
 
-                    if (averageMark.MarkValue.Equals(0))
+                    if (!averageMark.MarkValue.Equals(0))
                     {
                         averageMarks.Add(averageMark);
                     }
