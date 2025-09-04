@@ -106,9 +106,12 @@ namespace SadSchool.Services.ApiServices
             var marksForStudent = await this.markRepository.GetMarksByStudentIdAsync(student.Id!.Value);
 
             var foundMarks = new List<Mark>();
+            var lessons = await this.derivedRepositories.LessonRepository.GetAllEntitiesAsync<Lesson>();
+
             foreach (var m in marksForStudent)
             {
-                var lesson = await this.derivedRepositories.LessonRepository.GetEntityByIdAsync<Lesson>(m.LessonId!.Value);
+                var lesson = lessons.FirstOrDefault(l => l.Id == m.LessonId);
+
                 if (lesson?.ScheduledLesson?.Subject?.Name == subject.Name)
                 {
                     foundMarks.Add(m);

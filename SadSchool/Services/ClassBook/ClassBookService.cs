@@ -85,34 +85,29 @@ namespace SadSchool.Services.ClassBook
         {
             Log.Information("ClassBookService.GetMarkData(): method called.");
 
-            var markCellsQuery = this.rawMarks.Select(async mc => await this.GetMarkCellData(mc));
+            var studentsList = await this.derivedRepositories.StudentRepository.GetAllEntitiesAsync<Student>();
+            var lessons = await this.derivedRepositories.LessonRepository.GetAllEntitiesAsync<Lesson>();
 
-            this.markCells = (await Task.WhenAll(markCellsQuery)).ToList();
+            this.markCells = this.rawMarks
+                .Select(mc => this.GetMarkCellData(mc, studentsList, lessons))
+                .ToList();
 
             this.GetDates();
             this.GetStudents();
         }
 
-        private async Task<MarkCellDto> GetMarkCellData(Mark mc)
+        private MarkCellDto GetMarkCellData(Mark mc, List<Student> students, List<Lesson> lessons)
         {
             Log.Debug("ClassBookService.GetMarkCellData(): method called with Mark.Id = {MarkId}", mc.Id);
-            var lesson = await this.GetLessonData(mc);
-            var student = await this.derivedRepositories.StudentRepository.GetEntityByIdAsync<Student>(mc.StudentId!.Value);
+            var lesson = lessons.FirstOrDefault(l => l.Id == mc.LessonId);
+            var student = students.FirstOrDefault(s => s.Id == mc.StudentId);
 
             return new MarkCellDto
             {
-                Date = $"{lesson.Date} {lesson.ScheduledLesson?.StartTime?.Value}",
+                Date = $"{lesson?.Date} {lesson?.ScheduledLesson?.StartTime?.Value}",
                 Mark = mc.Value,
                 StudentName = $"{student?.LastName} {student?.FirstName}",
             };
-        }
-
-        private async Task<Lesson> GetLessonData(Mark mc)
-        {
-            Log.Debug("ClassBookService.GetLessonData(): method called with Mark.LessonId = {LessonId}", mc.LessonId);
-            var lessons = await this.derivedRepositories.LessonRepository.GetAllEntitiesAsync<Lesson>();
-            return lessons
-                .First(l => l.Id == mc.LessonId);
         }
 
         private void GetMarkTable()
